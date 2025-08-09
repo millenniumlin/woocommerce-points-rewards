@@ -101,8 +101,8 @@ class WC_Points_Rewards_Install {
             // 點數使用設定
             'enable_cart_redemption' => 'yes',
             'points_value' => 1,
-            'min_cart_total' => 0,
-            'max_discount_percent' => 100,
+            'min_cart_total' => 500,
+            'max_discount_percent' => 20,
             'min_points_redemption' => 1,
             
             // 通知設定
@@ -256,8 +256,8 @@ class WC_Points_Rewards_Install {
             'points_expiry_months' => 12,
             'enable_cart_redemption' => 'yes',
             'points_value' => 1,
-            'min_cart_total' => 0,
-            'max_discount_percent' => 100,
+            'min_cart_total' => 500,
+            'max_discount_percent' => 20,
             'min_points_redemption' => 1,
             'enable_notifications' => 'yes',
             'notification_days' => 30,

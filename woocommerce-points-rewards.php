@@ -288,8 +288,8 @@ class WC_Points_Rewards {
             'registration_points' => 100,
             'birthday_points' => 200,
             'points_expiry_months' => 12,
-            'min_cart_total' => 0,
-            'max_discount_percent' => 50,  // 預設最多折抵50%
+            'min_cart_total' => 500,  // 預設消費滿NT$500才能使用點數折抵
+            'max_discount_percent' => 20,  // 預設最多折抵20%
             'notification_days' => 30,
             'enable_notifications' => 'yes',
             'enable_birthday_points' => 'yes',

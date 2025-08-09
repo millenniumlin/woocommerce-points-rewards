@@ -320,8 +320,8 @@ class WC_Points_Rewards_Points_Calculator {
      * 檢查點數是否可以使用
      */
     public function can_use_points($cart_total, $points_to_use) {
-        $min_cart_total = isset($this->settings['min_cart_total']) ? floatval($this->settings['min_cart_total']) : 0;
-        $max_discount_percent = isset($this->settings['max_discount_percent']) ? floatval($this->settings['max_discount_percent']) : 100;
+        $min_cart_total = isset($this->settings['min_cart_total']) ? floatval($this->settings['min_cart_total']) : 500;
+        $max_discount_percent = isset($this->settings['max_discount_percent']) ? floatval($this->settings['max_discount_percent']) : 20;
         
         // 檢查購物車金額是否達到最低要求
         if ($cart_total < $min_cart_total) {

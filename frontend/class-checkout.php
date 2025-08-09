@@ -40,14 +40,11 @@ class WC_Points_Rewards_Checkout {
      * 初始化 hooks
      */
     private function init_hooks() {
-        // 購物車頁面顯示點數使用選項 - 使用WooCommerce標準hooks提升主題相容性
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_section'));
+        // 購物車頁面顯示點數使用選項 - 插入於購物車商品清單與總計區塊之間
+        add_action('woocommerce_before_cart_totals', array($this, 'display_cart_points_section'));
         
         // 結帳頁面顯示點數使用選項 - 使用WooCommerce標準hooks
         add_action('woocommerce_review_order_after_order_total', array($this, 'display_checkout_points_section'));
-        
-        // 購物車頁面也可選擇顯示在優惠券區域之後 - 提供更好的使用者體驗
-        add_action('woocommerce_cart_coupon', array($this, 'display_cart_points_section_alternative'), 20);
         
         // 處理點數折扣 - 與WooCommerce費用系統整合
         add_action('woocommerce_cart_calculate_fees', array($this, 'apply_points_discount'));
@@ -64,40 +61,25 @@ class WC_Points_Rewards_Checkout {
     }
     
     /**
-     * 在購物車頁面優惠券區域後顯示點數使用區塊（替代位置）
-     * 提供更好的主題相容性，避免直接修改主題檔案
-     */
-    public function display_cart_points_section_alternative() {
-        if (!is_user_logged_in()) {
-            return;
-        }
-        
-        // 只在購物車頁面顯示，避免重複
-        if (!is_cart()) {
-            return;
-        }
-        
-        // 檢查是否已在其他位置顯示過
-        static $points_section_displayed = false;
-        if ($points_section_displayed) {
-            return;
-        }
-        $points_section_displayed = true;
-        
-        echo '<div class="wc-points-cart-section-wrapper">';
-        $this->render_points_section('cart');
-        echo '</div>';
-    }
-    
-    /**
-     * 在購物車顯示點數使用區塊
+     * 在購物車顯示點數使用區塊 - 位於購物車商品清單與總計區塊之間
      */
     public function display_cart_points_section() {
         if (!is_user_logged_in()) {
             return;
         }
         
+        // 只在購物車頁面顯示
+        if (!is_cart()) {
+            return;
+        }
+        
+        echo '<div class="wc-points-cart-section-wrapper">';
+        echo '<div class="cart-collaterals">';
+        echo '<table class="shop_table shop_table_responsive">';
         $this->render_points_section('cart');
+        echo '</table>';
+        echo '</div>';
+        echo '</div>';
     }
     
     /**
@@ -119,9 +101,9 @@ class WC_Points_Rewards_Checkout {
         $database = WC_Points_Rewards_Database::instance();
         $calculator = WC_Points_Rewards_Points_Calculator::instance();
         
-        // 從設定中獲取參數，而非hardcoded
-        $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 50));
-        $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
+        // 從設定中獲取參數，使用新的預設值
+        $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 20));
+        $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 500));
         
         $available_points = $database->get_user_points($user_id);
         $cart_total = WC()->cart->get_subtotal();
@@ -251,8 +233,8 @@ class WC_Points_Rewards_Checkout {
         
         // 檢查購物車條件和折扣限制
         $cart_total = WC()->cart->get_subtotal();
-        $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
-        $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 50));
+        $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 500));
+        $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 20));
         
         // 檢查最低購物車金額
         if ($cart_total < $min_cart_total) {
@@ -317,8 +299,8 @@ class WC_Points_Rewards_Checkout {
             $cart_total = WC()->cart->get_subtotal();
             
             // 獲取設定
-            $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
-            $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 50));
+            $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 500));
+            $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 20));
             $points_value = floatval(get_option('wc_points_rewards_points_value', 0.01));
             
             // 計算最大允許使用的點數

@@ -25,8 +25,8 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
         
         // 購物車點數使用設定
         'enable_cart_redemption' => sanitize_text_field($_POST['enable_cart_redemption'] ?? 'yes'),
-        'max_discount_percent' => floatval($_POST['max_discount_percent'] ?? 100),
-        'min_cart_total' => floatval($_POST['min_cart_total'] ?? 0),
+        'max_discount_percent' => floatval($_POST['max_discount_percent'] ?? 20),
+        'min_cart_total' => floatval($_POST['min_cart_total'] ?? 500),
         
         // 顯示設定
         'show_in_menu' => sanitize_text_field($_POST['show_in_menu'] ?? 'yes'),
@@ -131,7 +131,7 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                 <tr>
                     <th scope="row"><?php _e('最大折扣百分比', 'wc-points-rewards'); ?></th>
                     <td>
-                        <input type="number" name="max_discount_percent" value="<?php echo esc_attr($settings['max_discount_percent'] ?? 100); ?>" min="1" max="100" step="1" class="small-text">
+                        <input type="number" name="max_discount_percent" value="<?php echo esc_attr($settings['max_discount_percent'] ?? 20); ?>" min="1" max="100" step="1" class="small-text">
                         %
                         <p class="description"><?php _e('消費者最多可使用訂單金額多少百分比的點數來折抵（例如：設定50，表示最多可用點數折抵訂單金額的50%）', 'wc-points-rewards'); ?></p>
                     </td>
@@ -140,7 +140,7 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                 <tr>
                     <th scope="row"><?php _e('最低購物車金額', 'wc-points-rewards'); ?></th>
                     <td>
-                        <input type="number" name="min_cart_total" value="<?php echo esc_attr($settings['min_cart_total'] ?? 0); ?>" min="0" step="0.01" class="regular-text">
+                        <input type="number" name="min_cart_total" value="<?php echo esc_attr($settings['min_cart_total'] ?? 500); ?>" min="0" step="0.01" class="regular-text">
                         <?php echo get_woocommerce_currency_symbol(); ?>
                         <p class="description"><?php _e('購物車金額需達到此數額才能使用點數折抵（設定為0表示無限制）', 'wc-points-rewards'); ?></p>
                     </td>

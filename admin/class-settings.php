@@ -330,8 +330,8 @@ class WC_Points_Rewards_Settings {
             'birthday_points' => get_option('wc_points_rewards_birthday_points', '200'),
             
             // 點數使用限制設定
-            'max_discount_percent' => get_option('wc_points_rewards_max_discount_percent', '50'),
-            'min_cart_total' => get_option('wc_points_rewards_min_cart_total', '0'),
+            'max_discount_percent' => get_option('wc_points_rewards_max_discount_percent', '20'),
+            'min_cart_total' => get_option('wc_points_rewards_min_cart_total', '500'),
             
             // 🚀 新增：顯示設定 - 商店頁面預設不顯示
             'show_in_shop_loop' => get_option('wc_points_rewards_show_in_shop_loop', 'no'),
