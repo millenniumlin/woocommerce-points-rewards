@@ -1500,3 +1500,206 @@ jQuery(document).ready(function($) {
         SettingsPage: SettingsPage
     };
 });
+
+/* ==========================================================================
+   Extracted JavaScript from PHP Files
+   ========================================================================== */
+
+// Settings page - Historical orders processing
+jQuery(document).ready(function($) {
+    $('#process_historical_orders').on('click', function() {
+        var startDate = $('#historical_start_date').val();
+        var endDate = $('#historical_end_date').val();
+        
+        if (!startDate || !endDate) {
+            alert(wcPointsRewardsAdmin.messages.select_dates || '請選擇開始和結束日期');
+            return;
+        }
+        
+        if (startDate > endDate) {
+            alert(wcPointsRewardsAdmin.messages.invalid_date_range || '開始日期不能晚於結束日期');
+            return;
+        }
+        
+        if (!confirm(wcPointsRewardsAdmin.messages.confirm_historical_process || '確定要處理此日期範圍內的歷史訂單嗎？此操作無法撤銷。')) {
+            return;
+        }
+        
+        var $button = $(this);
+        var $progress = $('#process_progress');
+        var $results = $('#process_results');
+        
+        $button.prop('disabled', true).text(wcPointsRewardsAdmin.messages.processing || '處理中...');
+        $progress.show();
+        $results.empty();
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'wc_points_rewards_process_historical_orders',
+                start_date: startDate,
+                end_date: endDate,
+                nonce: wcPointsRewardsAdmin.nonces ? wcPointsRewardsAdmin.nonces.historical_orders : ''
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('.progress-fill').css('width', '100%');
+                    $('.progress-text').text(wcPointsRewardsAdmin.messages.processing_complete || '處理完成');
+                    
+                    $results.html('<div class="notice notice-success"><p>' + response.data.message + '</p></div>');
+                } else {
+                    $results.html('<div class="notice notice-error"><p>' + response.data + '</p></div>');
+                }
+            },
+            error: function() {
+                $results.html('<div class="notice notice-error"><p>' + (wcPointsRewardsAdmin.messages.processing_failed || '處理失敗，請稍後再試') + '</p></div>');
+            },
+            complete: function() {
+                $button.prop('disabled', false).text(wcPointsRewardsAdmin.messages.start_historical_process || '開始處理歷史訂單');
+                setTimeout(function() {
+                    $progress.hide();
+                }, 2000);
+            }
+        });
+    });
+});
+
+// Historical orders page - Processing functionality
+jQuery(document).ready(function($) {
+    $('#historical-orders-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        var $form = $(this);
+        var $button = $('#process-orders-btn');
+        var $spinner = $('#processing-spinner');
+        var $results = $('#processing-results');
+        var $resultsContent = $('#results-content');
+        
+        // Validation
+        var startDate = $('#start_date').val();
+        var endDate = $('#end_date').val();
+        
+        if (!startDate || !endDate) {
+            alert(wcPointsRewardsAdmin.messages.select_dates || '請選擇開始和結束日期');
+            return;
+        }
+        
+        if (new Date(startDate) > new Date(endDate)) {
+            alert(wcPointsRewardsAdmin.messages.invalid_date_range || '開始日期不能晚於結束日期');
+            return;
+        }
+        
+        // Confirmation
+        var isDryRun = $('#dry_run').is(':checked');
+        var confirmMessage = isDryRun 
+            ? (wcPointsRewardsAdmin.messages.confirm_dry_run || '確定要執行測試模式嗎？')
+            : (wcPointsRewardsAdmin.messages.confirm_historical_process || '確定要開始處理歷史訂單嗎？此操作將會實際發放點數。');
+            
+        if (!confirm(confirmMessage)) {
+            return;
+        }
+        
+        // Start processing
+        $button.prop('disabled', true);
+        $spinner.addClass('is-active');
+        $results.show();
+        $resultsContent.html('<div class="processing-status">正在處理歷史訂單...</div>');
+        
+        var formData = $form.serialize();
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: formData + '&action=wc_points_rewards_process_historical_orders',
+            success: function(response) {
+                if (response.success) {
+                    $resultsContent.html('<div class="processing-status success">' + response.data.message + '</div>');
+                } else {
+                    $resultsContent.html('<div class="processing-status error">' + (response.data.message || response.data) + '</div>');
+                }
+            },
+            error: function() {
+                $resultsContent.html('<div class="processing-status error">' + (wcPointsRewardsAdmin.messages.processing_failed || '處理失敗，請稍後再試') + '</div>');
+            },
+            complete: function() {
+                $button.prop('disabled', false);
+                $spinner.removeClass('is-active');
+            }
+        });
+    });
+});
+
+// Tier edit page - Form handling and preview
+jQuery(document).ready(function($) {
+    // Tier form preview update
+    function updateTierPreview() {
+        var name = $('#tier_name').val() || 'New Tier';
+        var minAmount = $('#minimum_amount').val() || '0';
+        var pointsBonus = $('#points_bonus').val() || '0';
+        
+        $('.preview-tier-name').text(name);
+        $('.preview-tier-amount').text('Minimum spend: $' + minAmount);
+        $('.preview-tier-bonus').text(pointsBonus + '% bonus points');
+    }
+    
+    // Update preview on input change
+    $('#tier_name, #minimum_amount, #points_bonus').on('input', updateTierPreview);
+    
+    // Initialize preview
+    updateTierPreview();
+});
+
+// Tiers list page - Enhanced functionality
+jQuery(document).ready(function($) {
+    // Tier deletion confirmation
+    $('.button-delete').on('click', function(e) {
+        if (!confirm(wcPointsRewardsAdmin.messages.confirm_tier_delete || '確定要刪除這個會員等級嗎？此操作無法撤銷。')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
+    // Enhanced sortable functionality for tier ordering
+    if ($('.tiers-sortable').length > 0) {
+        $('.tiers-sortable').sortable({
+            handle: '.tier-handle',
+            axis: 'y',
+            placeholder: 'tier-sort-placeholder',
+            update: function(event, ui) {
+                updateTierOrder();
+            }
+        });
+    }
+    
+    function updateTierOrder() {
+        var order = [];
+        $('.tiers-sortable tr').each(function(index) {
+            var tierId = $(this).data('tier-id');
+            if (tierId) {
+                order.push({
+                    id: tierId,
+                    order: index + 1
+                });
+            }
+        });
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'wc_points_rewards_update_tier_order',
+                order: order,
+                nonce: wcPointsRewardsAdmin.nonces ? wcPointsRewardsAdmin.nonces.tier_order : ''
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Update order numbers in UI
+                    $('.tier-order-number').each(function(index) {
+                        $(this).text(index + 1);
+                    });
+                }
+            }
+        });
+    }
+});

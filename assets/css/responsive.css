@@ -688,22 +688,7 @@
    暗色模式響應式調整
    ========================================================================== */
 
-@media (prefers-color-scheme: dark) {
-    @media screen and (max-width: 767px) {
-        .stat-card,
-        .points-card {
-            border: 1px solid #555;
-        }
-        
-        .current-tier-section {
-            box-shadow: 0 2px 8px rgba(255,255,255,0.1);
-        }
-        
-        .modal-content {
-            border: 1px solid #555;
-        }
-    }
-}
+
 
 /* ==========================================================================
    動畫和轉場效果優化

@@ -173,7 +173,24 @@ class WC_Points_Rewards_Admin {
             'nonce' => wp_create_nonce('wc_points_rewards_admin_nonce'),
             'confirmDelete' => __('確定要刪除嗎？此操作無法復原。', 'wc-points-rewards'),
             'processing' => __('處理中...', 'wc-points-rewards'),
-            'error' => __('發生錯誤，請稍後再試。', 'wc-points-rewards')
+            'error' => __('發生錯誤，請稍後再試。', 'wc-points-rewards'),
+            'messages' => array(
+                'select_dates' => __('請選擇開始和結束日期', 'wc-points-rewards'),
+                'invalid_date_range' => __('開始日期不能晚於結束日期', 'wc-points-rewards'),
+                'confirm_historical_process' => __('確定要處理此日期範圍內的歷史訂單嗎？此操作無法撤銷。', 'wc-points-rewards'),
+                'processing' => __('處理中...', 'wc-points-rewards'),
+                'processing_complete' => __('處理完成', 'wc-points-rewards'),
+                'processing_failed' => __('處理失敗，請稍後再試', 'wc-points-rewards'),
+                'start_historical_process' => __('開始處理歷史訂單', 'wc-points-rewards'),
+                'confirm_dry_run' => __('確定要執行測試模式嗎？', 'wc-points-rewards'),
+                'confirm_tier_delete' => __('確定要刪除這個會員等級嗎？此操作無法撤銷。', 'wc-points-rewards'),
+                'select_export_type' => __('請選擇匯出類型', 'wc-points-rewards')
+            ),
+            'nonces' => array(
+                'historical_orders' => wp_create_nonce('wc_points_rewards_historical_orders'),
+                'tier_order' => wp_create_nonce('wc_points_rewards_tier_order'),
+                'export' => wp_create_nonce('wc_points_rewards_export')
+            )
         ));
     }
     

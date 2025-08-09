@@ -123,28 +123,3 @@ if (!defined('ABSPATH')) {
     </div>
     <?php endif; ?>
 </div>
-
-<style>
-.points-amount.positive {
-    color: #00a32a;
-    font-weight: bold;
-}
-
-.points-amount.negative {
-    color: #d63638;
-    font-weight: bold;
-}
-
-.points-type-earned { color: #00a32a; }
-.points-type-redeemed { color: #d63638; }
-.points-type-expired { color: #8c8f94; }
-.points-type-admin { color: #2271b1; }
-
-.no-records-message {
-    text-align: center;
-    padding: 40px;
-    background: white;
-    border: 1px solid #c3c4c7;
-    margin-top: 20px;
-}
-</style>
