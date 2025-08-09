@@ -1,0 +1,557 @@
+# WooCommerce Points & Rewards - Translation Template
+#
+# Copyright (C) 2024 millenniumlim
+# This file is distributed under the same license as the WooCommerce Points & Rewards package.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Points & Rewards 1.0.2\n"
+"Report-Msgid-Bugs-To: https://github.com/millenniumlin/woocommerce-points-rewards\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+# Plugin information
+msgid "WooCommerce Points & Rewards 會員系統"
+msgstr ""
+
+msgid "Complete WooCommerce points reward system with member tiers, points cashback, and redemption features."
+msgstr ""
+
+# General terms
+msgid "Points"
+msgstr ""
+
+msgid "Point"
+msgstr ""
+
+msgid "Rewards"
+msgstr ""
+
+msgid "Member Tier"
+msgstr ""
+
+msgid "Balance"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Earned"
+msgstr ""
+
+msgid "Redeemed"
+msgstr ""
+
+msgid "Expired"
+msgstr ""
+
+msgid "Expiring"
+msgstr ""
+
+# Member tiers
+msgid "Member Tiers"
+msgstr ""
+
+msgid "Current Tier"
+msgstr ""
+
+msgid "Next Tier"
+msgstr ""
+
+msgid "Tier Upgrade"
+msgstr ""
+
+msgid "Tier Benefits"
+msgstr ""
+
+msgid "Minimum Spending"
+msgstr ""
+
+msgid "Bonus Percentage"
+msgstr ""
+
+msgid "You have been upgraded to %s tier!"
+msgstr ""
+
+msgid "Congratulations on your tier upgrade!"
+msgstr ""
+
+# Points earning
+msgid "Earn %d points"
+msgstr ""
+
+msgid "Earn %d point"
+msgstr ""
+
+msgid "You will earn %d points from this purchase"
+msgstr ""
+
+msgid "Points earned from purchase"
+msgstr ""
+
+msgid "Registration bonus"
+msgstr ""
+
+msgid "Birthday bonus"
+msgstr ""
+
+msgid "Admin adjustment"
+msgstr ""
+
+msgid "Tier bonus"
+msgstr ""
+
+# Points usage
+msgid "Use Points"
+msgstr ""
+
+msgid "Apply Points"
+msgstr ""
+
+msgid "Remove Points"
+msgstr ""
+
+msgid "Points to use"
+msgstr ""
+
+msgid "Points applied successfully"
+msgstr ""
+
+msgid "Points removed successfully"
+msgstr ""
+
+msgid "You have %d points available"
+msgstr ""
+
+msgid "Maximum discount: %s"
+msgstr ""
+
+msgid "Points discount: -%s"
+msgstr ""
+
+# Quick use buttons
+msgid "Use All"
+msgstr ""
+
+msgid "Use 25%"
+msgstr ""
+
+msgid "Use 50%"
+msgstr ""
+
+msgid "Use 75%"
+msgstr ""
+
+# Points history
+msgid "Points History"
+msgstr ""
+
+msgid "Transaction History"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Points Change"
+msgstr ""
+
+msgid "Balance After"
+msgstr ""
+
+msgid "Expiry Date"
+msgstr ""
+
+msgid "Order #%d"
+msgstr ""
+
+msgid "No expiry"
+msgstr ""
+
+msgid "No points history found"
+msgstr ""
+
+# Filters
+msgid "All Types"
+msgstr ""
+
+msgid "Filter by"
+msgstr ""
+
+msgid "Filter"
+msgstr ""
+
+msgid "Reset"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "Last 30 days"
+msgstr ""
+
+msgid "Last 3 months"
+msgstr ""
+
+msgid "Last 6 months"
+msgstr ""
+
+msgid "This year"
+msgstr ""
+
+# Statistics and reports
+msgid "Statistics"
+msgstr ""
+
+msgid "Reports"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Total Points Earned"
+msgstr ""
+
+msgid "Total Points Redeemed"
+msgstr ""
+
+msgid "Active Members"
+msgstr ""
+
+msgid "Tier Distribution"
+msgstr ""
+
+msgid "Points Trend"
+msgstr ""
+
+msgid "Usage Rate"
+msgstr ""
+
+# Admin interface
+msgid "Points & Rewards"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Manage Tiers"
+msgstr ""
+
+msgid "Points Management"
+msgstr ""
+
+msgid "Save Changes"
+msgstr ""
+
+msgid "Add New Tier"
+msgstr ""
+
+msgid "Edit Tier"
+msgstr ""
+
+msgid "Delete Tier"
+msgstr ""
+
+msgid "Tier Name"
+msgstr ""
+
+msgid "Tier Order"
+msgstr ""
+
+# Settings
+msgid "General Settings"
+msgstr ""
+
+msgid "Points Settings"
+msgstr ""
+
+msgid "Tier Settings"
+msgstr ""
+
+msgid "Email Settings"
+msgstr ""
+
+msgid "Enable Points System"
+msgstr ""
+
+msgid "Points per Amount"
+msgstr ""
+
+msgid "Points Value"
+msgstr ""
+
+msgid "Points Expiry"
+msgstr ""
+
+msgid "Registration Points"
+msgstr ""
+
+msgid "Birthday Points"
+msgstr ""
+
+msgid "Enable Email Notifications"
+msgstr ""
+
+# Validation messages
+msgid "Invalid points amount"
+msgstr ""
+
+msgid "Insufficient points"
+msgstr ""
+
+msgid "Points must be greater than zero"
+msgstr ""
+
+msgid "Maximum points exceeded"
+msgstr ""
+
+msgid "Please enter a valid amount"
+msgstr ""
+
+# Error messages
+msgid "Error applying points discount"
+msgstr ""
+
+msgid "Error removing points discount"
+msgstr ""
+
+msgid "Error updating points balance"
+msgstr ""
+
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+msgid "Permission denied"
+msgstr ""
+
+# Success messages
+msgid "Points settings saved successfully"
+msgstr ""
+
+msgid "Tier created successfully"
+msgstr ""
+
+msgid "Tier updated successfully"
+msgstr ""
+
+msgid "Tier deleted successfully"
+msgstr ""
+
+msgid "Points added successfully"
+msgstr ""
+
+msgid "Points deducted successfully"
+msgstr ""
+
+# User account pages
+msgid "My Points"
+msgstr ""
+
+msgid "Points Overview"
+msgstr ""
+
+msgid "Member Status"
+msgstr ""
+
+msgid "Points Summary"
+msgstr ""
+
+msgid "Current Points"
+msgstr ""
+
+msgid "Lifetime Earned"
+msgstr ""
+
+msgid "Lifetime Redeemed"
+msgstr ""
+
+msgid "Points Expiring Soon"
+msgstr ""
+
+msgid "%d points expiring in %d days"
+msgstr ""
+
+# Tier progress
+msgid "Progress to Next Tier"
+msgstr ""
+
+msgid "Spend %s more to reach %s tier"
+msgstr ""
+
+msgid "You are at the highest tier!"
+msgstr ""
+
+msgid "Current Progress"
+msgstr ""
+
+msgid "Remaining Amount"
+msgstr ""
+
+# Date and time formatting
+msgid "Y-m-d H:i:s"
+msgstr ""
+
+msgid "M j, Y"
+msgstr ""
+
+msgid "Y-m-d"
+msgstr ""
+
+# Currency formatting
+msgid "$%s"
+msgstr ""
+
+msgid "NT$%s"
+msgstr ""
+
+# Notifications
+msgid "Points Expiry Reminder"
+msgstr ""
+
+msgid "Tier Upgrade Notification"
+msgstr ""
+
+msgid "Your points are expiring soon!"
+msgstr ""
+
+msgid "Dismiss"
+msgstr ""
+
+msgid "Use Now"
+msgstr ""
+
+# Tooltips and help text
+msgid "Points earned from purchases based on your tier"
+msgstr ""
+
+msgid "Points can be used to get discounts on future purchases"
+msgstr ""
+
+msgid "Higher tiers provide better point earning rates"
+msgstr ""
+
+msgid "Points may expire after a certain period"
+msgstr ""
+
+# Loading and status
+msgid "Loading..."
+msgstr ""
+
+msgid "Processing..."
+msgstr ""
+
+msgid "Updating..."
+msgstr ""
+
+msgid "Please wait..."
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Inactive"
+msgstr ""
+
+msgid "Pending"
+msgstr ""
+
+# Buttons and actions
+msgid "View Details"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Confirm"
+msgstr ""
+
+msgid "Submit"
+msgstr ""
+
+msgid "Apply"
+msgstr ""
+
+msgid "Clear"
+msgstr ""
+
+msgid "Export"
+msgstr ""
+
+msgid "Import"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+# Bulk operations
+msgid "Bulk Actions"
+msgstr ""
+
+msgid "Select All"
+msgstr ""
+
+msgid "Bulk Delete"
+msgstr ""
+
+msgid "Bulk Export"
+msgstr ""
+
+msgid "Apply Bulk Action"
+msgstr ""
+
+msgid "%d items selected"
+msgstr ""
+
+msgid "Are you sure you want to delete the selected items?"
+msgstr ""
+
+# Charts and analytics
+msgid "Chart Type"
+msgstr ""
+
+msgid "Line Chart"
+msgstr ""
+
+msgid "Bar Chart"
+msgstr ""
+
+msgid "Pie Chart"
+msgstr ""
+
+msgid "Export Chart"
+msgstr ""
+
+msgid "No data available"
+msgstr ""
+
+msgid "Data Range"
+msgstr ""
+
+# Responsive design
+msgid "Menu"
+msgstr ""
+
+msgid "Toggle Navigation"
+msgstr ""
+
+msgid "Mobile View"
+msgstr ""
+
+msgid "Desktop View"
+msgstr ""

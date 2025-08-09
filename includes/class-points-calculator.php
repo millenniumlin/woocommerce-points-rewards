@@ -1,0 +1,337 @@
+<?php
+/**
+ * 點數計算類別
+ * 
+ * @package WC_Points_Rewards
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+/**
+ * 點數計算類別
+ */
+class WC_Points_Rewards_Points_Calculator {
+    
+    /**
+     * 單例實例
+     */
+    private static $instance = null;
+    
+    /**
+     * 設定選項
+     */
+    private $settings;
+    
+    /**
+     * 獲取單例實例
+     */
+    public static function instance() {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    /**
+     * 建構函式
+     */
+    public function __construct() {
+        $this->settings = get_option('wc_points_rewards_settings', array());
+        $this->init_hooks();
+    }
+    
+    /**
+     * 初始化 hooks
+     */
+    private function init_hooks() {
+        // 訂單完成時計算點數
+        add_action('woocommerce_order_status_completed', array($this, 'calculate_order_points'));
+        
+        // 用戶註冊時贈送點數
+        add_action('user_register', array($this, 'award_registration_points'));
+        
+        // 生日贈送點數（需要自定義觸發）
+        add_action('wc_points_rewards_birthday_bonus', array($this, 'award_birthday_points'));
+        
+        // 購物車中顯示可獲得的點數
+        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_info'));
+        
+        // 產品頁面顯示可獲得的點數
+        add_action('woocommerce_single_product_summary', array($this, 'display_product_points_info'), 25);
+    }
+    
+    /**
+     * 計算訂單點數
+     */
+    public function calculate_order_points($order_id) {
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return;
+        }
+        
+        $user_id = $order->get_user_id();
+        if (!$user_id) {
+            return;
+        }
+        
+        // 檢查是否已經計算過點數
+        if (get_post_meta($order_id, '_points_awarded', true)) {
+            return;
+        }
+        
+        $order_total = $order->get_total();
+        $used_points_amount = get_post_meta($order_id, '_points_discount_amount', true);
+        
+        // 計算可獲得點數的金額（扣除點數折抵的部分）
+        $points_eligible_amount = $order_total - floatval($used_points_amount);
+        
+        // 基礎點數計算
+        $base_points = $this->calculate_points_for_amount($points_eligible_amount);
+        
+        // 獲取用戶會員等級加成
+        $tier_bonus = $this->get_user_tier_bonus($user_id);
+        $bonus_points = $base_points * ($tier_bonus / 100);
+        
+        $total_points = $base_points + $bonus_points;
+        
+        // 記錄點數
+        if ($total_points > 0) {
+            $database = WC_Points_Rewards_Database::instance();
+            
+            // 計算過期時間
+            $expiry_months = isset($this->settings['points_expiry_months']) ? intval($this->settings['points_expiry_months']) : 12;
+            $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
+            
+            $description = sprintf(
+                __('訂單 #%s 獲得點數（基礎: %s, 等級加成: %s%%）', 'wc-points-rewards'),
+                $order->get_order_number(),
+                $base_points,
+                $tier_bonus
+            );
+            
+            $database->add_points(
+                $user_id,
+                $total_points,
+                'earned',
+                $description,
+                $order_id,
+                $expiry_date
+            );
+            
+            // 標記已發放點數
+            update_post_meta($order_id, '_points_awarded', $total_points);
+            
+            // 更新年度消費統計
+            $database->update_user_yearly_stats($user_id, $order_total);
+            
+            // 發送通知
+            $this->send_points_notification($user_id, $total_points, $order);
+        }
+    }
+    
+    /**
+     * 根據金額計算基礎點數
+     */
+    public function calculate_points_for_amount($amount) {
+        $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 100;
+        $points_amount = isset($this->settings['points_amount']) ? floatval($this->settings['points_amount']) : 1;
+        $decimal_places = wc_get_price_decimals(); // 使用 WooCommerce 小數位數設定
+        
+        if ($points_per_amount <= 0) {
+            return 0;
+        }
+        
+        // 計算基礎點數（只取百位數，例如256元只算200元）
+        $eligible_amount = floor($amount / $points_per_amount) * $points_per_amount;
+        $points = ($eligible_amount / $points_per_amount) * $points_amount;
+        
+        return round($points, $decimal_places);
+    }
+    
+    /**
+     * 獲取用戶會員等級加成百分比
+     */
+    public function get_user_tier_bonus($user_id) {
+        $database = WC_Points_Rewards_Database::instance();
+        $tier = $database->get_user_current_tier($user_id);
+        
+        return $tier ? floatval($tier->bonus_percentage) : 0;
+    }
+    
+    /**
+     * 註冊贈送點數
+     */
+    public function award_registration_points($user_id) {
+        if (!isset($this->settings['enable_registration_points']) || $this->settings['enable_registration_points'] !== 'yes') {
+            return;
+        }
+        
+        $points = isset($this->settings['registration_points']) ? floatval($this->settings['registration_points']) : 0;
+        
+        if ($points > 0) {
+            $database = WC_Points_Rewards_Database::instance();
+            
+            // 計算過期時間
+            $expiry_months = isset($this->settings['points_expiry_months']) ? intval($this->settings['points_expiry_months']) : 12;
+            $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
+            
+            $database->add_points(
+                $user_id,
+                $points,
+                'earned',
+                __('註冊贈送點數', 'wc-points-rewards'),
+                null,
+                $expiry_date
+            );
+        }
+    }
+    
+    /**
+     * 生日贈送點數
+     */
+    public function award_birthday_points($user_id) {
+        if (!isset($this->settings['enable_birthday_points']) || $this->settings['enable_birthday_points'] !== 'yes') {
+            return;
+        }
+        
+        $points = isset($this->settings['birthday_points']) ? floatval($this->settings['birthday_points']) : 0;
+        
+        if ($points > 0) {
+            $database = WC_Points_Rewards_Database::instance();
+            
+            // 檢查今年是否已經發放過生日點數
+            $current_year = date('Y');
+            $existing_birthday_points = $database->get_user_points_history($user_id, 1, 0);
+            
+            $already_awarded = false;
+            foreach ($existing_birthday_points as $record) {
+                if ($record->type === 'earned' && 
+                    strpos($record->description, '生日贈送') !== false && 
+                    date('Y', strtotime($record->created_at)) === $current_year) {
+                    $already_awarded = true;
+                    break;
+                }
+            }
+            
+            if (!$already_awarded) {
+                // 計算過期時間
+                $expiry_months = isset($this->settings['points_expiry_months']) ? intval($this->settings['points_expiry_months']) : 12;
+                $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
+                
+                $database->add_points(
+                    $user_id,
+                    $points,
+                    'earned',
+                    __('生日贈送點數', 'wc-points-rewards'),
+                    null,
+                    $expiry_date
+                );
+            }
+        }
+    }
+    
+    /**
+     * 在購物車顯示可獲得的點數
+     */
+    public function display_cart_points_info() {
+        if (!is_user_logged_in()) {
+            return;
+        }
+        
+        $cart_total = WC()->cart->get_subtotal();
+        $points = $this->calculate_points_for_amount($cart_total);
+        
+        if ($points > 0) {
+            $user_id = get_current_user_id();
+            $tier_bonus = $this->get_user_tier_bonus($user_id);
+            $bonus_points = $points * ($tier_bonus / 100);
+            $total_points = $points + $bonus_points;
+            
+            echo '<tr class="points-info">';
+            echo '<th>' . __('可獲得點數', 'wc-points-rewards') . '</th>';
+            echo '<td>';
+            echo sprintf(__('%s 點', 'wc-points-rewards'), wc_points_rewards_number_format($total_points));
+            if ($tier_bonus > 0) {
+                echo '<small> (' . sprintf(__('基礎 %s + 等級加成 %s%%', 'wc-points-rewards'), wc_points_rewards_number_format($points), $tier_bonus) . ')</small>';
+            }
+            echo '</td>';
+            echo '</tr>';
+        }
+    }
+    
+    /**
+     * 在產品頁面顯示可獲得的點數
+     */
+    public function display_product_points_info() {
+        if (!is_user_logged_in()) {
+            return;
+        }
+        
+        global $product;
+        if (!$product) {
+            return;
+        }
+        
+        $price = $product->get_price();
+        if (!$price) {
+            return;
+        }
+        
+        $points = $this->calculate_points_for_amount($price);
+        
+        if ($points > 0) {
+            $user_id = get_current_user_id();
+            $tier_bonus = $this->get_user_tier_bonus($user_id);
+            $bonus_points = $points * ($tier_bonus / 100);
+            $total_points = $points + $bonus_points;
+            
+            echo '<div class="wc-points-rewards-product-info">';
+            echo '<p class="points-info">';
+            echo '<span class="points-label">' . __('購買可得', 'wc-points-rewards') . ': </span>';
+            echo '<span class="points-value">' . sprintf(__('%s 點', 'wc-points-rewards'), wc_points_rewards_number_format($total_points)) . '</span>';
+            if ($tier_bonus > 0) {
+                echo '<small class="tier-bonus"> (+' . $tier_bonus . '%)</small>';
+            }
+            echo '</p>';
+            echo '</div>';
+        }
+    }
+    
+    /**
+     * 發送點數獲得通知
+     */
+    private function send_points_notification($user_id, $points, $order) {
+        // 這裡可以發送郵件或其他通知
+        do_action('wc_points_rewards_points_earned_notification', $user_id, $points, $order);
+    }
+    
+    /**
+     * 計算點數折抵金額
+     */
+    public function calculate_discount_amount($points) {
+        // 通常 1 點 = 1 元折抵，可以在設定中調整
+        $point_value = 1; // 可以從設定中獲取
+        return $points * $point_value;
+    }
+    
+    /**
+     * 檢查點數是否可以使用
+     */
+    public function can_use_points($cart_total, $points_to_use) {
+        $min_cart_total = isset($this->settings['min_cart_total']) ? floatval($this->settings['min_cart_total']) : 0;
+        $max_discount_percent = isset($this->settings['max_discount_percent']) ? floatval($this->settings['max_discount_percent']) : 100;
+        
+        // 檢查購物車金額是否達到最低要求
+        if ($cart_total < $min_cart_total) {
+            return false;
+        }
+        
+        // 檢查折抵金額是否超過最大百分比
+        $discount_amount = $this->calculate_discount_amount($points_to_use);
+        $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
+        
+        return $discount_amount <= $max_discount_amount;
+    }
+}

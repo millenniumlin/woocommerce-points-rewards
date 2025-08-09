@@ -1,0 +1,1978 @@
+/**
+ * WooCommerce Points & Rewards - 前端樣式
+ * 
+ * @package WC_Points_Rewards
+ */
+
+/* ==========================================================================
+   基礎樣式
+   ========================================================================== */
+
+.wc-points-rewards-product-points,
+.wc-points-rewards-loop-points {
+    margin: 10px 0;
+}
+
+.points-earning-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.points-earning-info .points-icon {
+    font-size: 16px;
+}
+
+.points-earning-info small {
+    color: #6c757d;
+    margin-left: 4px;
+}
+
+.points-badge {
+    display: inline-block;
+    background: #28a745;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   購物車點數使用區塊 - 增強版
+   ========================================================================== */
+
+.wc-points-redemption-wrapper {
+    padding: 15px 0;
+}
+
+/* 點數資訊總覽 */
+.points-overview-section {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.points-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.points-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.points-info-item.discount-amount {
+    grid-column: 1 / -1;
+    border-top: 1px solid #dee2e6;
+    margin-top: 10px;
+    padding-top: 15px;
+    font-weight: bold;
+}
+
+.points-label {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.points-value {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.points-value.available-points {
+    color: #28a745;
+}
+
+.points-value.used-points {
+    color: #dc3545;
+}
+
+.points-value.remaining-points {
+    color: #17a2b8;
+}
+
+.points-value.max-usable {
+    color: #fd7e14;
+}
+
+.points-value.discount-value {
+    color: #28a745;
+    font-size: 16px;
+}
+
+.points-note {
+    color: #6c757d;
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+/* 已使用點數狀態 */
+.points-applied-section {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.points-applied-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.points-applied-text {
+    color: #155724;
+    font-weight: bold;
+    flex: 1;
+}
+
+/* 點數輸入區域 */
+.points-input-section {
+    margin-bottom: 15px;
+}
+
+.points-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.points-input-group .points-input {
+    flex: 1;
+    min-width: 150px;
+    max-width: 200px;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.points-input-group .button {
+    white-space: nowrap;
+}
+
+.points-quick-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.points-quick-use {
+    background: none;
+    border: none;
+    color: #007cba;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.points-quick-use:hover {
+    color: #005a87;
+    background: #f0f8ff;
+}
+
+/* 訊息區域 */
+.points-messages {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.points-messages.wc-points-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.points-messages.wc-points-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .points-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .points-applied-summary {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .points-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .points-input-group .points-input {
+        max-width: none;
+    }
+}
+
+/* ==========================================================================
+   我的帳戶 - 點數總覽
+   ========================================================================== */
+
+.wc-points-rewards-overview {
+    margin-bottom: 30px;
+}
+
+.points-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.points-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.points-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.points-card .card-icon {
+    font-size: 2.5em;
+    margin-right: 15px;
+}
+
+.points-card .card-content h3 {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.points-value {
+    font-size: 2em;
+    font-weight: bold;
+    color: #2c3e50;
+    line-height: 1;
+}
+
+.points-label {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.points-value-info {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.tier-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.tier-benefit {
+    font-size: 12px;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.expiring-points {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.expiring-label {
+    font-size: 12px;
+    color: #dc3545;
+}
+
+.expiring-card {
+    border-left: 4px solid #dc3545;
+}
+
+/* 等級進度區塊 */
+.tier-progress-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.tier-progress-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.progress-info {
+    margin-bottom: 15px;
+}
+
+.progress-text {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.progress-percentage {
+    text-align: right;
+    font-size: 14px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* 最近記錄區塊 */
+.recent-history-section {
+    margin-bottom: 30px;
+}
+
+.recent-history-section h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.points-history-list {
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e1e5e9;
+    transition: background-color 0.2s ease;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-item:hover {
+    background-color: #f8f9fa;
+}
+
+.history-date {
+    flex: 0 0 80px;
+    font-size: 12px;
+    color: #6c757d;
+    margin-right: 15px;
+}
+
+.history-description {
+    flex: 1;
+    margin-right: 15px;
+}
+
+.history-points {
+    flex: 0 0 80px;
+    text-align: right;
+    font-weight: bold;
+}
+
+.history-points.positive {
+    color: #28a745;
+}
+
+.history-points.negative {
+    color: #dc3545;
+}
+
+.view-all-link {
+    text-align: center;
+    margin-top: 15px;
+}
+
+/* 快速操作區塊 */
+.quick-actions-section h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   我的帳戶 - 點數記錄 - 增強版
+   ========================================================================== */
+
+.wc-points-rewards-history {
+    margin-bottom: 30px;
+}
+
+/* 篩選器樣式增強 */
+.history-filters {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.points-filter-form {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.points-filter-form select {
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    color: #495057;
+    transition: all 0.3s ease;
+    min-width: 160px;
+}
+
+.points-filter-form select:focus {
+    outline: none;
+    border-color: #007cba;
+    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+}
+
+/* 表格容器增強 */
+.points-history-table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    background: white;
+}
+
+/* 表格樣式大幅優化 */
+.wc-points-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin: 0;
+    font-size: 14px;
+}
+
+.wc-points-history-table th {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    padding: 18px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.wc-points-history-table td {
+    padding: 16px;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+    transition: background-color 0.2s ease;
+}
+
+.wc-points-history-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.wc-points-history-table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: translateX(2px);
+}
+
+.wc-points-history-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* 日期欄位樣式 */
+.date-cell {
+    width: 120px;
+    font-weight: 500;
+    color: #6c757d;
+    white-space: nowrap;
+}
+
+.date-cell time {
+    display: block;
+    color: #495057;
+}
+
+/* 描述欄位增強 */
+.description-cell {
+    position: relative;
+    max-width: 300px;
+}
+
+.description-cell strong {
+    color: #495057;
+    font-weight: 600;
+}
+
+.type-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: 8px;
+    letter-spacing: 0.3px;
+}
+
+.type-earned {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.type-redeemed {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.type-expired {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.type-admin {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* 點數欄位樣式增強 */
+.points-column {
+    width: 120px;
+    text-align: right;
+}
+
+.points-amount {
+    font-weight: 700;
+    font-size: 15px;
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    min-width: 60px;
+    text-align: center;
+}
+
+.points-amount.positive {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.points-amount.negative {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* 到期欄位樣式 */
+.expiry-column {
+    width: 130px;
+    font-size: 13px;
+}
+
+.expiry-warning {
+    margin-left: 5px;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: #fff3cd;
+    color: #856404;
+}
+
+.no-expiry {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* 歷史記錄類型行樣式 */
+.history-row.history-earned {
+    border-left: 4px solid #28a745;
+}
+
+.history-row.history-redeemed {
+    border-left: 4px solid #ffc107;
+}
+
+.history-row.history-expired {
+    border-left: 4px solid #dc3545;
+}
+
+.history-row.history-admin {
+    border-left: 4px solid #17a2b8;
+}
+
+/* 無記錄訊息增強 */
+.no-history-message {
+    text-align: center;
+    padding: 80px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+}
+
+.no-history-icon {
+    font-size: 5em;
+    margin-bottom: 25px;
+    opacity: 0.5;
+}
+
+.no-history-message h3 {
+    margin-bottom: 15px;
+    color: #495057;
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.no-history-message p {
+    color: #6c757d;
+    margin-bottom: 25px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* 分頁樣式增強 */
+.points-history-pagination {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.points-history-pagination .page-numbers {
+    display: inline-block;
+    padding: 12px 16px;
+    margin: 0 4px;
+    border: 2px solid #e9ecef;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 44px;
+}
+
+.points-history-pagination .page-numbers:hover {
+    background: #007cba;
+    color: white;
+    border-color: #007cba;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 124, 186, 0.3);
+}
+
+.points-history-pagination .page-numbers.current {
+    background: linear-gradient(135deg, #007cba 0%, #005a87 100%);
+    color: white;
+    border-color: #007cba;
+    box-shadow: 0 4px 8px rgba(0, 124, 186, 0.3);
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .points-filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .points-filter-form select {
+        min-width: auto;
+    }
+    
+    .points-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .wc-points-history-table th,
+    .wc-points-history-table td {
+        padding: 12px 8px;
+    }
+    
+    .wc-points-history-table {
+        font-size: 13px;
+    }
+    
+    .description-cell {
+        max-width: 200px;
+    }
+}
+
+/* ==========================================================================
+   我的帳戶 - 會員等級
+   ========================================================================== */
+
+.wc-points-rewards-member-tier {
+    margin-bottom: 30px;
+}
+
+/* 時間篩選器 */
+.tier-filters {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.tier-filter-form select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+}
+
+/* 當前等級區塊 */
+.current-tier-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.current-tier-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+}
+
+.tier-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.tier-icon {
+    font-size: 3em;
+    margin-right: 20px;
+}
+
+.tier-info .tier-name {
+    font-size: 2.5em;
+    margin: 0 0 10px 0;
+    font-weight: bold;
+}
+
+.tier-benefits {
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+.tier-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-item {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.stat-label {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* 升級進度區塊 */
+.tier-upgrade-section {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.tier-upgrade-section h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.upgrade-target {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.target-tier {
+    display: inline-block;
+    background: #f8f9fa;
+    padding: 15px 25px;
+    border-radius: 25px;
+    border: 2px dashed #dee2e6;
+}
+
+.target-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-right: 10px;
+}
+
+.target-benefit {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.progress-details {
+    margin-bottom: 20px;
+}
+
+.progress-amounts {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.current-amount {
+    color: #28a745;
+}
+
+.target-amount {
+    color: #6c757d;
+}
+
+.remaining-amount {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.upgrade-cta {
+    text-align: center;
+}
+
+/* 最高等級區塊 */
+.max-tier-section {
+    text-align: center;
+    padding: 40px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.max-tier-badge {
+    font-size: 4em;
+    margin-bottom: 20px;
+}
+
+.max-tier-section h3 {
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+/* 所有等級說明 */
+.all-tiers-section {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.all-tiers-section h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.tiers-list {
+    display: grid;
+    gap: 15px;
+}
+
+.tier-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.tier-item:hover {
+    border-color: #dee2e6;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tier-item.current-tier {
+    border-color: #28a745;
+    background: #f8fff9;
+}
+
+.tier-name-badge {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.current-badge {
+    display: inline-block;
+    background: #28a745;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    margin-left: 10px;
+    text-transform: uppercase;
+}
+
+.tier-requirements {
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.tier-benefits-info {
+    text-align: right;
+}
+
+.benefit-item {
+    display: inline-block;
+    background: #e9ecef;
+    color: #495057;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.tier-item.current-tier .benefit-item {
+    background: #28a745;
+    color: white;
+}
+
+/* 等級規則說明 */
+.tier-rules-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.tier-rules-section h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.tier-rules-list {
+    margin: 0;
+    padding-left: 20px;
+    color: #6c757d;
+}
+
+.tier-rules-list li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   點數獲得動畫效果
+   ========================================================================== */
+
+.points-earned-animation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    pointer-events: none;
+    font-size: 2em;
+    font-weight: bold;
+    color: #28a745;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    animation: pointsEarnedFloat 3s ease-out forwards;
+}
+
+@keyframes pointsEarnedFloat {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+    40% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -80px) scale(0.8);
+    }
+}
+
+.points-badge-animated {
+    animation: pointsBadgePulse 0.6s ease-in-out;
+}
+
+@keyframes pointsBadgePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+        background: #20c997;
+    }
+}
+
+/* 點數餘額即時更新動畫 */
+.points-balance-updating {
+    position: relative;
+}
+
+.points-balance-updating::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(40,167,69,0.3), transparent);
+    animation: shimmer 1.5s infinite;
+    pointer-events: none;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* ==========================================================================
+   增強的點數使用預覽
+   ========================================================================== */
+
+.points-usage-preview {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    transition: all 0.3s ease;
+}
+
+.points-usage-preview.active {
+    background: #e3f2fd;
+    border-color: #2196f3;
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.preview-title {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.preview-toggle {
+    background: none;
+    border: none;
+    color: #007cba;
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: underline;
+}
+
+.preview-content {
+    display: none;
+}
+
+.preview-content.expanded {
+    display: block;
+    animation: expandDown 0.3s ease-out;
+}
+
+@keyframes expandDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 200px;
+    }
+}
+
+.preview-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.preview-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    font-size: 13px;
+}
+
+.preview-label {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.preview-value {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.preview-value.discount {
+    color: #28a745;
+}
+
+.preview-value.remaining {
+    color: #dc3545;
+}
+
+.preview-slider {
+    margin: 15px 0;
+}
+
+.points-range-slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #e9ecef;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.points-range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #007cba;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.points-range-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #007cba;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+/* ==========================================================================
+   優化快速使用點數按鈕
+   ========================================================================== */
+
+.points-quick-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+}
+
+.points-quick-use {
+    background: linear-gradient(135deg, #007cba, #005a87);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.points-quick-use::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.points-quick-use:hover::before {
+    left: 100%;
+}
+
+.points-quick-use:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,124,186,0.3);
+}
+
+.points-quick-use:active {
+    transform: translateY(0);
+}
+
+.points-quick-use.percentage {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+}
+
+.points-quick-use.percentage:hover {
+    box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+}
+
+.points-quick-use.max-use {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+}
+
+.points-quick-use.max-use:hover {
+    box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+}
+
+/* ==========================================================================
+   購物車點數折扣顯示增強
+   ========================================================================== */
+
+.wc-points-cart-discount {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    border: 1px solid #b8d4c2;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.wc-points-cart-discount::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #28a745;
+}
+
+.discount-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.discount-icon {
+    font-size: 1.2em;
+    color: #28a745;
+    margin-right: 8px;
+}
+
+.discount-title {
+    font-weight: 600;
+    color: #155724;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.discount-amount {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #155724;
+}
+
+.discount-details {
+    font-size: 12px;
+    color: #155724;
+    opacity: 0.8;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.discount-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.modify-points {
+    background: none;
+    border: none;
+    color: #007cba;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.remove-discount {
+    background: none;
+    border: none;
+    color: #dc3545;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   點數餘額顯示優化
+   ========================================================================== */
+
+.points-balance-widget {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.points-balance-widget:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+
+.balance-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.balance-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #007cba, #005a87);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2em;
+    margin-right: 15px;
+}
+
+.balance-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.balance-subtitle {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 2px;
+}
+
+.balance-amount {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: #007cba;
+    text-align: center;
+    margin: 15px 0;
+    line-height: 1;
+}
+
+.balance-value-display {
+    text-align: center;
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+.balance-value-amount {
+    font-weight: 600;
+    color: #28a745;
+}
+
+.balance-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.balance-action {
+    flex: 1;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #495057;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.balance-action:hover {
+    background: #e9ecef;
+    color: #2c3e50;
+    transform: translateY(-1px);
+}
+
+.balance-action.primary {
+    background: #007cba;
+    border-color: #007cba;
+    color: white;
+}
+
+.balance-action.primary:hover {
+    background: #005a87;
+}
+
+/* ==========================================================================
+   會員等級進度增強
+   ========================================================================== */
+
+.tier-progress-enhanced {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tier-progress-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #007cba, #28a745);
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.current-tier-badge {
+    background: linear-gradient(135deg, #007cba, #005a87);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.next-tier-info {
+    text-align: right;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.next-tier-name {
+    font-weight: 600;
+    color: #2c3e50;
+    display: block;
+}
+
+.progress-visual {
+    margin: 15px 0;
+}
+
+.progress-track {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill-animated {
+    height: 100%;
+    background: linear-gradient(90deg, #007cba, #28a745);
+    border-radius: 4px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill-animated::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.6),
+        transparent
+    );
+    animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #6c757d;
+}
+
+.progress-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.progress-stat {
+    text-align: center;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.progress-stat-value {
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.progress-stat-label {
+    font-size: 10px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+/* ==========================================================================
+   點數到期提醒增強
+   ========================================================================== */
+
+.points-expiry-alert {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border: 1px solid #ffecb5;
+    border-left: 4px solid #ffc107;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    position: relative;
+    animation: expiryPulse 3s infinite;
+}
+
+@keyframes expiryPulse {
+    0%, 100% {
+        box-shadow: 0 2px 4px rgba(255,193,7,0.2);
+    }
+    50% {
+        box-shadow: 0 4px 12px rgba(255,193,7,0.4);
+    }
+}
+
+.expiry-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.expiry-icon {
+    font-size: 1.5em;
+    color: #856404;
+    margin-right: 10px;
+    animation: expiryShake 1s infinite;
+}
+
+@keyframes expiryShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+.expiry-title {
+    font-weight: 600;
+    color: #856404;
+    font-size: 14px;
+}
+
+.expiry-details {
+    font-size: 13px;
+    color: #856404;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.expiry-countdown {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.countdown-item {
+    text-align: center;
+    background: rgba(255,255,255,0.5);
+    padding: 8px;
+    border-radius: 6px;
+    min-width: 50px;
+}
+
+.countdown-number {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #856404;
+    display: block;
+}
+
+.countdown-label {
+    font-size: 10px;
+    color: #856404;
+    text-transform: uppercase;
+}
+
+.expiry-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.expiry-action {
+    padding: 6px 12px;
+    background: #ffc107;
+    color: #212529;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.expiry-action:hover {
+    background: #e0a800;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   響應式優化（新增）
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .points-usage-preview {
+        padding: 12px;
+    }
+    
+    .preview-breakdown {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .points-balance-widget {
+        padding: 15px;
+    }
+    
+    .balance-amount {
+        font-size: 2em;
+    }
+    
+    .balance-actions {
+        flex-direction: column;
+    }
+    
+    .tier-progress-enhanced {
+        padding: 15px;
+    }
+    
+    .progress-stats {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .expiry-countdown {
+        gap: 10px;
+    }
+    
+    .countdown-item {
+        min-width: 40px;
+        padding: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .points-quick-actions {
+        flex-direction: column;
+    }
+    
+    .points-quick-use {
+        width: 100%;
+        padding: 10px;
+    }
+    
+    .discount-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .balance-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1em;
+    }
+    
+    .balance-amount {
+        font-size: 1.8em;
+    }
+    
+    .current-tier-badge {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+    
+    .expiry-countdown {
+        gap: 8px;
+    }
+    
+    .countdown-item {
+        min-width: 35px;
+        padding: 4px;
+    }
+}
+
+@media (max-width: 768px) {
+    .points-summary-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .points-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .points-card .card-icon {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .tier-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .tier-icon {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .tier-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .progress-amounts {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .tier-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .tier-benefits-info {
+        text-align: center;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .points-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .wc-points-history-table {
+        font-size: 14px;
+    }
+    
+    .wc-points-history-table th,
+    .wc-points-history-table td {
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .points-value {
+        font-size: 1.5em;
+    }
+    
+    .tier-name {
+        font-size: 1.2em;
+    }
+    
+    .tier-info .tier-name {
+        font-size: 2em;
+    }
+    
+    .target-tier {
+        padding: 10px 15px;
+    }
+    
+    .target-name {
+        font-size: 1.2em;
+    }
+    
+    .wc-points-history-table th,
+    .wc-points-history-table td {
+        padding: 6px;
+        font-size: 12px;
+    }
+    
+    .date-column,
+    .expiry-column {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   深色模式支援
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+    .points-card,
+    .tier-upgrade-section,
+    .all-tiers-section {
+        background: #2c3e50;
+        border-color: #34495e;
+        color: #ecf0f1;
+    }
+    
+    .points-card h3,
+    .tier-upgrade-section h3,
+    .all-tiers-section h3 {
+        color: #ecf0f1;
+    }
+    
+    .wc-points-history-table {
+        background: #2c3e50;
+        color: #ecf0f1;
+    }
+    
+    .wc-points-history-table td {
+        border-color: #34495e;
+    }
+    
+    .tier-item {
+        background: #34495e;
+        border-color: #4a5f7a;
+        color: #ecf0f1;
+    }
+    
+    .tier-rules-section,
+    .history-filters {
+        background: #34495e;
+        color: #ecf0f1;
+    }
+    
+    .no-history-message {
+        background: #34495e;
+        color: #ecf0f1;
+    }
+}

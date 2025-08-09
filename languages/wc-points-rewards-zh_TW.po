@@ -1,0 +1,557 @@
+# WooCommerce Points & Rewards - Traditional Chinese Translation
+#
+# Copyright (C) 2024 millenniumlim
+# This file is distributed under the same license as the WooCommerce Points & Rewards package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Points & Rewards 1.0.2\n"
+"Report-Msgid-Bugs-To: https://github.com/millenniumlin/woocommerce-points-rewards\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: millenniumlim\n"
+"Language-Team: Chinese (Traditional)\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.0\n"
+
+# Plugin information
+msgid "WooCommerce Points & Rewards 會員系統"
+msgstr "WooCommerce 點數與獎勵會員系統"
+
+msgid "Complete WooCommerce points reward system with member tiers, points cashback, and redemption features."
+msgstr "完整的 WooCommerce 累積消費點數獎勵系統，支援會員等級、點數回饋、折抵功能等。"
+
+# General terms
+msgid "Points"
+msgstr "點數"
+
+msgid "Point"
+msgstr "點"
+
+msgid "Rewards"
+msgstr "獎勵"
+
+msgid "Member Tier"
+msgstr "會員等級"
+
+msgid "Balance"
+msgstr "餘額"
+
+msgid "Available"
+msgstr "可用"
+
+msgid "Earned"
+msgstr "已獲得"
+
+msgid "Redeemed"
+msgstr "已使用"
+
+msgid "Expired"
+msgstr "已到期"
+
+msgid "Expiring"
+msgstr "即將到期"
+
+# Member tiers
+msgid "Member Tiers"
+msgstr "會員等級"
+
+msgid "Current Tier"
+msgstr "目前等級"
+
+msgid "Next Tier"
+msgstr "下一等級"
+
+msgid "Tier Upgrade"
+msgstr "等級升級"
+
+msgid "Tier Benefits"
+msgstr "等級福利"
+
+msgid "Minimum Spending"
+msgstr "最低消費"
+
+msgid "Bonus Percentage"
+msgstr "回饋百分比"
+
+msgid "You have been upgraded to %s tier!"
+msgstr "您已升級至 %s 等級！"
+
+msgid "Congratulations on your tier upgrade!"
+msgstr "恭喜您的等級升級！"
+
+# Points earning
+msgid "Earn %d points"
+msgstr "獲得 %d 點"
+
+msgid "Earn %d point"
+msgstr "獲得 %d 點"
+
+msgid "You will earn %d points from this purchase"
+msgstr "此次購買您將獲得 %d 點"
+
+msgid "Points earned from purchase"
+msgstr "購物獲得點數"
+
+msgid "Registration bonus"
+msgstr "註冊獎勵"
+
+msgid "Birthday bonus"
+msgstr "生日獎勵"
+
+msgid "Admin adjustment"
+msgstr "管理員調整"
+
+msgid "Tier bonus"
+msgstr "等級獎勵"
+
+# Points usage
+msgid "Use Points"
+msgstr "使用點數"
+
+msgid "Apply Points"
+msgstr "應用點數"
+
+msgid "Remove Points"
+msgstr "移除點數"
+
+msgid "Points to use"
+msgstr "使用點數"
+
+msgid "Points applied successfully"
+msgstr "點數應用成功"
+
+msgid "Points removed successfully"
+msgstr "點數移除成功"
+
+msgid "You have %d points available"
+msgstr "您有 %d 點可用"
+
+msgid "Maximum discount: %s"
+msgstr "最大折扣：%s"
+
+msgid "Points discount: -%s"
+msgstr "點數折扣：-%s"
+
+# Quick use buttons
+msgid "Use All"
+msgstr "全部使用"
+
+msgid "Use 25%"
+msgstr "使用 25%"
+
+msgid "Use 50%"
+msgstr "使用 50%"
+
+msgid "Use 75%"
+msgstr "使用 75%"
+
+# Points history
+msgid "Points History"
+msgstr "點數記錄"
+
+msgid "Transaction History"
+msgstr "交易記錄"
+
+msgid "Date"
+msgstr "日期"
+
+msgid "Description"
+msgstr "說明"
+
+msgid "Points Change"
+msgstr "點數變化"
+
+msgid "Balance After"
+msgstr "變更後餘額"
+
+msgid "Expiry Date"
+msgstr "到期日期"
+
+msgid "Order #%d"
+msgstr "訂單 #%d"
+
+msgid "No expiry"
+msgstr "永不到期"
+
+msgid "No points history found"
+msgstr "找不到點數記錄"
+
+# Filters
+msgid "All Types"
+msgstr "所有類型"
+
+msgid "Filter by"
+msgstr "篩選條件"
+
+msgid "Filter"
+msgstr "篩選"
+
+msgid "Reset"
+msgstr "重置"
+
+msgid "Search"
+msgstr "搜尋"
+
+msgid "Last 30 days"
+msgstr "最近 30 天"
+
+msgid "Last 3 months"
+msgstr "最近 3 個月"
+
+msgid "Last 6 months"
+msgstr "最近 6 個月"
+
+msgid "This year"
+msgstr "今年"
+
+# Statistics and reports
+msgid "Statistics"
+msgstr "統計"
+
+msgid "Reports"
+msgstr "報表"
+
+msgid "Dashboard"
+msgstr "控制台"
+
+msgid "Total Points Earned"
+msgstr "總獲得點數"
+
+msgid "Total Points Redeemed"
+msgstr "總使用點數"
+
+msgid "Active Members"
+msgstr "活躍會員"
+
+msgid "Tier Distribution"
+msgstr "等級分布"
+
+msgid "Points Trend"
+msgstr "點數趨勢"
+
+msgid "Usage Rate"
+msgstr "使用率"
+
+# Admin interface
+msgid "Points & Rewards"
+msgstr "點數與獎勵"
+
+msgid "Settings"
+msgstr "設定"
+
+msgid "Manage Tiers"
+msgstr "管理等級"
+
+msgid "Points Management"
+msgstr "點數管理"
+
+msgid "Save Changes"
+msgstr "儲存變更"
+
+msgid "Add New Tier"
+msgstr "新增等級"
+
+msgid "Edit Tier"
+msgstr "編輯等級"
+
+msgid "Delete Tier"
+msgstr "刪除等級"
+
+msgid "Tier Name"
+msgstr "等級名稱"
+
+msgid "Tier Order"
+msgstr "等級順序"
+
+# Settings
+msgid "General Settings"
+msgstr "一般設定"
+
+msgid "Points Settings"
+msgstr "點數設定"
+
+msgid "Tier Settings"
+msgstr "等級設定"
+
+msgid "Email Settings"
+msgstr "信件設定"
+
+msgid "Enable Points System"
+msgstr "啟用點數系統"
+
+msgid "Points per Amount"
+msgstr "每消費金額獲得點數"
+
+msgid "Points Value"
+msgstr "點數價值"
+
+msgid "Points Expiry"
+msgstr "點數到期"
+
+msgid "Registration Points"
+msgstr "註冊點數"
+
+msgid "Birthday Points"
+msgstr "生日點數"
+
+msgid "Enable Email Notifications"
+msgstr "啟用郵件通知"
+
+# Validation messages
+msgid "Invalid points amount"
+msgstr "無效的點數數量"
+
+msgid "Insufficient points"
+msgstr "點數不足"
+
+msgid "Points must be greater than zero"
+msgstr "點數必須大於零"
+
+msgid "Maximum points exceeded"
+msgstr "超過最大點數限制"
+
+msgid "Please enter a valid amount"
+msgstr "請輸入有效金額"
+
+# Error messages
+msgid "Error applying points discount"
+msgstr "應用點數折扣時發生錯誤"
+
+msgid "Error removing points discount"
+msgstr "移除點數折扣時發生錯誤"
+
+msgid "Error updating points balance"
+msgstr "更新點數餘額時發生錯誤"
+
+msgid "Something went wrong. Please try again."
+msgstr "出現錯誤，請稍後再試。"
+
+msgid "Permission denied"
+msgstr "權限不足"
+
+# Success messages
+msgid "Points settings saved successfully"
+msgstr "點數設定儲存成功"
+
+msgid "Tier created successfully"
+msgstr "等級建立成功"
+
+msgid "Tier updated successfully"
+msgstr "等級更新成功"
+
+msgid "Tier deleted successfully"
+msgstr "等級刪除成功"
+
+msgid "Points added successfully"
+msgstr "點數新增成功"
+
+msgid "Points deducted successfully"
+msgstr "點數扣除成功"
+
+# User account pages
+msgid "My Points"
+msgstr "我的點數"
+
+msgid "Points Overview"
+msgstr "點數總覽"
+
+msgid "Member Status"
+msgstr "會員狀態"
+
+msgid "Points Summary"
+msgstr "點數摘要"
+
+msgid "Current Points"
+msgstr "目前點數"
+
+msgid "Lifetime Earned"
+msgstr "累計獲得"
+
+msgid "Lifetime Redeemed"
+msgstr "累計使用"
+
+msgid "Points Expiring Soon"
+msgstr "即將到期點數"
+
+msgid "%d points expiring in %d days"
+msgstr "%d 點將在 %d 天後到期"
+
+# Tier progress
+msgid "Progress to Next Tier"
+msgstr "下一等級進度"
+
+msgid "Spend %s more to reach %s tier"
+msgstr "再消費 %s 即可達到 %s 等級"
+
+msgid "You are at the highest tier!"
+msgstr "您已達到最高等級！"
+
+msgid "Current Progress"
+msgstr "目前進度"
+
+msgid "Remaining Amount"
+msgstr "剩餘金額"
+
+# Date and time formatting
+msgid "Y-m-d H:i:s"
+msgstr "Y年m月d日 H:i:s"
+
+msgid "M j, Y"
+msgstr "Y年m月j日"
+
+msgid "Y-m-d"
+msgstr "Y-m-d"
+
+# Currency formatting
+msgid "$%s"
+msgstr "$%s"
+
+msgid "NT$%s"
+msgstr "NT$%s"
+
+# Notifications
+msgid "Points Expiry Reminder"
+msgstr "點數到期提醒"
+
+msgid "Tier Upgrade Notification"
+msgstr "等級升級通知"
+
+msgid "Your points are expiring soon!"
+msgstr "您的點數即將到期！"
+
+msgid "Dismiss"
+msgstr "關閉"
+
+msgid "Use Now"
+msgstr "立即使用"
+
+# Tooltips and help text
+msgid "Points earned from purchases based on your tier"
+msgstr "根據您的等級從購買中獲得的點數"
+
+msgid "Points can be used to get discounts on future purchases"
+msgstr "點數可用於未來購買的折扣"
+
+msgid "Higher tiers provide better point earning rates"
+msgstr "更高等級提供更好的點數獲得率"
+
+msgid "Points may expire after a certain period"
+msgstr "點數可能在一定期間後到期"
+
+# Loading and status
+msgid "Loading..."
+msgstr "載入中..."
+
+msgid "Processing..."
+msgstr "處理中..."
+
+msgid "Updating..."
+msgstr "更新中..."
+
+msgid "Please wait..."
+msgstr "請稍候..."
+
+msgid "Active"
+msgstr "啟用"
+
+msgid "Inactive"
+msgstr "停用"
+
+msgid "Pending"
+msgstr "待處理"
+
+# Buttons and actions
+msgid "View Details"
+msgstr "查看詳情"
+
+msgid "Edit"
+msgstr "編輯"
+
+msgid "Delete"
+msgstr "刪除"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Confirm"
+msgstr "確認"
+
+msgid "Submit"
+msgstr "提交"
+
+msgid "Apply"
+msgstr "應用"
+
+msgid "Clear"
+msgstr "清除"
+
+msgid "Export"
+msgstr "匯出"
+
+msgid "Import"
+msgstr "匯入"
+
+msgid "Refresh"
+msgstr "重新整理"
+
+# Bulk operations
+msgid "Bulk Actions"
+msgstr "批量操作"
+
+msgid "Select All"
+msgstr "全選"
+
+msgid "Bulk Delete"
+msgstr "批量刪除"
+
+msgid "Bulk Export"
+msgstr "批量匯出"
+
+msgid "Apply Bulk Action"
+msgstr "應用批量操作"
+
+msgid "%d items selected"
+msgstr "已選擇 %d 項"
+
+msgid "Are you sure you want to delete the selected items?"
+msgstr "確定要刪除選中的項目嗎？"
+
+# Charts and analytics
+msgid "Chart Type"
+msgstr "圖表類型"
+
+msgid "Line Chart"
+msgstr "線圖"
+
+msgid "Bar Chart"
+msgstr "長條圖"
+
+msgid "Pie Chart"
+msgstr "圓餅圖"
+
+msgid "Export Chart"
+msgstr "匯出圖表"
+
+msgid "No data available"
+msgstr "無可用數據"
+
+msgid "Data Range"
+msgstr "數據範圍"
+
+# Responsive design
+msgid "Menu"
+msgstr "選單"
+
+msgid "Toggle Navigation"
+msgstr "切換導航"
+
+msgid "Mobile View"
+msgstr "手機檢視"
+
+msgid "Desktop View"
+msgstr "桌面檢視"
