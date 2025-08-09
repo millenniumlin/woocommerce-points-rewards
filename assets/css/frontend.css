@@ -47,6 +47,20 @@
    購物車點數使用區塊 - 增強版
    ========================================================================== */
 
+.wc-points-cart-section-wrapper {
+    margin: 20px 0;
+}
+
+.wc-points-cart-section-wrapper .cart-collaterals {
+    width: 100%;
+}
+
+.wc-points-cart-section-wrapper .shop_table {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 0;
+}
+
 .wc-points-redemption-wrapper {
     padding: 15px 0;
 }
