@@ -69,15 +69,22 @@ function wc_points_rewards_is_enabled() {
  * @return string 格式化後的百分比
  */
 function wc_points_rewards_format_percentage($percentage) {
-    $decimals = wc_get_price_decimals();
-    $formatted = number_format(floatval($percentage ?? 0), $decimals);
+    // 根據需求，點數回饋百分比只顯示到百位數，不顯示小數點
+    $percentage = floatval($percentage ?? 0);
     
-    // 如果格式化後的數字沒有小數位，移除不必要的 .00
-    if ($decimals > 0 && strpos($formatted, '.') !== false) {
+    // 如果是小數，顯示一位小數；如果是整數，不顯示小數點
+    if ($percentage == floor($percentage)) {
+        // 整數，不顯示小數點
+        $formatted = number_format($percentage, 0);
+    } else {
+        // 小數，最多顯示一位小數
+        $formatted = number_format($percentage, 1);
+        // 移除不必要的 .0
         $formatted = rtrim(rtrim($formatted, '0'), '.');
     }
     
     return $formatted . '%';
+}
 }
 
 /**

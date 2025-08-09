@@ -353,6 +353,7 @@ class WC_Points_Rewards_Account {
         global $wpdb;
         $stats_table = $wpdb->prefix . 'wc_points_rewards_user_stats';
         $selected_year = intval($_GET['filter_year'] ?? date('Y'));
+        $selected_month = intval($_GET['filter_month'] ?? 0);
         
         // 先獲取統計表中的數據
         $yearly_stats = $wpdb->get_row($wpdb->prepare("
@@ -364,6 +365,15 @@ class WC_Points_Rewards_Account {
         $orders_table = $wpdb->prefix . 'posts';
         $order_meta_table = $wpdb->prefix . 'postmeta';
         
+        // 準備日期條件
+        $date_condition = "AND YEAR(p.post_date) = %d";
+        $date_params = array($user_id, $selected_year);
+        
+        if ($selected_month > 0) {
+            $date_condition .= " AND MONTH(p.post_date) = %d";
+            $date_params[] = $selected_month;
+        }
+        
         $actual_spent = $wpdb->get_var($wpdb->prepare("
             SELECT SUM(pm.meta_value) 
             FROM $orders_table p
@@ -372,24 +382,33 @@ class WC_Points_Rewards_Account {
             AND p.post_status IN ('wc-completed', 'wc-processing')
             AND pm.meta_key = '_order_total'
             AND p.post_author = %d
-            AND YEAR(p.post_date) = %d
-        ", $user_id, $selected_year));
+            $date_condition
+        ", $date_params));
         
         // 獲取總點數
         $points_table = $wpdb->prefix . 'wc_points_rewards_points';
+        $points_date_condition = "AND YEAR(created_at) = %d";
+        $points_params = array($user_id, $selected_year);
+        
+        if ($selected_month > 0) {
+            $points_date_condition .= " AND MONTH(created_at) = %d";
+            $points_params[] = $selected_month;
+        }
+        
         $total_points_earned = $wpdb->get_var($wpdb->prepare("
             SELECT SUM(points) 
             FROM $points_table 
             WHERE user_id = %d 
             AND type = 'earned'
-            AND YEAR(created_at) = %d
-        ", $user_id, $selected_year));
+            $points_date_condition
+        ", $points_params));
         
         // 如果沒有統計數據，創建一個基本對象
         if (!$yearly_stats) {
             $yearly_stats = (object) array(
                 'user_id' => $user_id,
                 'year' => $selected_year,
+                'month' => $selected_month,
                 'total_spent' => floatval($actual_spent ?? 0),
                 'total_points_earned' => floatval($total_points_earned ?? 0),
                 'current_tier_id' => $current_tier ? $current_tier->id : null,
@@ -400,6 +419,7 @@ class WC_Points_Rewards_Account {
             // 更新真實消費金額和點數
             $yearly_stats->total_spent = floatval($actual_spent ?? 0);
             $yearly_stats->total_points_earned = floatval($total_points_earned ?? 0);
+            $yearly_stats->month = $selected_month;
         }
         
         $this->render_member_tier($current_tier, $all_tiers, $tier_progress, $yearly_stats);

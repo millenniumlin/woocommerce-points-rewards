@@ -11,22 +11,38 @@ if (!defined('ABSPATH')) {
 ?>
 
 <div class="wc-points-rewards-member-tier">
-    <!-- 時間篩選器 -->
+    <!-- 時間篩選器 - 新增月份查詢功能 -->
     <div class="tier-filters">
         <form method="get" class="tier-filter-form">
-            <select name="filter_year" onchange="this.form.submit()">
-                <?php
-                $selected_year = intval($_GET['filter_year'] ?? date('Y'));
-                $current_year = date('Y');
-                for ($year = $current_year; $year >= $current_year - 5; $year--):
-                ?>
-                <option value="<?php echo $year; ?>" <?php selected($selected_year, $year); ?>><?php echo $year; ?> 年</option>
-                <?php endfor; ?>
-            </select>
+            <div class="filter-group">
+                <label for="filter_year"><?php _e('查詢年份', 'wc-points-rewards'); ?>：</label>
+                <select name="filter_year" id="filter_year" onchange="this.form.submit()">
+                    <?php
+                    $selected_year = intval($_GET['filter_year'] ?? date('Y'));
+                    $current_year = date('Y');
+                    for ($year = $current_year; $year >= $current_year - 5; $year--):
+                    ?>
+                    <option value="<?php echo $year; ?>" <?php selected($selected_year, $year); ?>><?php echo $year; ?> 年</option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="filter_month"><?php _e('查詢月份', 'wc-points-rewards'); ?>：</label>
+                <select name="filter_month" id="filter_month" onchange="this.form.submit()">
+                    <option value=""><?php _e('全年', 'wc-points-rewards'); ?></option>
+                    <?php
+                    $selected_month = intval($_GET['filter_month'] ?? 0);
+                    for ($month = 1; $month <= 12; $month++):
+                    ?>
+                    <option value="<?php echo $month; ?>" <?php selected($selected_month, $month); ?>><?php echo $month; ?> 月</option>
+                    <?php endfor; ?>
+                </select>
+            </div>
             
             <!-- 保持其他查詢參數 -->
             <?php foreach ($_GET as $key => $value): ?>
-                <?php if ($key !== 'filter_year'): ?>
+                <?php if (!in_array($key, ['filter_year', 'filter_month'])): ?>
                     <input type="hidden" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($value); ?>" />
                 <?php endif; ?>
             <?php endforeach; ?>
@@ -50,7 +66,15 @@ if (!defined('ABSPATH')) {
         <?php if ($yearly_stats): ?>
         <div class="tier-stats">
             <div class="stat-item">
-                <div class="stat-label"><?php printf(__('%d年度消費', 'wc-points-rewards'), $yearly_stats->year ?? date('Y')); ?></div>
+                <div class="stat-label">
+                    <?php 
+                    if (isset($yearly_stats->month) && $yearly_stats->month > 0) {
+                        printf(__('%d年%d月消費', 'wc-points-rewards'), $yearly_stats->year ?? date('Y'), $yearly_stats->month);
+                    } else {
+                        printf(__('%d年度消費', 'wc-points-rewards'), $yearly_stats->year ?? date('Y'));
+                    }
+                    ?>
+                </div>
                 <div class="stat-value"><?php echo wc_price($yearly_stats->total_spent); ?></div>
             </div>
             
@@ -85,6 +109,7 @@ if (!defined('ABSPATH')) {
         
         <div class="progress-details">
             <div class="progress-amounts">
+                <span class="current-amount"><?php echo wc_price($yearly_stats->total_spent ?? 0); ?></span>
                 <span class="target-amount"><?php echo wc_price($tier_progress['next_tier']->min_amount); ?></span>
             </div>
             
