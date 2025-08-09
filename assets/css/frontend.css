@@ -498,14 +498,14 @@
 .wc-points-history-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    background: #ffffff;
     margin: 0;
     font-size: 14px;
 }
 
 .wc-points-history-table th {
-    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-    color: white;
+    background: #f8f9fa;
+    color: #000000;
     padding: 18px 16px;
     text-align: left;
     font-weight: 600;

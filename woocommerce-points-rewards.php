@@ -289,7 +289,7 @@ class WC_Points_Rewards {
             'birthday_points' => 200,
             'points_expiry_months' => 12,
             'min_cart_total' => 0,
-            'max_discount_percent' => 100,
+            'max_discount_percent' => 50,  // 預設最多折抵50%
             'notification_days' => 30,
             'enable_notifications' => 'yes',
             'enable_birthday_points' => 'yes',

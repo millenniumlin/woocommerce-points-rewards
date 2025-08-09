@@ -77,6 +77,10 @@ class WC_Points_Rewards_Settings {
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_registration_points');
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_birthday_points');
         
+        // 點數使用限制設定
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_max_discount_percent');
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_min_cart_total');
+        
         // 🚀 新增：顯示設定
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_show_in_shop_loop');
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_show_in_single_product');
@@ -182,6 +186,36 @@ class WC_Points_Rewards_Settings {
                                 <input type="number" id="birthday_points" name="wc_points_rewards_birthday_points" 
                                        value="<?php echo esc_attr($settings['birthday_points']); ?>" min="0">
                                 <p class="description"><?php _e('用戶設定生日時贈送的點數', 'wc-points-rewards'); ?></p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2><?php _e('點數使用限制', 'wc-points-rewards'); ?></h2>
+                
+                <!-- 點數使用限制設定 -->
+                <table class="form-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">
+                                <label for="max_discount_percent"><?php _e('單筆訂單最多折抵百分比', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="number" id="max_discount_percent" name="wc_points_rewards_max_discount_percent" 
+                                       value="<?php echo esc_attr($settings['max_discount_percent']); ?>" min="1" max="100" step="1">
+                                <span>%</span>
+                                <p class="description"><?php _e('限制單一訂單最多可折抵之點數百分比（例：設定50%，購物車小計$420，最多可折抵210點數）', 'wc-points-rewards'); ?></p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="min_cart_total"><?php _e('消費滿多少金額才能使用點數', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="number" id="min_cart_total" name="wc_points_rewards_min_cart_total" 
+                                       value="<?php echo esc_attr($settings['min_cart_total']); ?>" min="0" step="0.01">
+                                <p class="description"><?php _e('設定最低購物車金額門檻，未達門檻不顯示點數折抵區塊（設定為0表示無門檻限制）', 'wc-points-rewards'); ?></p>
                             </td>
                         </tr>
                     </tbody>
@@ -295,6 +329,10 @@ class WC_Points_Rewards_Settings {
             'registration_points' => get_option('wc_points_rewards_registration_points', '100'),
             'birthday_points' => get_option('wc_points_rewards_birthday_points', '200'),
             
+            // 點數使用限制設定
+            'max_discount_percent' => get_option('wc_points_rewards_max_discount_percent', '50'),
+            'min_cart_total' => get_option('wc_points_rewards_min_cart_total', '0'),
+            
             // 🚀 新增：顯示設定 - 商店頁面預設不顯示
             'show_in_shop_loop' => get_option('wc_points_rewards_show_in_shop_loop', 'no'),
             'show_in_single_product' => get_option('wc_points_rewards_show_in_single_product', 'yes'),
@@ -329,8 +367,10 @@ class WC_Points_Rewards_Settings {
             'points_expiry_months',
             'registration_points',
             'birthday_points',
-            'show_in_shop_loop',  // 🚀 新增
-            'show_in_single_product',  // 🚀 新增
+            'max_discount_percent',      // 新增
+            'min_cart_total',           // 新增
+            'show_in_shop_loop',        // 🚀 新增
+            'show_in_single_product',   // 🚀 新增
             'enable_tiers',
             'tier_period',
             'enable_notifications',

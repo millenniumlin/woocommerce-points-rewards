@@ -200,7 +200,24 @@ class WC_Points_Rewards_Member_Tier {
     }
     
     /**
-     * 檢查會員等級過期
+     * 檢查會員等級過期與降級邏輯
+     * 
+     * 會員等級降級邏輯說明：
+     * 1. 每日自動檢查所有會員的等級是否過期
+     * 2. 若等級已過期，重新計算該會員在當前年度的消費總額
+     * 3. 根據當前年度消費總額，重新評估並分配對應的會員等級
+     * 4. 若新等級低於原等級，則自動執行降級
+     * 5. 降級後重新設定等級開始日期和過期日期（+1年）
+     * 6. 發送等級變更通知給會員
+     * 
+     * 降級觸發條件：
+     * - 會員等級已到期（tier_expiry_date <= 當前時間）
+     * - 當前年度消費不足以維持原有等級
+     * 
+     * 降級計算方式：
+     * - 基於當前年度實際消費金額
+     * - 採用向下匹配：找出消費金額能夠達到的最高等級
+     * - 確保等級分配的公平性和準確性
      */
     public function check_tier_expiry() {
         global $wpdb;
@@ -208,7 +225,7 @@ class WC_Points_Rewards_Member_Tier {
         $stats_table = $wpdb->prefix . 'wc_points_rewards_user_stats';
         $tiers_table = $wpdb->prefix . 'wc_points_rewards_tiers';
         
-        // 獲取過期的會員
+        // 獲取過期的會員等級記錄
         $expired_members = $wpdb->get_results("
             SELECT * FROM $stats_table 
             WHERE tier_expiry_date IS NOT NULL 
@@ -218,6 +235,7 @@ class WC_Points_Rewards_Member_Tier {
         
         foreach ($expired_members as $member) {
             // 重新計算等級（基於當前年度消費）
+            // 降級邏輯：以當前年度實際消費重新評估等級
             $current_year = date('Y');
             $current_spent = $wpdb->get_var($wpdb->prepare("
                 SELECT total_spent FROM $stats_table 
@@ -226,7 +244,8 @@ class WC_Points_Rewards_Member_Tier {
             
             $current_spent = $current_spent ? floatval($current_spent) : 0;
             
-            // 獲取符合的等級
+            // 根據當前消費金額獲取符合的等級（可能比原等級低）
+            // 降級機制：若消費不足，自動降至符合條件的較低等級
             $new_tier = $wpdb->get_row($wpdb->prepare("
                 SELECT * FROM $tiers_table 
                 WHERE min_amount <= %f 
@@ -235,18 +254,20 @@ class WC_Points_Rewards_Member_Tier {
             ", $current_spent));
             
             if ($new_tier) {
-                // 更新會員等級
+                // 執行等級更新（包含可能的降級）
+                // 無論升級或降級都會重新設定等級期限
                 $wpdb->update(
                     $stats_table,
                     array(
                         'current_tier_id' => $new_tier->id,
                         'tier_start_date' => current_time('mysql'),
-                        'tier_expiry_date' => date('Y-m-d H:i:s', strtotime('+1 year'))
+                        'tier_expiry_date' => date('Y-m-d H:i:s', strtotime('+1 year')) // 等級有效期：1年
                     ),
                     array('user_id' => $member->user_id, 'year' => $member->year)
                 );
                 
-                // 發送等級變更通知
+                // 發送等級變更通知（包含降級通知）
+                // 讓會員了解其等級變化原因和新的權益
                 do_action('wc_points_rewards_tier_changed', $member->user_id, $new_tier, $member->current_tier_id);
             }
         }
