@@ -510,7 +510,7 @@ class WC_Points_Rewards_Account {
             </p>
             
             <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-                <label for="birthday"><?php _e('出生年月日', 'wc-points-rewards'); ?></label>
+                <label for="birthday"><?php _e('出生 - 年/月/日', 'wc-points-rewards'); ?></label>
                 <input type="date" class="woocommerce-Input woocommerce-Input--date input-text" 
                        name="birthday" id="birthday" 
                        value="<?php echo esc_attr($birthday); ?>"
@@ -565,22 +565,18 @@ class WC_Points_Rewards_Account {
                     update_user_meta($user_id, 'birthday', $birthday);
                     update_user_meta($user_id, 'birthday_set', true);
                     
-                    // 發放生日點數
-                    $settings = get_option('wc_points_rewards_settings', array());
-                    $birthday_points = floatval($settings['birthday_points'] ?? 0);
+                    // 修正：不立即發放生日點數，而是等到生日月的第1天發放
+                    $birthday_date = new DateTime($birthday);
+                    $current_date = new DateTime();
                     
-                    if ($birthday_points > 0) {
-                        $database = WC_Points_Rewards_Database::instance();
-                        $database->add_points($user_id, $birthday_points, 'earned', __('設定生日獎勵', 'wc-points-rewards'));
-                        
-                        wc_add_notice(sprintf(
-                            __('生日設定成功！您獲得了 %s 生日獎勵點數。', 'wc-points-rewards'),
-                            wc_points_rewards_number_format($birthday_points) . ' ' . __('點', 'wc-points-rewards')
-                        ), 'success');
+                    // 如果當前是生日月且今天是1號，則發放點數
+                    if ($birthday_date->format('m') === $current_date->format('m') && $current_date->format('j') == '1') {
+                        do_action('wc_points_rewards_birthday_set', $user_id);
                     }
                     
-                    // 檢查是否當天生日
-                    do_action('wc_points_rewards_birthday_set', $user_id);
+                    wc_add_notice(sprintf(
+                        __('生日設定成功！生日點數將於生日月的第1天發放。', 'wc-points-rewards')
+                    ), 'success');
                 }
             }
         }
