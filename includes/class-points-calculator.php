@@ -58,6 +58,9 @@ class WC_Points_Rewards_Points_Calculator {
         // 每日檢查生日點數
         add_action('wc_points_rewards_daily_birthday_check', array($this, 'check_birthday_points'));
         
+        // 生日設定時也檢查是否當天生日
+        add_action('wc_points_rewards_birthday_set', array($this, 'check_immediate_birthday_bonus'));
+        
         // 購物車中顯示可獲得的點數
         add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_info'));
         
@@ -258,6 +261,23 @@ class WC_Points_Rewards_Points_Calculator {
         
         foreach ($birthday_users as $user) {
             $this->award_birthday_points($user->user_id);
+        }
+    }
+    
+    /**
+     * 檢查用戶是否當天生日並立即發放點數
+     */
+    public function check_immediate_birthday_bonus($user_id) {
+        $birthday = get_user_meta($user_id, 'birthday', true);
+        
+        if ($birthday) {
+            $birthday_date = new DateTime($birthday);
+            $today = new DateTime();
+            
+            // 檢查是否今天生日（月和日相同）
+            if ($birthday_date->format('m-d') === $today->format('m-d')) {
+                $this->award_birthday_points($user_id);
+            }
         }
     }
     

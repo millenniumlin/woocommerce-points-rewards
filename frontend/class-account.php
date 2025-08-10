@@ -578,6 +578,9 @@ class WC_Points_Rewards_Account {
                             wc_points_rewards_number_format($birthday_points) . ' ' . __('點', 'wc-points-rewards')
                         ), 'success');
                     }
+                    
+                    // 檢查是否當天生日
+                    do_action('wc_points_rewards_birthday_set', $user_id);
                 }
             }
         }
