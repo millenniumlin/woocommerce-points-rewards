@@ -91,8 +91,23 @@ class WC_Points_Rewards_Checkout {
         $calculator = WC_Points_Rewards_Points_Calculator::instance();
         $settings = get_option('wc_points_rewards_settings', array());
         
-        // 檢查是否啟用購物車點數折抵
-        if (!isset($settings['enable_cart_redemption']) || $settings['enable_cart_redemption'] !== 'yes') {
+        // 🚀 修復：檢查是否啟用購物車點數折抵（支援新舊兩種設定方式）
+        $enable_cart_redemption = false;
+        
+        // 優先檢查新的個別設定方式
+        if (get_option('wc_points_rewards_enable_cart_redemption', null) !== null) {
+            $enable_cart_redemption = get_option('wc_points_rewards_enable_cart_redemption', 'yes') === 'yes';
+        } 
+        // 回退到舊的設定數組方式
+        elseif (isset($settings['enable_cart_redemption'])) {
+            $enable_cart_redemption = $settings['enable_cart_redemption'] === 'yes';
+        }
+        // 預設啟用
+        else {
+            $enable_cart_redemption = true;
+        }
+        
+        if (!$enable_cart_redemption) {
             return;
         }
         

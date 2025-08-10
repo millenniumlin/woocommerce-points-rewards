@@ -277,6 +277,9 @@ class WC_Points_Rewards {
             // 點數系統啟用設定
             'enable_points_system' => 'yes',
             
+            // 🚀 修復：新增購物車點數折抵設定
+            'enable_cart_redemption' => 'yes',
+            
             // 前台顯示控制設定
             'show_in_menu' => 'no',  // 預設不在選單顯示
             'show_in_shop_loop' => 'yes',

@@ -139,6 +139,16 @@ class WC_Points_Rewards_Admin {
             'wc-points-rewards-settings',
             array($this, 'admin_settings_page')
         );
+        
+        // 🚀 新增：診斷工具
+        add_submenu_page(
+            'wc-points-rewards',
+            __('診斷信息', 'wc-points-rewards'),
+            __('診斷信息', 'wc-points-rewards'),
+            'manage_woocommerce',
+            'wc-points-rewards-debug',
+            array($this, 'admin_debug_page')
+        );
     }
     
     /**
@@ -381,6 +391,17 @@ class WC_Points_Rewards_Admin {
             } else {
                 $this->show_fallback_page(__('設定', 'wc-points-rewards'), __('設定頁面開發中...', 'wc-points-rewards'));
             }
+        }
+    }
+    
+    /**
+     * 🚀 新增：診斷信息頁面
+     */
+    public function admin_debug_page() {
+        if (file_exists(WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/views/debug-info.php')) {
+            include WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/views/debug-info.php';
+        } else {
+            $this->show_fallback_page(__('診斷信息', 'wc-points-rewards'), __('診斷頁面文件缺失', 'wc-points-rewards'));
         }
     }
     

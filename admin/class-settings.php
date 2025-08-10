@@ -81,6 +81,9 @@ class WC_Points_Rewards_Settings {
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_show_in_shop_loop');
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_show_in_single_product');
         
+        // 🚀 修復：購物車點數折抵設定
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_enable_cart_redemption');
+        
         // 會員等級設定
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_enable_tiers');
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_tier_period');
@@ -213,6 +216,17 @@ class WC_Points_Rewards_Settings {
                                 <p class="description"><?php _e('在單一商品頁面顯示可獲得的點數', 'wc-points-rewards'); ?></p>
                             </td>
                         </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="enable_cart_redemption"><?php _e('啟用購物車點數折抵', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="checkbox" id="enable_cart_redemption" name="wc_points_rewards_enable_cart_redemption" value="yes" 
+                                       <?php checked($settings['enable_cart_redemption'], 'yes'); ?>>
+                                <p class="description"><?php _e('在購物車和結帳頁面顯示點數折抵選項', 'wc-points-rewards'); ?></p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 
@@ -299,6 +313,9 @@ class WC_Points_Rewards_Settings {
             'show_in_shop_loop' => get_option('wc_points_rewards_show_in_shop_loop', 'no'),
             'show_in_single_product' => get_option('wc_points_rewards_show_in_single_product', 'yes'),
             
+            // 🚀 修復：購物車點數折抵設定
+            'enable_cart_redemption' => get_option('wc_points_rewards_enable_cart_redemption', 'yes'),
+            
             'enable_tiers' => get_option('wc_points_rewards_enable_tiers', 'yes'),
             'tier_period' => get_option('wc_points_rewards_tier_period', 'yearly'),
             'enable_notifications' => get_option('wc_points_rewards_enable_notifications', 'yes'),
@@ -331,6 +348,7 @@ class WC_Points_Rewards_Settings {
             'birthday_points',
             'show_in_shop_loop',  // 🚀 新增
             'show_in_single_product',  // 🚀 新增
+            'enable_cart_redemption',  // 🚀 修復：新增購物車點數折抵設定
             'enable_tiers',
             'tier_period',
             'enable_notifications',
