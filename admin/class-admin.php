@@ -142,7 +142,7 @@ class WC_Points_Rewards_Admin {
     }
     
     /**
-     * 載入管理後台腳本和樣式
+     * 載入管理後台腳本和樣式 - 已移除非功能性前端資源
      */
     public function enqueue_admin_scripts($hook) {
         // 只在相關頁面載入
@@ -152,23 +152,8 @@ class WC_Points_Rewards_Admin {
         
         wp_enqueue_script('jquery-ui-sortable');
         
-        wp_enqueue_script(
-            'wc-points-rewards-admin',
-            WC_POINTS_REWARDS_PLUGIN_URL . 'assets/js/admin.js',
-            array('jquery', 'wp-util', 'jquery-ui-sortable'),
-            WC_POINTS_REWARDS_VERSION,
-            true
-        );
-        
-        wp_enqueue_style(
-            'wc-points-rewards-admin',
-            WC_POINTS_REWARDS_PLUGIN_URL . 'assets/css/admin.css',
-            array(),
-            WC_POINTS_REWARDS_VERSION
-        );
-        
-        // 本地化腳本
-        wp_localize_script('wc-points-rewards-admin', 'wcPointsRewardsAdmin', array(
+        // 前端 CSS/JS 資源已移除，只保留必要的本地化腳本
+        wp_localize_script('jquery', 'wcPointsRewardsAdmin', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('wc_points_rewards_admin_nonce'),
             'confirmDelete' => __('確定要刪除嗎？此操作無法復原。', 'wc-points-rewards'),

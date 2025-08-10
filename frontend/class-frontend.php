@@ -265,35 +265,16 @@ class WC_Points_Rewards_Frontend {
     }
     
     /**
-     * 🚀 更安全的腳本載入
+     * 載入腳本和樣式 - 已移除非功能性前端資源
      */
     public function enqueue_scripts() {
-        // 🚀 關鍵修正：不要在所有頁面載入，只在需要時載入
-        if (!$this->should_load_scripts()) {
-            return;
-        }
+        // 前端 CSS/JS 資源已移除，因為對前台沒有作用
+        // 如需要特定樣式，建議在主題中處理或使用內聯樣式
         
-        // 🚀 修正：不載入我們自己的 JavaScript，避免衝突
-        // 只載入必要的 CSS
-        wp_enqueue_style(
-            'wc-points-rewards-frontend',
-            WC_POINTS_REWARDS_PLUGIN_URL . 'assets/css/frontend.css',
-            array(),
-            WC_POINTS_REWARDS_VERSION
-        );
-        
-        // 🚀 修正：只在確實需要 AJAX 的頁面才載入 JavaScript
+        // 🚀 修正：只在確實需要 AJAX 的頁面才設定本地化腳本
         if (is_checkout() || is_cart()) {
-            wp_enqueue_script(
-                'wc-points-rewards-frontend',
-                WC_POINTS_REWARDS_PLUGIN_URL . 'assets/js/frontend.js',
-                array('jquery'),
-                WC_POINTS_REWARDS_VERSION,
-                true
-            );
-            
-            // 本地化腳本
-            wp_localize_script('wc-points-rewards-frontend', 'wcPointsRewards', array(
+            // 為 AJAX 功能提供必要的本地化數據
+            wp_localize_script('jquery', 'wcPointsRewards', array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('wc_points_rewards_nonce'),
                 'messages' => array(
@@ -305,14 +286,6 @@ class WC_Points_Rewards_Frontend {
                 )
             ));
         }
-    }
-    
-    /**
-     * 🚀 檢查是否應該載入腳本
-     */
-    private function should_load_scripts() {
-        // 只在 WooCommerce 相關頁面載入
-        return (is_woocommerce() || is_cart() || is_checkout() || is_account_page());
     }
     
     /**
