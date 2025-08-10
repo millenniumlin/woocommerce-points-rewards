@@ -224,6 +224,7 @@ class WC_Points_Rewards {
         // 清除排程任務
         wp_clear_scheduled_hook('wc_points_rewards_daily_cleanup');
         wp_clear_scheduled_hook('wc_points_rewards_notification_check');
+        wp_clear_scheduled_hook('wc_points_rewards_daily_birthday_check');
         
         // 停用時也重新整理重寫規則，移除我們的端點
         flush_rewrite_rules(false);
@@ -300,7 +301,8 @@ class WC_Points_Rewards {
             'birthday_points' => 200,
             'points_expiry_months' => 12,
             'min_cart_total' => 0,
-            'max_discount_percent' => 100,
+            'max_discount_percent' => 50,
+            'enable_cart_redemption' => 'yes',
             'notification_days' => 30,
             'enable_notifications' => 'yes',
             'enable_birthday_points' => 'yes',
@@ -396,6 +398,11 @@ class WC_Points_Rewards {
         
         if (!wp_next_scheduled('wc_points_rewards_notification_check')) {
             wp_schedule_event(time(), 'daily', 'wc_points_rewards_notification_check');
+        }
+        
+        // 新增：每日生日點數檢查
+        if (!wp_next_scheduled('wc_points_rewards_daily_birthday_check')) {
+            wp_schedule_event(time(), 'daily', 'wc_points_rewards_daily_birthday_check');
         }
     }
 }

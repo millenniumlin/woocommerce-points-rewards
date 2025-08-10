@@ -55,6 +55,9 @@ class WC_Points_Rewards_Points_Calculator {
         // 生日贈送點數（需要自定義觸發）
         add_action('wc_points_rewards_birthday_bonus', array($this, 'award_birthday_points'));
         
+        // 每日檢查生日點數
+        add_action('wc_points_rewards_daily_birthday_check', array($this, 'check_birthday_points'));
+        
         // 購物車中顯示可獲得的點數
         add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_info'));
         
@@ -135,17 +138,15 @@ class WC_Points_Rewards_Points_Calculator {
      * 根據金額計算基礎點數
      */
     public function calculate_points_for_amount($amount) {
-        $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 100;
-        $points_amount = isset($this->settings['points_amount']) ? floatval($this->settings['points_amount']) : 1;
+        $points_per_amount = floatval(get_option('wc_points_rewards_points_per_amount', 100));
         $decimal_places = wc_get_price_decimals(); // 使用 WooCommerce 小數位數設定
         
         if ($points_per_amount <= 0) {
             return 0;
         }
         
-        // 計算基礎點數（只取百位數，例如256元只算200元）
-        $eligible_amount = floor($amount / $points_per_amount) * $points_per_amount;
-        $points = ($eligible_amount / $points_per_amount) * $points_amount;
+        // 計算基礎點數：每消費 $points_per_amount 元獲得 1 點
+        $points = floor($amount / $points_per_amount);
         
         return round($points, $decimal_places);
     }
@@ -164,18 +165,18 @@ class WC_Points_Rewards_Points_Calculator {
      * 註冊贈送點數
      */
     public function award_registration_points($user_id) {
-        if (!isset($this->settings['enable_registration_points']) || $this->settings['enable_registration_points'] !== 'yes') {
-            return;
-        }
-        
-        $points = isset($this->settings['registration_points']) ? floatval($this->settings['registration_points']) : 0;
+        // 檢查註冊點數是否設定且大於0
+        $points = floatval(get_option('wc_points_rewards_registration_points', 0));
         
         if ($points > 0) {
             $database = WC_Points_Rewards_Database::instance();
             
             // 計算過期時間
-            $expiry_months = isset($this->settings['points_expiry_months']) ? intval($this->settings['points_expiry_months']) : 12;
-            $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
+            $expiry_months = intval(get_option('wc_points_rewards_points_expiry_months', 12));
+            $expiry_date = null;
+            if ($expiry_months > 0) {
+                $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
+            }
             
             $database->add_points(
                 $user_id,
@@ -192,33 +193,33 @@ class WC_Points_Rewards_Points_Calculator {
      * 生日贈送點數
      */
     public function award_birthday_points($user_id) {
-        if (!isset($this->settings['enable_birthday_points']) || $this->settings['enable_birthday_points'] !== 'yes') {
-            return;
-        }
-        
-        $points = isset($this->settings['birthday_points']) ? floatval($this->settings['birthday_points']) : 0;
+        // 檢查生日點數是否設定且大於0
+        $points = floatval(get_option('wc_points_rewards_birthday_points', 0));
         
         if ($points > 0) {
             $database = WC_Points_Rewards_Database::instance();
             
             // 檢查今年是否已經發放過生日點數
             $current_year = date('Y');
-            $existing_birthday_points = $database->get_user_points_history($user_id, 1, 0);
+            global $wpdb;
+            $points_table = $wpdb->prefix . 'wc_points_rewards_points';
             
-            $already_awarded = false;
-            foreach ($existing_birthday_points as $record) {
-                if ($record->type === 'earned' && 
-                    strpos($record->description, '生日贈送') !== false && 
-                    date('Y', strtotime($record->created_at)) === $current_year) {
-                    $already_awarded = true;
-                    break;
-                }
-            }
+            $existing_birthday_points = $wpdb->get_var($wpdb->prepare("
+                SELECT COUNT(*) 
+                FROM $points_table 
+                WHERE user_id = %d 
+                AND type = 'earned' 
+                AND description = %s 
+                AND YEAR(created_at) = %d
+            ", $user_id, __('生日贈送點數', 'wc-points-rewards'), $current_year));
             
-            if (!$already_awarded) {
+            if (!$existing_birthday_points) {
                 // 計算過期時間
-                $expiry_months = isset($this->settings['points_expiry_months']) ? intval($this->settings['points_expiry_months']) : 12;
-                $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
+                $expiry_months = intval(get_option('wc_points_rewards_points_expiry_months', 12));
+                $expiry_date = null;
+                if ($expiry_months > 0) {
+                    $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
+                }
                 
                 $database->add_points(
                     $user_id,
@@ -229,6 +230,34 @@ class WC_Points_Rewards_Points_Calculator {
                     $expiry_date
                 );
             }
+        }
+    }
+    
+    /**
+     * 檢查並發放生日點數 - 每日執行的 cron job
+     */
+    public function check_birthday_points() {
+        $birthday_points = floatval(get_option('wc_points_rewards_birthday_points', 0));
+        
+        if ($birthday_points <= 0) {
+            return;
+        }
+        
+        global $wpdb;
+        $current_month = date('n'); // 1-12
+        $current_day = date('j');   // 1-31
+        
+        // 查找今天生日的用戶
+        $birthday_users = $wpdb->get_results($wpdb->prepare("
+            SELECT user_id 
+            FROM {$wpdb->usermeta} 
+            WHERE meta_key = 'birthday' 
+            AND MONTH(STR_TO_DATE(meta_value, '%%Y-%%m-%%d')) = %d 
+            AND DAY(STR_TO_DATE(meta_value, '%%Y-%%m-%%d')) = %d
+        ", $current_month, $current_day));
+        
+        foreach ($birthday_users as $user) {
+            $this->award_birthday_points($user->user_id);
         }
     }
     
@@ -311,8 +340,8 @@ class WC_Points_Rewards_Points_Calculator {
      * 計算點數折抵金額
      */
     public function calculate_discount_amount($points) {
-        // 通常 1 點 = 1 元折抵，可以在設定中調整
-        $point_value = 1; // 可以從設定中獲取
+        // 使用設定中的點數價值：1點 = 多少元
+        $point_value = floatval(get_option('wc_points_rewards_points_value', 1));
         return $points * $point_value;
     }
     
@@ -320,8 +349,8 @@ class WC_Points_Rewards_Points_Calculator {
      * 檢查點數是否可以使用
      */
     public function can_use_points($cart_total, $points_to_use) {
-        $min_cart_total = isset($this->settings['min_cart_total']) ? floatval($this->settings['min_cart_total']) : 0;
-        $max_discount_percent = isset($this->settings['max_discount_percent']) ? floatval($this->settings['max_discount_percent']) : 100;
+        $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
+        $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 50));
         
         // 檢查購物車金額是否達到最低要求
         if ($cart_total < $min_cart_total) {

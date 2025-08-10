@@ -77,6 +77,11 @@ class WC_Points_Rewards_Settings {
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_registration_points');
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_birthday_points');
         
+        // 購物車點數使用限制設定
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_enable_cart_redemption');
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_min_cart_total');
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_max_discount_percent');
+        
         // 🚀 新增：顯示設定
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_show_in_shop_loop');
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_show_in_single_product');
@@ -182,6 +187,45 @@ class WC_Points_Rewards_Settings {
                                 <input type="number" id="birthday_points" name="wc_points_rewards_birthday_points" 
                                        value="<?php echo esc_attr($settings['birthday_points']); ?>" min="0">
                                 <p class="description"><?php _e('用戶設定生日時贈送的點數', 'wc-points-rewards'); ?></p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2><?php _e('購物車點數使用限制', 'wc-points-rewards'); ?></h2>
+                
+                <table class="form-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">
+                                <label for="enable_cart_redemption"><?php _e('啟用購物車點數折抵', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="checkbox" id="enable_cart_redemption" name="wc_points_rewards_enable_cart_redemption" value="yes" 
+                                       <?php checked($settings['enable_cart_redemption'], 'yes'); ?>>
+                                <p class="description"><?php _e('允許用戶在購物車和結帳頁面使用點數折抵', 'wc-points-rewards'); ?></p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="min_cart_total"><?php _e('最低購物車金額', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="number" id="min_cart_total" name="wc_points_rewards_min_cart_total" 
+                                       value="<?php echo esc_attr($settings['min_cart_total']); ?>" min="0" step="0.01">
+                                <p class="description"><?php _e('購物車小計金額超過多少後才能開始使用點數（0表示無限制）', 'wc-points-rewards'); ?></p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="max_discount_percent"><?php _e('最大折抵比例', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="number" id="max_discount_percent" name="wc_points_rewards_max_discount_percent" 
+                                       value="<?php echo esc_attr($settings['max_discount_percent']); ?>" min="1" max="100" step="1">
+                                <p class="description"><?php _e('單筆消費訂單最多可以使用多少%比例的購物車小計金額來使用點數', 'wc-points-rewards'); ?></p>
                             </td>
                         </tr>
                     </tbody>
@@ -295,6 +339,11 @@ class WC_Points_Rewards_Settings {
             'registration_points' => get_option('wc_points_rewards_registration_points', '100'),
             'birthday_points' => get_option('wc_points_rewards_birthday_points', '200'),
             
+            // 購物車點數使用限制設定
+            'enable_cart_redemption' => get_option('wc_points_rewards_enable_cart_redemption', 'yes'),
+            'min_cart_total' => get_option('wc_points_rewards_min_cart_total', '0'),
+            'max_discount_percent' => get_option('wc_points_rewards_max_discount_percent', '50'),
+            
             // 🚀 新增：顯示設定 - 商店頁面預設不顯示
             'show_in_shop_loop' => get_option('wc_points_rewards_show_in_shop_loop', 'no'),
             'show_in_single_product' => get_option('wc_points_rewards_show_in_single_product', 'yes'),
@@ -329,6 +378,9 @@ class WC_Points_Rewards_Settings {
             'points_expiry_months',
             'registration_points',
             'birthday_points',
+            'enable_cart_redemption',
+            'min_cart_total',
+            'max_discount_percent',
             'show_in_shop_loop',  // 🚀 新增
             'show_in_single_product',  // 🚀 新增
             'enable_tiers',
