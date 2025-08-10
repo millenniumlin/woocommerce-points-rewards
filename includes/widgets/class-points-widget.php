@@ -79,7 +79,7 @@ class WC_Points_Rewards_Widget extends WP_Widget {
         
         // 連結
         echo '<div class="widget-links">';
-        echo '<a href="' . wc_get_account_endpoint_url('points-rewards') . '" class="points-link">' . __('查看詳情', 'wc-points-rewards') . '</a>';
+        echo '<a href="' . wc_points_rewards_get_account_endpoint_url('points-rewards') . '" class="points-link">' . __('查看詳情', 'wc-points-rewards') . '</a>';
         echo '</div>';
         
         echo '</div>';

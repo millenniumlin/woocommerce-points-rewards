@@ -99,7 +99,7 @@ if (!defined('ABSPATH')) {
     <?php if ($total_pages > 1): ?>
     <div class="points-history-pagination">
         <?php
-        $base_url = wc_get_account_endpoint_url('points-history');
+        $base_url = wc_points_rewards_get_account_endpoint_url('points-history');
         if ($type_filter) {
             $base_url = add_query_arg('filter_type', $type_filter, $base_url);
         }

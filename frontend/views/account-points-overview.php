@@ -68,7 +68,7 @@ if (!defined('ABSPATH')) {
             <?php endforeach; ?>
         </div>
         <div class="view-all-link">
-            <a href="<?php echo wc_get_account_endpoint_url('points-history'); ?>" class="button">
+            <a href="<?php echo wc_points_rewards_get_account_endpoint_url('points-history'); ?>" class="button">
                 <?php _e('查看全部記錄', 'wc-points-rewards'); ?>
             </a>
         </div>
@@ -82,10 +82,10 @@ if (!defined('ABSPATH')) {
             <a href="<?php echo wc_get_page_permalink('shop'); ?>" class="button button-primary">
                 <?php _e('立即購物', 'wc-points-rewards'); ?>
             </a>
-            <a href="<?php echo wc_get_account_endpoint_url('points-history'); ?>" class="button">
+            <a href="<?php echo wc_points_rewards_get_account_endpoint_url('points-history'); ?>" class="button">
                 <?php _e('查看記錄', 'wc-points-rewards'); ?>
             </a>
-            <a href="<?php echo wc_get_account_endpoint_url('member-tier'); ?>" class="button">
+            <a href="<?php echo wc_points_rewards_get_account_endpoint_url('member-tier'); ?>" class="button">
                 <?php _e('會員等級', 'wc-points-rewards'); ?>
             </a>
         </div>
