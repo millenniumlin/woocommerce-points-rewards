@@ -165,17 +165,30 @@ class WC_Points_Rewards {
             }
         }
         
-        // 前端功能
-        if (!is_admin()) {
-            if (class_exists('WC_Points_Rewards_Frontend')) {
-                WC_Points_Rewards_Frontend::instance();
-            }
-            if (class_exists('WC_Points_Rewards_Checkout')) {
-                WC_Points_Rewards_Checkout::instance();
-            }
-            if (class_exists('WC_Points_Rewards_Account')) {
-                WC_Points_Rewards_Account::instance();
-            }
+        // 前端功能 - 🚀 修復：確保在適當的時機載入並增加錯誤檢查
+        if (!is_admin() || (defined('DOING_AJAX') && DOING_AJAX)) {
+            // 確保 WooCommerce 已載入
+            add_action('woocommerce_loaded', array($this, 'init_frontend_classes'));
+        }
+    }
+    
+    /**
+     * 🚀 新增：初始化前端類別
+     */
+    public function init_frontend_classes() {
+        // 只在前端或 AJAX 請求時執行
+        if (is_admin() && !(defined('DOING_AJAX') && DOING_AJAX)) {
+            return;
+        }
+        
+        if (class_exists('WC_Points_Rewards_Frontend')) {
+            WC_Points_Rewards_Frontend::instance();
+        }
+        if (class_exists('WC_Points_Rewards_Checkout')) {
+            WC_Points_Rewards_Checkout::instance();
+        }
+        if (class_exists('WC_Points_Rewards_Account')) {
+            WC_Points_Rewards_Account::instance();
         }
     }
     
@@ -268,11 +281,37 @@ class WC_Points_Rewards {
      * 設定預設設定值
      */
     private function set_default_settings() {
-        // 檢查是否已經有設定
-        if (get_option('wc_points_rewards_settings')) {
-            return; // 已經有設定，不要覆蓋
+        // 🚀 修復：更智能的設定初始化
+        $existing_settings = get_option('wc_points_rewards_settings', false);
+        
+        // 如果已經有設定，只添加缺失的設定項
+        if ($existing_settings !== false && is_array($existing_settings)) {
+            $updated = false;
+            
+            // 檢查是否缺少重要的設定項
+            $critical_settings = array(
+                'enable_cart_redemption' => 'yes',
+                'enable_points_system' => 'yes',
+                'points_per_amount' => 100,
+                'points_value' => 0.01,
+                'points_name' => '點'
+            );
+            
+            foreach ($critical_settings as $key => $default_value) {
+                if (!isset($existing_settings[$key])) {
+                    $existing_settings[$key] = $default_value;
+                    $updated = true;
+                }
+            }
+            
+            if ($updated) {
+                update_option('wc_points_rewards_settings', $existing_settings);
+            }
+            
+            return; // 不要覆蓋現有設定
         }
         
+        // 全新安裝，使用完整的預設設定
         $default_settings = array(
             // 點數系統啟用設定
             'enable_points_system' => 'yes',

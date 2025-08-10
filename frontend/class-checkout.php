@@ -40,11 +40,8 @@ class WC_Points_Rewards_Checkout {
      * 初始化 hooks
      */
     private function init_hooks() {
-        // 購物車頁面顯示點數使用選項
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_section'));
-        
-        // 結帳頁面顯示點數使用選項
-        add_action('woocommerce_review_order_after_order_total', array($this, 'display_checkout_points_section'));
+        // 🚀 修復：確保在正確的時機載入購物車和結帳頁面功能
+        add_action('init', array($this, 'init_cart_checkout_hooks'), 20);
         
         // 處理點數折扣
         add_action('woocommerce_cart_calculate_fees', array($this, 'apply_points_discount'));
@@ -58,6 +55,22 @@ class WC_Points_Rewards_Checkout {
         
         // 購物車更新時檢查點數使用
         add_action('woocommerce_cart_updated', array($this, 'validate_points_usage'));
+    }
+    
+    /**
+     * 🚀 新增：初始化購物車和結帳頁面的 hooks
+     */
+    public function init_cart_checkout_hooks() {
+        // 確保只在前端且 WooCommerce 可用時執行
+        if (is_admin() || !class_exists('WooCommerce')) {
+            return;
+        }
+        
+        // 購物車頁面顯示點數使用選項
+        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_section'), 10);
+        
+        // 結帳頁面顯示點數使用選項
+        add_action('woocommerce_review_order_after_order_total', array($this, 'display_checkout_points_section'), 10);
     }
     
     /**

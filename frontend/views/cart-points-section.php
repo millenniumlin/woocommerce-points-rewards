@@ -145,7 +145,7 @@ jQuery(document).ready(function($) {
         $button.prop('disabled', true).text('<?php _e('處理中...', 'wc-points-rewards'); ?>');
         
         $.ajax({
-            url: wcPointsRewards.ajaxUrl,
+            url: (typeof wcPointsRewards !== 'undefined' && wcPointsRewards.ajaxUrl) ? wcPointsRewards.ajaxUrl : '<?php echo admin_url('admin-ajax.php'); ?>',
             type: 'POST',
             data: {
                 action: 'wc_points_rewards_apply_discount',
@@ -178,7 +178,7 @@ jQuery(document).ready(function($) {
         $button.prop('disabled', true).text('<?php _e('處理中...', 'wc-points-rewards'); ?>');
         
         $.ajax({
-            url: wcPointsRewards.ajaxUrl,
+            url: (typeof wcPointsRewards !== 'undefined' && wcPointsRewards.ajaxUrl) ? wcPointsRewards.ajaxUrl : '<?php echo admin_url('admin-ajax.php'); ?>',
             type: 'POST',
             data: {
                 action: 'wc_points_rewards_remove_discount',

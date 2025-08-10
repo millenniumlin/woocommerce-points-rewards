@@ -268,13 +268,7 @@ class WC_Points_Rewards_Frontend {
      * 🚀 更安全的腳本載入
      */
     public function enqueue_scripts() {
-        // 🚀 關鍵修正：不要在所有頁面載入，只在需要時載入
-        if (!$this->should_load_scripts()) {
-            return;
-        }
-        
-        // 🚀 修正：不載入我們自己的 JavaScript，避免衝突
-        // 只載入必要的 CSS
+        // 🚀 修復：先載入 CSS，再決定是否載入 JS
         wp_enqueue_style(
             'wc-points-rewards-frontend',
             WC_POINTS_REWARDS_PLUGIN_URL . 'assets/css/frontend.css',
@@ -282,8 +276,8 @@ class WC_Points_Rewards_Frontend {
             WC_POINTS_REWARDS_VERSION
         );
         
-        // 🚀 修正：只在確實需要 AJAX 的頁面才載入 JavaScript
-        if (is_checkout() || is_cart()) {
+        // 🚀 修復：在需要的頁面載入 JavaScript
+        if ($this->should_load_scripts()) {
             wp_enqueue_script(
                 'wc-points-rewards-frontend',
                 WC_POINTS_REWARDS_PLUGIN_URL . 'assets/js/frontend.js',
@@ -311,8 +305,22 @@ class WC_Points_Rewards_Frontend {
      * 🚀 檢查是否應該載入腳本
      */
     private function should_load_scripts() {
-        // 只在 WooCommerce 相關頁面載入
-        return (is_woocommerce() || is_cart() || is_checkout() || is_account_page());
+        // 🚀 修復：更寬容的檢查條件
+        if (is_cart() || is_checkout() || is_account_page()) {
+            return true;
+        }
+        
+        // 檢查是否為 WooCommerce 相關頁面
+        if (function_exists('is_woocommerce') && is_woocommerce()) {
+            return true;
+        }
+        
+        // 檢查是否為 AJAX 請求
+        if (defined('DOING_AJAX') && DOING_AJAX) {
+            return true;
+        }
+        
+        return false;
     }
     
     /**
