@@ -85,6 +85,19 @@ class WC_Points_Rewards_Account {
             WC()->query->query_vars['points-history'] = 'points-history';
             WC()->query->query_vars['member-tier'] = 'member-tier';
         }
+        
+        // 🚀 新增：確保端點被加入到 WooCommerce 端點列表
+        add_filter('woocommerce_get_query_vars', array($this, 'add_wc_query_vars'));
+    }
+    
+    /**
+     * 🚀 新增：添加查詢變數到 WooCommerce
+     */
+    public function add_wc_query_vars($vars) {
+        $vars['points-rewards'] = 'points-rewards';
+        $vars['points-history'] = 'points-history';
+        $vars['member-tier'] = 'member-tier';
+        return $vars;
     }
     
     /**
@@ -111,6 +124,28 @@ class WC_Points_Rewards_Account {
                     }
                 }
             }
+        }
+    }
+    
+    /**
+     * 🚀 新增：產生帳戶端點 URL 的輔助函數
+     */
+    public static function get_account_endpoint_url($endpoint) {
+        $account_page_id = wc_get_page_id('myaccount');
+        $account_page_url = get_permalink($account_page_id);
+        
+        if (!$account_page_url) {
+            return home_url('/my-account/' . $endpoint . '/');
+        }
+        
+        $permalink_structure = get_option('permalink_structure');
+        
+        if (empty($permalink_structure)) {
+            // 預設永久連結結構
+            return add_query_arg($endpoint, '1', $account_page_url);
+        } else {
+            // 美化永久連結結構
+            return trailingslashit($account_page_url) . $endpoint . '/';
         }
     }
     
@@ -164,8 +199,27 @@ class WC_Points_Rewards_Account {
                 // 🚀 修正：支援所有永久連結結構
                 $permalink_structure = get_option('permalink_structure');
                 
-                if ($permalink_structure) {
-                    // 美化連結結構
+                if (empty($permalink_structure)) {
+                    // 預設永久連結結構 (?p=123)
+                    add_rewrite_rule(
+                        '^index\.php\?page_id=' . $account_page_id . '&points-rewards=1$',
+                        'index.php?page_id=' . $account_page_id . '&points-rewards=1',
+                        'top'
+                    );
+                    
+                    add_rewrite_rule(
+                        '^index\.php\?page_id=' . $account_page_id . '&points-history=1$',
+                        'index.php?page_id=' . $account_page_id . '&points-history=1',
+                        'top'
+                    );
+                    
+                    add_rewrite_rule(
+                        '^index\.php\?page_id=' . $account_page_id . '&member-tier=1$',
+                        'index.php?page_id=' . $account_page_id . '&member-tier=1',
+                        'top'
+                    );
+                } else {
+                    // 美化連結結構（文章名稱、自訂結構等）
                     add_rewrite_rule(
                         '^' . $account_slug . '/points-rewards/?$',
                         'index.php?page_id=' . $account_page_id . '&points-rewards=1',
@@ -191,6 +245,25 @@ class WC_Points_Rewards_Account {
                         'top'
                     );
                 }
+                
+                // 📌 關鍵：增加查詢字串支援，確保向後兼容
+                add_rewrite_rule(
+                    '(.*)[\?&]points-rewards=1(.*)$',
+                    'index.php?page_id=' . $account_page_id . '&points-rewards=1',
+                    'top'
+                );
+                
+                add_rewrite_rule(
+                    '(.*)[\?&]points-history=1(.*)$',
+                    'index.php?page_id=' . $account_page_id . '&points-history=1',
+                    'top'
+                );
+                
+                add_rewrite_rule(
+                    '(.*)[\?&]member-tier=1(.*)$',
+                    'index.php?page_id=' . $account_page_id . '&member-tier=1',
+                    'top'
+                );
             }
         }
     }
@@ -527,7 +600,7 @@ class WC_Points_Rewards_Account {
                 echo '<div class="points-balance-widget">';
                 echo '<h3>' . __('我的點數', 'wc-points-rewards') . '</h3>';
                 echo '<div class="points-value">' . wc_points_rewards_number_format($current_points) . ' ' . __('點', 'wc-points-rewards') . '</div>';
-                echo '<a href="' . wc_get_account_endpoint_url('points-rewards') . '" class="button">' . __('查看詳情', 'wc-points-rewards') . '</a>';
+                echo '<a href="' . wc_points_rewards_get_account_endpoint_url('points-rewards') . '" class="button">' . __('查看詳情', 'wc-points-rewards') . '</a>';
                 echo '</div>';
             }
             
@@ -538,7 +611,7 @@ class WC_Points_Rewards_Account {
                 if ($current_tier->bonus_percentage > 0) {
                     echo '<div class="tier-benefit">+' . $current_tier->bonus_percentage . '% ' . __('點數回饋', 'wc-points-rewards') . '</div>';
                 }
-                echo '<a href="' . wc_get_account_endpoint_url('member-tier') . '" class="button">' . __('查看等級', 'wc-points-rewards') . '</a>';
+                echo '<a href="' . wc_points_rewards_get_account_endpoint_url('member-tier') . '" class="button">' . __('查看等級', 'wc-points-rewards') . '</a>';
                 echo '</div>';
             }
             
@@ -603,14 +676,14 @@ class WC_Points_Rewards_Account {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-                <p><a href="<?php echo wc_get_account_endpoint_url('points-history'); ?>"><?php _e('查看完整記錄', 'wc-points-rewards'); ?></a></p>
+                <p><a href="<?php echo wc_points_rewards_get_account_endpoint_url('points-history'); ?>"><?php _e('查看完整記錄', 'wc-points-rewards'); ?></a></p>
             </div>
             <?php endif; ?>
             
             <div class="quick-actions">
                 <a href="<?php echo wc_get_page_permalink('shop'); ?>" class="button"><?php _e('開始購物', 'wc-points-rewards'); ?></a>
-                <a href="<?php echo wc_get_account_endpoint_url('points-history'); ?>" class="button"><?php _e('查看記錄', 'wc-points-rewards'); ?></a>
-                <a href="<?php echo wc_get_account_endpoint_url('member-tier'); ?>" class="button"><?php _e('會員等級', 'wc-points-rewards'); ?></a>
+                <a href="<?php echo wc_points_rewards_get_account_endpoint_url('points-history'); ?>" class="button"><?php _e('查看記錄', 'wc-points-rewards'); ?></a>
+                <a href="<?php echo wc_points_rewards_get_account_endpoint_url('member-tier'); ?>" class="button"><?php _e('會員等級', 'wc-points-rewards'); ?></a>
             </div>
         </div>
         
@@ -797,7 +870,7 @@ class WC_Points_Rewards_Account {
             <?php if ($total_pages > 1): ?>
             <div class="wc-points-pagination">
                 <?php
-                $base_url = wc_get_account_endpoint_url('points-history');
+                $base_url = wc_points_rewards_get_account_endpoint_url('points-history');
                 if ($type_filter) {
                     $base_url = add_query_arg('filter_type', $type_filter, $base_url);
                 }
@@ -885,14 +958,25 @@ class WC_Points_Rewards_Account {
             <h3><?php _e('會員等級', 'wc-points-rewards'); ?></h3>
             
             <div class="current-tier-info">
-                <div class="tier-badge">
+                <div class="tier-card current">
                     <?php if ($current_tier): ?>
-                        <div class="tier-name"><?php echo esc_html($current_tier->name); ?></div>
-                        <?php if ($current_tier->bonus_percentage > 0): ?>
-                            <div class="tier-benefit">+<?php echo esc_html($current_tier->bonus_percentage); ?>% <?php _e('點數回饋', 'wc-points-rewards'); ?></div>
-                        <?php endif; ?>
+                        <div class="tier-name-badge"><?php echo esc_html($current_tier->name); ?>
+                            <span class="current-badge"><?php _e('目前等級', 'wc-points-rewards'); ?></span>
+                        </div>
+                        <div class="tier-requirements"><?php printf(__('消費滿 %s', 'wc-points-rewards'), wc_price($current_tier->min_amount)); ?></div>
+                        <div class="tier-benefits-info">
+                            <?php if ($current_tier->bonus_percentage > 0): ?>
+                                <span class="benefit-item">+<?php echo esc_html($current_tier->bonus_percentage); ?>% <?php _e('點數回饋', 'wc-points-rewards'); ?></span>
+                            <?php endif; ?>
+                        </div>
                     <?php else: ?>
-                        <div class="tier-name"><?php _e('一般會員', 'wc-points-rewards'); ?></div>
+                        <div class="tier-name-badge"><?php _e('一般會員', 'wc-points-rewards'); ?>
+                            <span class="current-badge"><?php _e('目前等級', 'wc-points-rewards'); ?></span>
+                        </div>
+                        <div class="tier-requirements"><?php _e('無特殊要求', 'wc-points-rewards'); ?></div>
+                        <div class="tier-benefits-info">
+                            <span class="benefit-item"><?php _e('標準回饋', 'wc-points-rewards'); ?></span>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -907,7 +991,7 @@ class WC_Points_Rewards_Account {
                     <div class="progress-fill" style="width: <?php echo esc_attr($tier_progress['progress_percentage'] ?? 0); ?>%"></div>
                 </div>
                 <div class="progress-details">
-                    <span><?php printf(__('已消費 %s', 'wc-points-rewards'), wc_price($tier_progress['current_spending'] ?? 0)); ?></span>
+                    <span><?php echo wc_price($tier_progress['current_spending'] ?? 0); ?></span>
                     <span><?php printf(__('還需 %s', 'wc-points-rewards'), wc_price($tier_progress['amount_to_next'] ?? 0)); ?></span>
                 </div>
             </div>

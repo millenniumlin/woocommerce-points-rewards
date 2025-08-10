@@ -504,7 +504,7 @@
 }
 
 .wc-points-history-table th {
-    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    background: #2c3e50;
     color: white;
     padding: 18px 16px;
     text-align: left;
@@ -522,10 +522,13 @@
     border-bottom: 1px solid #f1f3f4;
     vertical-align: middle;
     transition: background-color 0.2s ease;
+    background: white;
+    color: #2c3e50;
 }
 
 .wc-points-history-table tbody tr {
     transition: all 0.2s ease;
+    background: white;
 }
 
 .wc-points-history-table tbody tr:hover {
