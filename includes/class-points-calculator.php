@@ -241,40 +241,47 @@ class WC_Points_Rewards_Points_Calculator {
     
     /**
      * 檢查並發放生日點數 - 每日執行的 cron job
-     * 修正：在生日月的第1天發送點數，而非生日當天
+     * 修正：處理外掛安裝後的生日點數發放邏輯
      */
     public function check_birthday_points() {
+        // 檢查是否啟用生日點數功能
+        $enable_birthday_points = get_option('wc_points_rewards_enable_birthday_points', 'yes');
+        if ($enable_birthday_points !== 'yes') {
+            return;
+        }
+        
         $birthday_points = floatval(get_option('wc_points_rewards_birthday_points', 0));
         
         if ($birthday_points <= 0) {
             return;
         }
         
-        // 只在每月1日執行檢查
-        $current_day = date('j');
-        if ($current_day != 1) {
-            return;
-        }
-        
         global $wpdb;
         $current_month = date('n'); // 1-12
+        $current_year = date('Y');
         
-        // 查找當月生日的用戶（不限制日期）
+        // 查找當月生日的用戶（只查詢有設定生日且已確認的用戶）
         $birthday_users = $wpdb->get_results($wpdb->prepare("
-            SELECT user_id 
-            FROM {$wpdb->usermeta} 
-            WHERE meta_key = 'birthday' 
-            AND MONTH(STR_TO_DATE(meta_value, '%%Y-%%m-%%d')) = %d
+            SELECT DISTINCT u1.user_id 
+            FROM {$wpdb->usermeta} u1
+            INNER JOIN {$wpdb->usermeta} u2 ON u1.user_id = u2.user_id
+            WHERE u1.meta_key = 'birthday' 
+            AND u1.meta_value != ''
+            AND u1.meta_value IS NOT NULL
+            AND u2.meta_key = 'birthday_set'
+            AND u2.meta_value = '1'
+            AND MONTH(STR_TO_DATE(u1.meta_value, '%%Y-%%m-%%d')) = %d
         ", $current_month));
         
+        // 對每個生日用戶檢查是否已發放當年當月的生日點數
         foreach ($birthday_users as $user) {
             $this->award_birthday_points($user->user_id);
         }
     }
     
     /**
-     * 檢查用戶是否在生日月並立即發放點數
-     * 修正：檢查是否為生日月而非生日當天
+     * 檢查用戶設定生日時是否應立即發放生日點數
+     * 修正：當用戶設定生日時，如果是當前生日月，立即檢查是否應發放點數
      */
     public function check_immediate_birthday_bonus($user_id) {
         $birthday = get_user_meta($user_id, 'birthday', true);
@@ -285,11 +292,8 @@ class WC_Points_Rewards_Points_Calculator {
             
             // 檢查是否為生日月（只比較月份）
             if ($birthday_date->format('m') === $today->format('m')) {
-                // 只在當月1日或設定生日時發放
-                $current_day = date('j');
-                if ($current_day == 1) {
-                    $this->award_birthday_points($user_id);
-                }
+                // 當用戶設定生日時，如果正好是生日月，立即發放點數
+                $this->award_birthday_points($user_id);
             }
         }
     }

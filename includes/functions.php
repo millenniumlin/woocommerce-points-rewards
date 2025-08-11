@@ -63,27 +63,26 @@ function wc_points_rewards_is_enabled() {
 }
 
 /**
- * 格式化百分比顯示 - 根據需求只顯示到百位數，不顯示小數點
+ * 格式化百分比顯示 - 與 WooCommerce 貨幣小數位數同步
  * 
  * @param float $percentage 百分比值
  * @return string 格式化後的百分比
  */
 function wc_points_rewards_format_percentage($percentage) {
-    // 根據需求，點數回饋百分比只顯示到百位數，不顯示小數點
     $percentage = floatval($percentage ?? 0);
 
-    // 如果是小數，顯示一位小數；如果是整數，不顯示小數點
-    if ($percentage == floor($percentage)) {
-        // 整數，不顯示小數點
+    // 獲取 WooCommerce 貨幣小數位數設定
+    $decimal_places = wc_get_price_decimals();
+    
+    // 使用 WooCommerce 的小數位數格式化百分比
+    $formatted = number_format($percentage, $decimal_places);
+    
+    // 如果小數位數為0或所有小數都是0，則移除不必要的小數點和0
+    if ($decimal_places == 0 || rtrim(substr($formatted, strpos($formatted, '.') + 1), '0') === '') {
         $formatted = number_format($percentage, 0);
-    } else {
-        // 小數，最多顯示一位小數
-        $formatted = number_format($percentage, 1);
-        // 移除不必要的 .0
-        $formatted = rtrim(rtrim($formatted, '0'), '.');
     }
 
-    return $formatted + '%';
+    return $formatted . '%';
 }
 
 /**

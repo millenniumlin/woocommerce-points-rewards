@@ -43,10 +43,10 @@ class WC_Points_Rewards_Admin {
         // 添加管理選單
         add_action('admin_menu', array($this, 'add_admin_menu'));
         
-        // 添加 WooCommerce 設定頁籤
-        add_filter('woocommerce_settings_tabs_array', array($this, 'add_settings_tab'), 50);
-        add_action('woocommerce_settings_tabs_points_rewards', array($this, 'settings_tab_content'));
-        add_action('woocommerce_update_options_points_rewards', array($this, 'update_settings'));
+        // 移除 WooCommerce 設定頁籤整合（根據需求移除多餘的頁籤）
+        // add_filter('woocommerce_settings_tabs_array', array($this, 'add_settings_tab'), 50);
+        // add_action('woocommerce_settings_tabs_points_rewards', array($this, 'settings_tab_content'));
+        // add_action('woocommerce_update_options_points_rewards', array($this, 'update_settings'));
         
         // 載入管理後台腳本和樣式
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
@@ -426,9 +426,13 @@ class WC_Points_Rewards_Admin {
         exit;
     }
     
+    /*
+     * 下面的方法已被註解掉，因為根據需求移除了 WooCommerce 設定頁籤整合
+     * 
     /**
      * 添加 WooCommerce 設定頁籤
      */
+    /*
     public function add_settings_tab($settings_tabs) {
         $settings_tabs['points_rewards'] = __('點數獎勵', 'wc-points-rewards');
         return $settings_tabs;
@@ -437,6 +441,7 @@ class WC_Points_Rewards_Admin {
     /**
      * 設定頁籤內容
      */
+    /*
     public function settings_tab_content() {
         woocommerce_admin_fields($this->get_settings());
     }
@@ -444,6 +449,7 @@ class WC_Points_Rewards_Admin {
     /**
      * 更新設定
      */
+    /*
     public function update_settings() {
         woocommerce_update_options($this->get_settings());
     }
@@ -451,6 +457,7 @@ class WC_Points_Rewards_Admin {
     /**
      * 獲取設定欄位
      */
+    /*
     private function get_settings() {
         return array(
             array(
@@ -478,6 +485,7 @@ class WC_Points_Rewards_Admin {
             )
         );
     }
+    */
     
     /**
      * 添加用戶列表欄位
