@@ -479,7 +479,7 @@ class WC_Points_Rewards_Account {
     }
     
     /**
-     * 修正 D-4: 編輯帳戶頁面新增欄位
+     * 修正 D: 編輯帳戶頁面新增欄位 - 新增聯絡電話
      */
     public function add_edit_account_fields() {
         $user_id = get_current_user_id();
@@ -495,6 +495,9 @@ class WC_Points_Rewards_Account {
         // 獲取生日（自訂欄位）
         $birthday = get_user_meta($user_id, 'birthday', true);
         $birthday_set = get_user_meta($user_id, 'birthday_set', true);
+        
+        // 修正 D: 獲取聯絡電話
+        $contact_phone = get_user_meta($user_id, 'contact_phone', true);
         
         ?>
         <fieldset class="wc-points-rewards-account-fields">
@@ -520,6 +523,16 @@ class WC_Points_Rewards_Account {
                 <?php else: ?>
                     <span class="description"><?php _e('設定生日可獲得生日禮點數（僅可設定一次）', 'wc-points-rewards'); ?></span>
                 <?php endif; ?>
+            </p>
+            
+            <!-- 修正 D: 新增聯絡電話欄位 -->
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <label for="contact_phone"><?php _e('聯絡電話', 'wc-points-rewards'); ?></label>
+                <input type="tel" class="woocommerce-Input woocommerce-Input--tel input-text" 
+                       name="contact_phone" id="contact_phone" 
+                       value="<?php echo esc_attr($contact_phone); ?>"
+                       placeholder="<?php _e('請輸入聯絡電話', 'wc-points-rewards'); ?>">
+                <span class="description"><?php _e('您的聯絡電話，可隨時修改', 'wc-points-rewards'); ?></span>
             </p>
         </fieldset>
         
@@ -549,9 +562,15 @@ class WC_Points_Rewards_Account {
     }
     
     /**
-     * 儲存編輯帳戶欄位
+     * 儲存編輯帳戶欄位 - 修正 D: 新增聯絡電話儲存
      */
     public function save_edit_account_fields($user_id) {
+        // 修正 D: 處理聯絡電話儲存
+        if (isset($_POST['contact_phone'])) {
+            $contact_phone = sanitize_text_field($_POST['contact_phone']);
+            update_user_meta($user_id, 'contact_phone', $contact_phone);
+        }
+        
         // 處理生日設定
         if (isset($_POST['birthday']) && !empty($_POST['birthday'])) {
             $birthday_set = get_user_meta($user_id, 'birthday_set', true);

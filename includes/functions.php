@@ -101,13 +101,14 @@ function wc_points_rewards_get_points_value() {
 
 /**
  * 格式化點數價值顯示
+ * 修正 E: 改為"等於"，並確保使用正確的點數價值設定
  */
 function wc_points_rewards_format_points_value($points = 1) {
     $points_name = wc_points_rewards_get_points_name();
     $points_value = wc_points_rewards_get_points_value();
     $value_formatted = wc_price($points * $points_value);
     
-    return sprintf(__('%s%s等於%s', 'wc-points-rewards'), $points_name, $points, $value_formatted);
+    return sprintf(__('等於%s', 'wc-points-rewards'), $value_formatted);
 }
 
 /**

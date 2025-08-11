@@ -547,11 +547,28 @@ class WC_Points_Rewards_Admin {
     }
     
     /**
-     * 儲存用戶資料欄位
+     * 儲存用戶資料欄位 - 修正 D: 新增聯絡電話儲存
      */
     public function save_user_profile_fields($user_id) {
         if (!current_user_can('manage_woocommerce')) {
             return;
+        }
+        
+        // 修正 D: 儲存聯絡電話
+        if (isset($_POST['user_contact_phone'])) {
+            $contact_phone = sanitize_text_field($_POST['user_contact_phone']);
+            update_user_meta($user_id, 'contact_phone', $contact_phone);
+        }
+        
+        // 儲存生日
+        if (isset($_POST['user_birthday'])) {
+            $birthday = sanitize_text_field($_POST['user_birthday']);
+            if (empty($birthday) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $birthday)) {
+                update_user_meta($user_id, 'birthday', $birthday);
+                if (!empty($birthday)) {
+                    update_user_meta($user_id, 'birthday_set', true);
+                }
+            }
         }
         
         // 這裡可以處理手動設定會員等級等功能

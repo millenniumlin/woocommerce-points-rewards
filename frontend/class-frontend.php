@@ -290,8 +290,23 @@ class WC_Points_Rewards_Frontend {
     
     /**
      * 🚀 修正：在產品頁面顯示點數資訊（移除重複顯示的最終版本）
+     * 修正 C: 當兩個顯示設定都關閉時，不顯示任何點數相關資訊，並移除鑽石 emoji
      */
     public function display_product_points() {
+        // 🚀 修正 C: 檢查兩個顯示設定，當都關閉時完全不顯示
+        $show_in_shop_loop = get_option('wc_points_rewards_show_in_shop_loop', 'no');
+        $show_in_single_product = get_option('wc_points_rewards_show_in_single_product', 'yes');
+        
+        // 當兩個設定都關閉時，不顯示任何點數資訊
+        if ($show_in_shop_loop !== 'yes' && $show_in_single_product !== 'yes') {
+            return;
+        }
+        
+        // 如果只是單一商品頁設定關閉，也不顯示
+        if ($show_in_single_product !== 'yes') {
+            return;
+        }
+        
         // 🚀 直接用 jQuery 移除所有已存在的重複元素
         echo '<script type="text/javascript">
         if (typeof jQuery !== "undefined") {
@@ -309,12 +324,6 @@ class WC_Points_Rewards_Frontend {
         // 🚀 防止重複顯示
         static $points_displayed = false;
         if ($points_displayed) {
-            return;
-        }
-        
-        // 🚀 檢查設定是否啟用單一商品頁面顯示
-        $show_in_single_product = get_option('wc_points_rewards_show_in_single_product', 'yes');
-        if ($show_in_single_product !== 'yes') {
             return;
         }
         
@@ -351,11 +360,17 @@ class WC_Points_Rewards_Frontend {
         // 🚀 設定已顯示標記
         $points_displayed = true;
         
-        // 🚀 輸出有鑽石 icon 的點數資訊（這個會保留）
+        // 🚀 修正 C: 根據設定決定是否顯示鑽石 icon
         echo '<div class="wc-points-rewards-product-info wc-points-with-icon">';
         echo '<div class="wc-points-rewards-product-points">';
         echo '<div class="points-earning-info">';
-        echo '<span class="points-icon">💎</span>';
+        
+        // 修正 C: 當兩個設定都關閉時，移除鑽石 emoji
+        if ($show_in_shop_loop === 'yes' || $show_in_single_product === 'yes') {
+            // 只有當至少一個顯示設定啟用時才顯示鑽石 emoji
+            echo '<span class="points-icon">💎</span>';
+        }
+        
         echo '<span class="points-text">';
         echo sprintf(__('購買可得 %s 點', 'wc-points-rewards'), '<strong>' . $this->format_points($total_points) . '</strong>');
         if ($tier_bonus > 0) {
@@ -418,7 +433,17 @@ class WC_Points_Rewards_Frontend {
         
         echo '<div class="wc-points-rewards-loop-points">';
         echo '<span class="points-badge">';
-        echo '💎 +' . $this->format_points($total_points);
+        
+        // 修正 C: 檢查設定決定是否顯示鑽石 emoji
+        $show_in_shop_loop = get_option('wc_points_rewards_show_in_shop_loop', 'no');
+        $show_in_single_product = get_option('wc_points_rewards_show_in_single_product', 'yes');
+        
+        if ($show_in_shop_loop === 'yes' || $show_in_single_product === 'yes') {
+            echo '💎 +' . $this->format_points($total_points);
+        } else {
+            echo '+' . $this->format_points($total_points);
+        }
+        
         echo '</span>';
         echo '</div>';
     }

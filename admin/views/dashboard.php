@@ -173,15 +173,12 @@ $total_tiers = intval($total_tiers);
                     
                     <div class="status-item">
                         <span class="status-label"><?php _e('點數系統狀態', 'wc-points-rewards'); ?>:</span>
-                        <span class="status-value status-<?php echo isset($settings['enable_points_system']) && $settings['enable_points_system'] === 'yes' ? 'enabled' : 'disabled'; ?>">
-                            <?php echo isset($settings['enable_points_system']) && $settings['enable_points_system'] === 'yes' ? __('已啟用', 'wc-points-rewards') : __('已停用', 'wc-points-rewards'); ?>
-                        </span>
-                    </div>
-                    
-                    <div class="status-item">
-                        <span class="status-label"><?php _e('通知功能', 'wc-points-rewards'); ?>:</span>
-                        <span class="status-value status-<?php echo isset($settings['enable_notifications']) && $settings['enable_notifications'] === 'yes' ? 'enabled' : 'disabled'; ?>">
-                            <?php echo isset($settings['enable_notifications']) && $settings['enable_notifications'] === 'yes' ? __('已啟用', 'wc-points-rewards') : __('已停用', 'wc-points-rewards'); ?>
+                        <?php 
+                        // 修正 A: 正確檢查點數系統狀態，確保與設定頁面同步
+                        $points_system_enabled = isset($settings['enable_points_system']) && $settings['enable_points_system'] === 'yes';
+                        ?>
+                        <span class="status-value status-<?php echo $points_system_enabled ? 'enabled' : 'disabled'; ?>">
+                            <?php echo $points_system_enabled ? __('已啟用', 'wc-points-rewards') : __('已停用', 'wc-points-rewards'); ?>
                         </span>
                     </div>
                 </div>
