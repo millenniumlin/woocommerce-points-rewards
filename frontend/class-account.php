@@ -496,6 +496,9 @@ class WC_Points_Rewards_Account {
         $birthday = get_user_meta($user_id, 'birthday', true);
         $birthday_set = get_user_meta($user_id, 'birthday_set', true);
         
+        // 獲取聯絡電話（來自帳單地址）
+        $billing_phone = get_user_meta($user_id, 'billing_phone', true);
+        
         ?>
         <fieldset class="wc-points-rewards-account-fields">
             <legend><?php _e('會員資訊', 'wc-points-rewards'); ?></legend>
@@ -520,6 +523,14 @@ class WC_Points_Rewards_Account {
                 <?php else: ?>
                     <span class="description"><?php _e('設定生日可獲得生日禮點數（僅可設定一次）', 'wc-points-rewards'); ?></span>
                 <?php endif; ?>
+            </p>
+            
+            <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+                <label for="billing_phone"><?php _e('聯絡電話', 'wc-points-rewards'); ?></label>
+                <input type="tel" class="woocommerce-Input woocommerce-Input--tel input-text" 
+                       name="billing_phone" id="billing_phone" 
+                       value="<?php echo esc_attr($billing_phone); ?>">
+                <span class="description"><?php _e('您的聯絡電話，可隨時修改', 'wc-points-rewards'); ?></span>
             </p>
         </fieldset>
         
@@ -580,6 +591,17 @@ class WC_Points_Rewards_Account {
                 }
             }
         }
+        
+        // 處理聯絡電話更新
+        if (isset($_POST['billing_phone'])) {
+            $billing_phone = sanitize_text_field($_POST['billing_phone']);
+            update_user_meta($user_id, 'billing_phone', $billing_phone);
+            
+            // 也同時更新到帳單地址資訊（確保一致性）
+            if (!empty($billing_phone)) {
+                wc_add_notice(__('聯絡電話已更新', 'wc-points-rewards'), 'success');
+            }
+        }
     }
     
     /**
@@ -627,7 +649,7 @@ class WC_Points_Rewards_Account {
                 <div class="points-balance-card">
                     <h3><?php _e('我的點數餘額', 'wc-points-rewards'); ?></h3>
                     <div class="points-amount"><?php echo wc_points_rewards_number_format($current_points); ?> <?php echo wc_points_rewards_get_points_name(); ?></div>
-                    <p class="points-value"><?php printf(__('約等於 %s', 'wc-points-rewards'), wc_price($current_points * 0.01)); ?></p>
+                    <p class="points-value"><?php printf(__('等於 %s', 'wc-points-rewards'), wc_price($current_points * wc_points_rewards_get_option('points_value', 0.01))); ?></p>
                 </div>
                 
                 <?php if ($current_tier): ?>

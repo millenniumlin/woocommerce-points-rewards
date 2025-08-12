@@ -130,9 +130,10 @@ class WC_Points_Rewards_Frontend {
      * 🚀 修正：根據設定設置顯示 hooks（移除重複）
      */
     public function setup_display_hooks() {
-        // 🚀 關鍵修正：改用新的個別選項獲取設定
-        $show_in_shop_loop = get_option('wc_points_rewards_show_in_shop_loop', 'no');
-        $show_in_single_product = get_option('wc_points_rewards_show_in_single_product', 'yes');
+        // 🚀 關鍵修正：從主設定數組獲取設定
+        $settings = get_option('wc_points_rewards_settings', array());
+        $show_in_shop_loop = isset($settings['show_in_shop_loop']) ? $settings['show_in_shop_loop'] : 'yes';
+        $show_in_single_product = isset($settings['show_in_single_product']) ? $settings['show_in_single_product'] : 'yes';
         
         // 🚀 修正：商品列表頁顯示控制 - 預設不顯示
         if ($show_in_shop_loop === 'yes') {
@@ -144,6 +145,11 @@ class WC_Points_Rewards_Frontend {
         if ($show_in_single_product === 'yes') {
             // 🚀 重要：使用唯一的優先級，避免重複
             add_action('woocommerce_single_product_summary', array($this, 'display_product_points'), 25);
+        }
+        
+        // 🚀 新增：當兩個顯示設定都關閉時，移除所有鑽石表情符號相關元素
+        if ($show_in_shop_loop !== 'yes' && $show_in_single_product !== 'yes') {
+            add_action('wp_footer', array($this, 'remove_diamond_elements'));
         }
     }
     
@@ -313,7 +319,8 @@ class WC_Points_Rewards_Frontend {
         }
         
         // 🚀 檢查設定是否啟用單一商品頁面顯示
-        $show_in_single_product = get_option('wc_points_rewards_show_in_single_product', 'yes');
+        $settings = get_option('wc_points_rewards_settings', array());
+        $show_in_single_product = isset($settings['show_in_single_product']) ? $settings['show_in_single_product'] : 'yes';
         if ($show_in_single_product !== 'yes') {
             return;
         }
@@ -640,5 +647,32 @@ class WC_Points_Rewards_Frontend {
                 register_widget('WC_Points_Rewards_Widget');
             }
         }
+    }
+    
+    /**
+     * 🚀 新增：當顯示設定都關閉時，移除鑽石表情符號相關元素
+     */
+    public function remove_diamond_elements() {
+        ?>
+        <script type="text/javascript">
+        if (typeof jQuery !== "undefined") {
+            jQuery(document).ready(function($) {
+                // 移除所有包含鑽石表情符號的元素
+                $('[class*="wc-points-rewards"]:contains("💎")').remove();
+                $('[class*="points"]:contains("💎")').remove();
+                
+                // 移除所有包含 points-icon 類別且內容為鑽石的元素
+                $('.points-icon').each(function() {
+                    if ($(this).text().indexOf('💎') !== -1) {
+                        $(this).closest('[class*="wc-points-rewards"]').remove();
+                    }
+                });
+                
+                // 移除所有 wc-points-rewards-product-info 類別的元素
+                $('.wc-points-rewards-product-info').remove();
+            });
+        }
+        </script>
+        <?php
     }
 }
