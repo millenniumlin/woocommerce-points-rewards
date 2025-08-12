@@ -647,9 +647,9 @@ class WC_Points_Rewards_Account {
         <div class="wc-points-rewards-overview">
             <div class="points-summary">
                 <div class="points-balance-card">
-                    <h3><?php _e('我的點數餘額', 'wc-points-rewards'); ?></h3>
+                    <h3><?php _e('點數餘額', 'wc-points-rewards'); ?></h3>
                     <div class="points-amount"><?php echo wc_points_rewards_number_format($current_points); ?> <?php echo wc_points_rewards_get_points_name(); ?></div>
-                    <p class="points-value"><?php printf(__('等於 %s', 'wc-points-rewards'), wc_price($current_points * wc_points_rewards_get_option('points_value', 0.01))); ?></p>
+                    <p class="points-value"><?php printf(__('等於 %s', 'wc-points-rewards'), wc_price($current_points * wc_points_rewards_get_points_value())); ?></p>
                 </div>
                 
                 <?php if ($current_tier): ?>
