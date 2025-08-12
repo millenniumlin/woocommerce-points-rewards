@@ -83,7 +83,7 @@ function wc_points_rewards_format_percentage($percentage) {
         $formatted = rtrim(rtrim($formatted, '0'), '.');
     }
 
-    return $formatted + '%';
+    return $formatted . '%';
 }
 
 /**

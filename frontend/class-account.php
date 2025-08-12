@@ -536,7 +536,7 @@ class WC_Points_Rewards_Account {
                 echo '<h3>' . __('會員等級', 'wc-points-rewards') . '</h3>';
                 echo '<div class="tier-name">' . esc_html($current_tier->name) . '</div>';
                 if ($current_tier->bonus_percentage > 0) {
-                    echo '<div class="tier-benefit">+' . $current_tier->bonus_percentage . '% ' . __('點數回饋', 'wc-points-rewards') . '</div>';
+                    echo '<div class="tier-benefit">+' . wc_points_rewards_format_percentage($current_tier->bonus_percentage) . ' ' . __('點數回饋', 'wc-points-rewards') . '</div>';
                 }
                 echo '<a href="' . wc_get_account_endpoint_url('member-tier') . '" class="button">' . __('查看等級', 'wc-points-rewards') . '</a>';
                 echo '</div>';
@@ -563,7 +563,7 @@ class WC_Points_Rewards_Account {
                     <h3><?php _e('會員等級', 'wc-points-rewards'); ?></h3>
                     <div class="tier-name"><?php echo esc_html($current_tier->name); ?></div>
                     <?php if ($current_tier->bonus_percentage > 0): ?>
-                        <p class="tier-benefit"><?php printf(__('額外 +%s%% 點數回饋', 'wc-points-rewards'), $current_tier->bonus_percentage); ?></p>
+                        <p class="tier-benefit"><?php printf(__('額外 +%s 點數回饋', 'wc-points-rewards'), wc_points_rewards_format_percentage($current_tier->bonus_percentage)); ?></p>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
@@ -889,7 +889,7 @@ class WC_Points_Rewards_Account {
                     <?php if ($current_tier): ?>
                         <div class="tier-name"><?php echo esc_html($current_tier->name); ?></div>
                         <?php if ($current_tier->bonus_percentage > 0): ?>
-                            <div class="tier-benefit">+<?php echo esc_html($current_tier->bonus_percentage); ?>% <?php _e('點數回饋', 'wc-points-rewards'); ?></div>
+                            <div class="tier-benefit">+<?php echo esc_html(wc_points_rewards_format_percentage($current_tier->bonus_percentage)); ?> <?php _e('點數回饋', 'wc-points-rewards'); ?></div>
                         <?php endif; ?>
                     <?php else: ?>
                         <div class="tier-name"><?php _e('一般會員', 'wc-points-rewards'); ?></div>
@@ -938,7 +938,7 @@ class WC_Points_Rewards_Account {
                         <div class="tier-name"><?php echo esc_html($tier->name); ?></div>
                         <div class="tier-requirement"><?php printf(__('消費滿 %s', 'wc-points-rewards'), wc_price($tier->min_amount)); ?></div>
                         <?php if ($tier->bonus_percentage > 0): ?>
-                            <div class="tier-bonus">+<?php echo $tier->bonus_percentage; ?>% <?php _e('點數回饋', 'wc-points-rewards'); ?></div>
+                            <div class="tier-bonus">+<?php echo wc_points_rewards_format_percentage($tier->bonus_percentage); ?> <?php _e('點數回饋', 'wc-points-rewards'); ?></div>
                         <?php endif; ?>
                     </div>
                     <?php endforeach; ?>
