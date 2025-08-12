@@ -574,7 +574,7 @@ class WC_Points_Rewards_Frontend {
         
         if ($atts['show_benefits'] === 'yes' && $tier->bonus_percentage > 0) {
             $output .= '<p class="tier-benefits">';
-            $output .= sprintf(__('享有 %s%% 額外點數回饋', 'wc-points-rewards'), $tier->bonus_percentage);
+            $output .= sprintf(__('享有 %s 額外點數回饋', 'wc-points-rewards'), wc_points_rewards_format_percentage($tier->bonus_percentage));
             $output .= '</p>';
         }
         
