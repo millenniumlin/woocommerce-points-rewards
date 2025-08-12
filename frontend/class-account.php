@@ -730,7 +730,7 @@ class WC_Points_Rewards_Account {
         }
         
         .points-amount {
-            font-size: 2.5em;
+            font-size: 1.7em;
             font-weight: bold;
             color: #28a745;
             margin: 10px 0;
