@@ -624,7 +624,7 @@ class WC_Points_Rewards_Frontend {
                 $output .= '<div class="progress-bar">';
                 $output .= '<div class="progress-fill" style="width: ' . $progress['progress_percentage'] . '%"></div>';
                 $output .= '</div>';
-                $output .= '<p class="progress-percentage">' . round($progress['progress_percentage'], 1) . '%</p>';
+                $output .= '<p class="progress-percentage">' . wc_points_rewards_format_percentage(round($progress['progress_percentage'], 1)) . '</p>';
             }
             
             $output .= '</div>';
