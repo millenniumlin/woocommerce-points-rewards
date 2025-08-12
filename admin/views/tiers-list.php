@@ -68,7 +68,7 @@ if (!defined('ABSPATH')) {
                     </td>
                     <td class="column-bonus">
                         <?php if ($tier->bonus_percentage > 0): ?>
-                            <span class="bonus-percentage">+<?php echo esc_html($tier->bonus_percentage); ?>%</span>
+                            <span class="bonus-percentage">+<?php echo esc_html(wc_points_rewards_format_percentage($tier->bonus_percentage)); ?></span>
                         <?php else: ?>
                             <span class="no-bonus"><?php _e('無加成', 'wc-points-rewards'); ?></span>
                         <?php endif; ?>

@@ -57,7 +57,7 @@ class WC_Points_Rewards_Widget extends WP_Widget {
             echo '<div class="widget-member-tier">';
             echo '<div class="tier-name">' . esc_html($current_tier->name) . '</div>';
             if ($current_tier->bonus_percentage > 0) {
-                echo '<div class="tier-benefit">+' . $current_tier->bonus_percentage . '% ' . __('回饋', 'wc-points-rewards') . '</div>';
+                echo '<div class="tier-benefit">+' . wc_points_rewards_format_percentage($current_tier->bonus_percentage) . ' ' . __('回饋', 'wc-points-rewards') . '</div>';
             }
             echo '</div>';
         }
