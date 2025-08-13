@@ -291,8 +291,6 @@ class WC_Points_Rewards {
             
             // 前台顯示控制設定
             'show_in_menu' => 'no',  // 預設不在選單顯示
-            'show_in_shop_loop' => 'yes',
-            'show_in_single_product' => 'yes',
             
             // 原有設定
             'points_per_amount' => 100, // 每100元回饋1點

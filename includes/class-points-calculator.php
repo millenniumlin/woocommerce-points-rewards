@@ -328,41 +328,11 @@ class WC_Points_Rewards_Points_Calculator {
     }
     
     /**
-     * 在產品頁面顯示可獲得的點數
+     * 在產品頁面顯示可獲得的點數（已停用 - 不再使用）
      */
     public function display_product_points_info() {
-        if (!is_user_logged_in()) {
-            return;
-        }
-        
-        global $product;
-        if (!$product) {
-            return;
-        }
-        
-        $price = $product->get_price();
-        if (!$price) {
-            return;
-        }
-        
-        $points = $this->calculate_points_for_amount($price);
-        
-        if ($points > 0) {
-            $user_id = get_current_user_id();
-            $tier_bonus = $this->get_user_tier_bonus($user_id);
-            $bonus_points = $points * ($tier_bonus / 100);
-            $total_points = $points + $bonus_points;
-            
-            echo '<div class="wc-points-rewards-product-info">';
-            echo '<p class="points-info">';
-            echo '<span class="points-label">' . __('購買可得', 'wc-points-rewards') . ': </span>';
-            echo '<span class="points-value">' . sprintf(__('%s 點', 'wc-points-rewards'), wc_points_rewards_number_format($total_points)) . '</span>';
-            if ($tier_bonus > 0) {
-                echo '<small class="tier-bonus"> (+' . $tier_bonus . '%)</small>';
-            }
-            echo '</p>';
-            echo '</div>';
-        }
+        // 功能已完全移除 - 不再顯示任何產品點數資訊
+        return;
     }
     
     /**
