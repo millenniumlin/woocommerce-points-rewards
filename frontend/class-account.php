@@ -657,7 +657,7 @@ class WC_Points_Rewards_Account {
                     <h3><?php _e('會員等級', 'wc-points-rewards'); ?></h3>
                     <div class="tier-name"><?php echo esc_html($current_tier->name); ?></div>
                     <?php if ($current_tier->bonus_percentage > 0): ?>
-                        <p class="tier-benefit"><?php printf(__('額外 +%s%% 點數回饋', 'wc-points-rewards'), $current_tier->bonus_percentage); ?></p>
+                    <p class="tier-benefit"><?php printf(__('額外 +%s 點數回饋', 'wc-points-rewards'), wc_points_rewards_format_percentage($current_tier->bonus_percentage, true)); ?></p>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
