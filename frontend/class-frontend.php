@@ -127,30 +127,14 @@ class WC_Points_Rewards_Frontend {
     }
     
     /**
-     * 🚀 修正：根據設定設置顯示 hooks（移除重複）
+     * 🚀 已移除：根據設定設置顯示 hooks（功能已移除）
      */
     public function setup_display_hooks() {
-        // 🚀 關鍵修正：從主設定數組獲取設定
-        $settings = get_option('wc_points_rewards_settings', array());
-        $show_in_shop_loop = isset($settings['show_in_shop_loop']) ? $settings['show_in_shop_loop'] : 'yes';
-        $show_in_single_product = isset($settings['show_in_single_product']) ? $settings['show_in_single_product'] : 'yes';
+        // 🚀 功能已移除：不再在前台顯示點數資訊
+        // 商品列表頁和單一商品頁的點數顯示功能已被移除
         
-        // 🚀 修正：商品列表頁顯示控制 - 預設不顯示
-        if ($show_in_shop_loop === 'yes') {
-            // 🚀 重要：確保只添加一次，使用唯一的優先級
-            add_action('woocommerce_after_shop_loop_item_title', array($this, 'display_loop_product_points'), 15);
-        }
-        
-        // 🚀 修正：單一商品頁顯示控制 - 確保只添加一次
-        if ($show_in_single_product === 'yes') {
-            // 🚀 重要：使用唯一的優先級，避免重複
-            add_action('woocommerce_single_product_summary', array($this, 'display_product_points'), 25);
-        }
-        
-        // 🚀 新增：當兩個顯示設定都關閉時，移除所有鑽石表情符號相關元素
-        if ($show_in_shop_loop !== 'yes' && $show_in_single_product !== 'yes') {
-            add_action('wp_footer', array($this, 'remove_diamond_elements'));
-        }
+        // 移除所有可能存在的點數顯示元素
+        add_action('wp_footer', array($this, 'remove_all_points_elements'));
     }
     
     /**
@@ -295,139 +279,19 @@ class WC_Points_Rewards_Frontend {
     }
     
     /**
-     * 🚀 修正：在產品頁面顯示點數資訊（移除重複顯示的最終版本）
+     * 🚀 已移除：在產品頁面顯示點數資訊 (依需求移除)
      */
     public function display_product_points() {
-        // 🚀 直接用 jQuery 移除所有已存在的重複元素
-        echo '<script type="text/javascript">
-        if (typeof jQuery !== "undefined") {
-            jQuery(document).ready(function($) {
-                // 移除所有已存在的點數資訊（不包含鑽石 icon 的）
-                $(".wc-points-rewards-product-info").each(function() {
-                    if (!$(this).find(".points-icon").length) {
-                        $(this).remove();
-                    }
-                });
-            });
-        }
-        </script>';
-        
-        // 🚀 防止重複顯示
-        static $points_displayed = false;
-        if ($points_displayed) {
-            return;
-        }
-        
-        // 🚀 檢查設定是否啟用單一商品頁面顯示
-        $settings = get_option('wc_points_rewards_settings', array());
-        $show_in_single_product = isset($settings['show_in_single_product']) ? $settings['show_in_single_product'] : 'yes';
-        if ($show_in_single_product !== 'yes') {
-            return;
-        }
-        
-        if (!is_user_logged_in()) {
-            return;
-        }
-        
-        global $product;
-        if (!$product || $product->get_type() === 'variable') {
-            return;
-        }
-        
-        $price = $product->get_price();
-        if (!$price) {
-            return;
-        }
-        
-        if (!class_exists('WC_Points_Rewards_Points_Calculator')) {
-            return;
-        }
-        
-        $calculator = WC_Points_Rewards_Points_Calculator::instance();
-        $points = $calculator->calculate_points_for_amount($price);
-        
-        if ($points <= 0) {
-            return;
-        }
-        
-        $user_id = get_current_user_id();
-        $tier_bonus = $calculator->get_user_tier_bonus($user_id);
-        $bonus_points = $points * ($tier_bonus / 100);
-        $total_points = $points + $bonus_points;
-        
-        // 🚀 設定已顯示標記
-        $points_displayed = true;
-        
-        // 🚀 輸出有鑽石 icon 的點數資訊（這個會保留）
-        echo '<div class="wc-points-rewards-product-info wc-points-with-icon">';
-        echo '<div class="wc-points-rewards-product-points">';
-        echo '<div class="points-earning-info">';
-        echo '<span class="points-icon">💎</span>';
-        echo '<span class="points-text">';
-        echo sprintf(__('購買可得 %s 點', 'wc-points-rewards'), '<strong>' . $this->format_points($total_points) . '</strong>');
-        if ($tier_bonus > 0) {
-            echo '<small> (+' . $tier_bonus . '% 會員加成)</small>';
-        }
-        echo '</span>';
-        echo '</div>';
-        echo '</div>';
-        echo '</div>';
+        // 功能已移除 - 不再在單一商品頁面顯示點數資訊
+        return;
     }
     
     /**
-     * 🚀 修正：在商品列表顯示點數資訊（加入重複檢查）
+     * 🚀 已移除：在商品列表顯示點數資訊 (依需求移除)
      */
     public function display_loop_product_points() {
-        // 🚀 新增：防止在同一個產品上重複顯示
-        global $product;
-        static $displayed_products = array();
-        
-        if (!$product) {
-            return;
-        }
-        
-        $product_id = $product->get_id();
-        if (in_array($product_id, $displayed_products)) {
-            return;
-        }
-        
-        if (!is_user_logged_in()) {
-            return;
-        }
-        
-        if ($product->get_type() === 'variable') {
-            return;
-        }
-        
-        $price = $product->get_price();
-        if (!$price) {
-            return;
-        }
-        
-        if (!class_exists('WC_Points_Rewards_Points_Calculator')) {
-            return;
-        }
-        
-        $calculator = WC_Points_Rewards_Points_Calculator::instance();
-        $points = $calculator->calculate_points_for_amount($price);
-        
-        if ($points <= 0) {
-            return;
-        }
-        
-        $user_id = get_current_user_id();
-        $tier_bonus = $calculator->get_user_tier_bonus($user_id);
-        $bonus_points = $points * ($tier_bonus / 100);
-        $total_points = $points + $bonus_points;
-        
-        // 🚀 標記此產品已顯示
-        $displayed_products[] = $product_id;
-        
-        echo '<div class="wc-points-rewards-loop-points">';
-        echo '<span class="points-badge">';
-        echo '💎 +' . $this->format_points($total_points);
-        echo '</span>';
-        echo '</div>';
+        // 功能已移除 - 不再在商品列表顯示點數資訊
+        return;
     }
     
     /**
@@ -650,13 +514,18 @@ class WC_Points_Rewards_Frontend {
     }
     
     /**
-     * 🚀 新增：當顯示設定都關閉時，移除鑽石表情符號相關元素
+     * 🚀 新增：移除所有點數顯示相關元素
      */
-    public function remove_diamond_elements() {
+    public function remove_all_points_elements() {
         ?>
         <script type="text/javascript">
         if (typeof jQuery !== "undefined") {
             jQuery(document).ready(function($) {
+                // 移除所有點數相關的元素
+                $('.wc-points-rewards-loop-points').remove();
+                $('.wc-points-rewards-product-info').remove();
+                $('.wc-points-with-icon').remove();
+                
                 // 移除所有包含鑽石表情符號的元素
                 $('[class*="wc-points-rewards"]:contains("💎")').remove();
                 $('[class*="points"]:contains("💎")').remove();
@@ -665,14 +534,20 @@ class WC_Points_Rewards_Frontend {
                 $('.points-icon').each(function() {
                     if ($(this).text().indexOf('💎') !== -1) {
                         $(this).closest('[class*="wc-points-rewards"]').remove();
+                        $(this).closest('[class*="points"]').remove();
                     }
                 });
-                
-                // 移除所有 wc-points-rewards-product-info 類別的元素
-                $('.wc-points-rewards-product-info').remove();
             });
         }
         </script>
         <?php
+    }
+    
+    /**
+     * 🚀 更新：當顯示設定都關閉時，移除鑽石表情符號相關元素
+     */
+    public function remove_diamond_elements() {
+        // 這個方法已被 remove_all_points_elements 取代
+        $this->remove_all_points_elements();
     }
 }

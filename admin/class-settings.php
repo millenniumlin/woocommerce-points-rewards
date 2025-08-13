@@ -82,9 +82,7 @@ class WC_Points_Rewards_Settings {
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_min_cart_total');
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_max_discount_percent');
         
-        // 🚀 新增：顯示設定
-        register_setting('wc_points_rewards_settings', 'wc_points_rewards_show_in_shop_loop');
-        register_setting('wc_points_rewards_settings', 'wc_points_rewards_show_in_single_product');
+        // 🚀 顯示設定已移除
         
         // 會員等級設定
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_enable_tiers');
@@ -231,34 +229,7 @@ class WC_Points_Rewards_Settings {
                     </tbody>
                 </table>
                 
-                <h2><?php _e('顯示設定', 'wc-points-rewards'); ?></h2>
-                
-                <!-- 🚀 新增：顯示設定 -->
-                <table class="form-table">
-                    <tbody>
-                        <tr>
-                            <th scope="row">
-                                <label for="show_in_shop_loop"><?php _e('商店頁面顯示點數', 'wc-points-rewards'); ?></label>
-                            </th>
-                            <td>
-                                <input type="checkbox" id="show_in_shop_loop" name="wc_points_rewards_show_in_shop_loop" value="yes" 
-                                       <?php checked($settings['show_in_shop_loop'], 'yes'); ?>>
-                                <p class="description"><?php _e('在商店頁面的商品列表中顯示可獲得的點數', 'wc-points-rewards'); ?></p>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <th scope="row">
-                                <label for="show_in_single_product"><?php _e('單一商品頁面顯示點數', 'wc-points-rewards'); ?></label>
-                            </th>
-                            <td>
-                                <input type="checkbox" id="show_in_single_product" name="wc_points_rewards_show_in_single_product" value="yes" 
-                                       <?php checked($settings['show_in_single_product'], 'yes'); ?>>
-                                <p class="description"><?php _e('在單一商品頁面顯示可獲得的點數', 'wc-points-rewards'); ?></p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- 顯示設定區塊已移除 -->
                 
                 <h2><?php _e('會員等級設定', 'wc-points-rewards'); ?></h2>
                 
@@ -344,9 +315,7 @@ class WC_Points_Rewards_Settings {
             'min_cart_total' => get_option('wc_points_rewards_min_cart_total', '0'),
             'max_discount_percent' => get_option('wc_points_rewards_max_discount_percent', '50'),
             
-            // 🚀 新增：顯示設定 - 商店頁面預設不顯示
-            'show_in_shop_loop' => get_option('wc_points_rewards_show_in_shop_loop', 'no'),
-            'show_in_single_product' => get_option('wc_points_rewards_show_in_single_product', 'yes'),
+            // 🚀 顯示設定已移除
             
             'enable_tiers' => get_option('wc_points_rewards_enable_tiers', 'yes'),
             'tier_period' => get_option('wc_points_rewards_tier_period', 'yearly'),
@@ -381,8 +350,8 @@ class WC_Points_Rewards_Settings {
             'enable_cart_redemption',
             'min_cart_total',
             'max_discount_percent',
-            'show_in_shop_loop',  // 🚀 新增
-            'show_in_single_product',  // 🚀 新增
+            // 'show_in_shop_loop', // 🚀 已移除
+            // 'show_in_single_product', // 🚀 已移除
             'enable_tiers',
             'tier_period',
             'enable_notifications',

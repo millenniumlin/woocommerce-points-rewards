@@ -61,11 +61,11 @@ class WC_Points_Rewards_Points_Calculator {
         // 生日設定時也檢查是否當天生日
         add_action('wc_points_rewards_birthday_set', array($this, 'check_immediate_birthday_bonus'));
         
-        // 購物車中顯示可獲得的點數
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_info'));
+        // 🚀 購物車中顯示可獲得的點數功能已移除
+        // add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_info'));
         
-        // 產品頁面顯示可獲得的點數
-        add_action('woocommerce_single_product_summary', array($this, 'display_product_points_info'), 25);
+        // 🚀 產品頁面顯示可獲得的點數功能已移除
+        // add_action('woocommerce_single_product_summary', array($this, 'display_product_points_info'), 25);
     }
     
     /**
@@ -299,70 +299,19 @@ class WC_Points_Rewards_Points_Calculator {
     }
     
     /**
-     * 在購物車顯示可獲得的點數
+     * 🚀 已移除：在購物車顯示可獲得的點數
      */
     public function display_cart_points_info() {
-        if (!is_user_logged_in()) {
-            return;
-        }
-        
-        $cart_total = WC()->cart->get_subtotal();
-        $points = $this->calculate_points_for_amount($cart_total);
-        
-        if ($points > 0) {
-            $user_id = get_current_user_id();
-            $tier_bonus = $this->get_user_tier_bonus($user_id);
-            $bonus_points = $points * ($tier_bonus / 100);
-            $total_points = $points + $bonus_points;
-            
-            echo '<tr class="points-info">';
-            echo '<th>' . __('可獲得點數', 'wc-points-rewards') . '</th>';
-            echo '<td>';
-            echo sprintf(__('%s 點', 'wc-points-rewards'), wc_points_rewards_number_format($total_points));
-            if ($tier_bonus > 0) {
-                echo '<small> (' . sprintf(__('基礎 %s + 等級加成 %s%%', 'wc-points-rewards'), wc_points_rewards_number_format($points), $tier_bonus) . ')</small>';
-            }
-            echo '</td>';
-            echo '</tr>';
-        }
+        // 功能已移除 - 不再在購物車顯示點數資訊
+        return;
     }
     
     /**
-     * 在產品頁面顯示可獲得的點數
+     * 🚀 已移除：在產品頁面顯示可獲得的點數
      */
     public function display_product_points_info() {
-        if (!is_user_logged_in()) {
-            return;
-        }
-        
-        global $product;
-        if (!$product) {
-            return;
-        }
-        
-        $price = $product->get_price();
-        if (!$price) {
-            return;
-        }
-        
-        $points = $this->calculate_points_for_amount($price);
-        
-        if ($points > 0) {
-            $user_id = get_current_user_id();
-            $tier_bonus = $this->get_user_tier_bonus($user_id);
-            $bonus_points = $points * ($tier_bonus / 100);
-            $total_points = $points + $bonus_points;
-            
-            echo '<div class="wc-points-rewards-product-info">';
-            echo '<p class="points-info">';
-            echo '<span class="points-label">' . __('購買可得', 'wc-points-rewards') . ': </span>';
-            echo '<span class="points-value">' . sprintf(__('%s 點', 'wc-points-rewards'), wc_points_rewards_number_format($total_points)) . '</span>';
-            if ($tier_bonus > 0) {
-                echo '<small class="tier-bonus"> (+' . $tier_bonus . '%)</small>';
-            }
-            echo '</p>';
-            echo '</div>';
-        }
+        // 功能已移除 - 不再在產品頁面顯示點數資訊
+        return;
     }
     
     /**
@@ -374,30 +323,18 @@ class WC_Points_Rewards_Points_Calculator {
     }
     
     /**
-     * 計算點數折抵金額
+     * 🚀 已禁用：計算點數折抵金額（購物車功能已停用）
      */
     public function calculate_discount_amount($points) {
-        // 使用設定中的點數價值：1點 = 多少元
-        $point_value = floatval(get_option('wc_points_rewards_points_value', 1));
-        return $points * $point_value;
+        // 購物車點數折抵功能已停用，但保留方法以避免錯誤
+        return 0;
     }
     
     /**
-     * 檢查點數是否可以使用
+     * 🚀 已禁用：檢查點數是否可以使用（購物車功能已停用）
      */
     public function can_use_points($cart_total, $points_to_use) {
-        $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
-        $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 50));
-        
-        // 檢查購物車金額是否達到最低要求
-        if ($cart_total < $min_cart_total) {
-            return false;
-        }
-        
-        // 檢查折抵金額是否超過最大百分比
-        $discount_amount = $this->calculate_discount_amount($points_to_use);
-        $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
-        
-        return $discount_amount <= $max_discount_amount;
+        // 購物車點數折抵功能已停用
+        return false;
     }
 }

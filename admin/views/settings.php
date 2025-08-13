@@ -28,10 +28,10 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
         'max_discount_percent' => floatval($_POST['max_discount_percent'] ?? 100),
         'min_cart_total' => floatval($_POST['min_cart_total'] ?? 0),
         
-        // 顯示設定
-        'show_in_menu' => sanitize_text_field($_POST['show_in_menu'] ?? 'yes'),
-        'show_in_shop_loop' => sanitize_text_field($_POST['show_in_shop_loop'] ?? 'yes'),
-        'show_in_single_product' => sanitize_text_field($_POST['show_in_single_product'] ?? 'yes'),
+        // 顯示設定 - 已移除
+        // 'show_in_menu' => sanitize_text_field($_POST['show_in_menu'] ?? 'yes'),
+        // 'show_in_shop_loop' => sanitize_text_field($_POST['show_in_shop_loop'] ?? 'yes'),
+        // 'show_in_single_product' => sanitize_text_field($_POST['show_in_single_product'] ?? 'yes'),
     );
     
     update_option('wc_points_rewards_settings', $new_settings);
@@ -147,43 +147,7 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                 </tr>
             </table>
         </div>
-        
-        <!-- 顯示設定 -->
-        <div class="settings-section">
-            <h2><?php _e('顯示設定', 'wc-points-rewards'); ?></h2>
-            
-            <table class="form-table">
-                <tr>
-                    <th scope="row"><?php _e('選單位置顯示', 'wc-points-rewards'); ?></th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="show_in_menu" value="yes" <?php checked($settings['show_in_menu'] ?? 'yes', 'yes'); ?>>
-                            <?php _e('在網站選單顯示點數資訊', 'wc-points-rewards'); ?>
-                        </label>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <th scope="row"><?php _e('商品列表頁顯示', 'wc-points-rewards'); ?></th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="show_in_shop_loop" value="yes" <?php checked($settings['show_in_shop_loop'] ?? 'yes', 'yes'); ?>>
-                            <?php _e('在商品列表頁顯示可獲得點數', 'wc-points-rewards'); ?>
-                        </label>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <th scope="row"><?php _e('單一商品頁顯示', 'wc-points-rewards'); ?></th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="show_in_single_product" value="yes" <?php checked($settings['show_in_single_product'] ?? 'yes', 'yes'); ?>>
-                            <?php _e('在單一商品頁顯示可獲得點數', 'wc-points-rewards'); ?>
-                        </label>
-                    </td>
-                </tr>
-            </table>
-        </div>
+        <!-- 顯示設定區塊已移除 -->
         
         <!-- 回溯歷史訂單 -->
         <div class="settings-section">
