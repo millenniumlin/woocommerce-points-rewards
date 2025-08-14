@@ -101,7 +101,7 @@ class WC_Points_Rewards_Account {
     }
     
     /**
-     * 🚀 關鍵修正：解析端點請求
+     * 🚀 關鍵修正：解析端點請求（支援查詢參數格式）
      */
     public function parse_endpoint_request($wp) {
         // 檢查是否為我們的端點
@@ -112,13 +112,18 @@ class WC_Points_Rewards_Account {
             if ((isset($wp->query_vars['page_id']) && $wp->query_vars['page_id'] == $account_page_id) ||
                 (isset($wp->query_vars['pagename']) && $wp->query_vars['pagename'] === get_post_field('post_name', $account_page_id))) {
                 
-                // 檢查 URL 路徑
+                // 檢查 URL 路徑和查詢參數
                 $request_uri = $_SERVER['REQUEST_URI'];
                 $endpoints = array('points-rewards', 'points-history', 'member-tier');
                 
                 foreach ($endpoints as $endpoint) {
+                    // 檢查路徑段格式: /endpoint/ 或 /endpoint
                     if (strpos($request_uri, '/' . $endpoint . '/') !== false || strpos($request_uri, '/' . $endpoint) !== false) {
-                        // 設定查詢變數
+                        $wp->query_vars[$endpoint] = '1';
+                        break;
+                    }
+                    // 檢查查詢參數格式: ?endpoint 或 &endpoint
+                    if (strpos($request_uri, '?' . $endpoint) !== false || strpos($request_uri, '&' . $endpoint) !== false) {
                         $wp->query_vars[$endpoint] = '1';
                         break;
                     }
@@ -128,24 +133,24 @@ class WC_Points_Rewards_Account {
     }
     
     /**
-     * 🚀 新增：產生帳戶端點 URL 的輔助函數
+     * 🚀 修正：產生帳戶端點 URL 的輔助函數（確保所有永久連結結構都正常工作）
      */
     public static function get_account_endpoint_url($endpoint) {
         $account_page_id = wc_get_page_id('myaccount');
         $account_page_url = get_permalink($account_page_id);
         
         if (!$account_page_url) {
-            return home_url('/my-account/' . $endpoint . '/');
+            return home_url('/my-account/?' . $endpoint);
         }
         
         $permalink_structure = get_option('permalink_structure');
         
         if (empty($permalink_structure)) {
-            // 預設永久連結結構
-            return add_query_arg($endpoint, '1', $account_page_url);
+            // 預設永久連結結構 - 使用頁面ID和查詢參數
+            return add_query_arg($endpoint, '', $account_page_url);
         } else {
-            // 美化永久連結結構
-            return trailingslashit($account_page_url) . $endpoint . '/';
+            // 美化永久連結結構 - 使用查詢參數而非路徑段
+            return trailingslashit($account_page_url) . '?' . $endpoint;
         }
     }
     

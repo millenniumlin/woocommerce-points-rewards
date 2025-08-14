@@ -215,7 +215,7 @@ function wc_points_rewards_calculate_points_value($points) {
 }
 
 /**
- * 🚀 新增：產生帳戶端點 URL（確保與所有永久連結結構兼容）
+ * 🚀 修正：產生帳戶端點 URL（確保與所有永久連結結構兼容）
  */
 function wc_points_rewards_get_account_endpoint_url($endpoint) {
     if (class_exists('WC_Points_Rewards_Account')) {
@@ -227,16 +227,16 @@ function wc_points_rewards_get_account_endpoint_url($endpoint) {
     $account_page_url = get_permalink($account_page_id);
     
     if (!$account_page_url) {
-        return home_url('/my-account/' . $endpoint . '/');
+        return home_url('/my-account/?' . $endpoint);
     }
     
     $permalink_structure = get_option('permalink_structure');
     
     if (empty($permalink_structure)) {
         // 預設永久連結結構
-        return add_query_arg($endpoint, '1', $account_page_url);
+        return add_query_arg($endpoint, '', $account_page_url);
     } else {
-        // 美化永久連結結構
-        return trailingslashit($account_page_url) . $endpoint . '/';
+        // 美化永久連結結構 - 使用查詢參數
+        return trailingslashit($account_page_url) . '?' . $endpoint;
     }
 }
