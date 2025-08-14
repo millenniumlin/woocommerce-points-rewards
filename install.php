@@ -195,16 +195,26 @@ class WC_Points_Rewards_Install {
     }
     
     /**
-     * 設定重寫規則
+     * 🚀 修正：設定重寫規則（兼容所有永久連結結構）
      */
     private static function setup_rewrite_rules() {
-        // 添加我的帳戶端點
+        // 添加我的帳戶端點 - 使用標準 WordPress 方式
         add_rewrite_endpoint('points-rewards', EP_ROOT | EP_PAGES);
         add_rewrite_endpoint('points-history', EP_ROOT | EP_PAGES);
         add_rewrite_endpoint('member-tier', EP_ROOT | EP_PAGES);
         
+        // 確保 WooCommerce 查詢變數包含我們的端點
+        if (class_exists('WC_Query')) {
+            $wc_query = new WC_Query();
+            if (isset($wc_query->query_vars)) {
+                $wc_query->query_vars['points-rewards'] = 'points-rewards';
+                $wc_query->query_vars['points-history'] = 'points-history';
+                $wc_query->query_vars['member-tier'] = 'member-tier';
+            }
+        }
+        
         // 重新整理重寫規則
-        flush_rewrite_rules();
+        flush_rewrite_rules(false);
     }
     
     /**

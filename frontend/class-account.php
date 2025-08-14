@@ -79,8 +79,9 @@ class WC_Points_Rewards_Account {
      * 🚀 關鍵修正：設定 WooCommerce 整合
      */
     public function setup_woocommerce_integration() {
-        // 確保端點被註冊到 WooCommerce
+        // 確保端點被註冊到 WooCommerce 查詢系統
         if (class_exists('WC_Query') && WC()->query) {
+            // 將端點添加到 WooCommerce 查詢變數中
             WC()->query->query_vars['points-rewards'] = 'points-rewards';
             WC()->query->query_vars['points-history'] = 'points-history';
             WC()->query->query_vars['member-tier'] = 'member-tier';
@@ -88,6 +89,9 @@ class WC_Points_Rewards_Account {
         
         // 🚀 新增：確保端點被加入到 WooCommerce 端點列表
         add_filter('woocommerce_get_query_vars', array($this, 'add_wc_query_vars'));
+        
+        // 🚀 修正：確保端點在我的帳戶頁面被正確識別
+        add_filter('woocommerce_is_account_page', array($this, 'is_account_page_check'));
     }
     
     /**
@@ -95,9 +99,28 @@ class WC_Points_Rewards_Account {
      */
     public function add_wc_query_vars($vars) {
         $vars['points-rewards'] = 'points-rewards';
-        $vars['points-history'] = 'points-history';
+        $vars['points-history'] = 'points-history'; 
         $vars['member-tier'] = 'member-tier';
         return $vars;
+    }
+    
+    /**
+     * 🚀 新增：確保我們的端點頁面被識別為帳戶頁面
+     */
+    public function is_account_page_check($is_account_page) {
+        if ($is_account_page) {
+            return true;
+        }
+        
+        // 檢查是否為我們的端點
+        global $wp_query;
+        if (isset($wp_query->query_vars['points-rewards']) || 
+            isset($wp_query->query_vars['points-history']) || 
+            isset($wp_query->query_vars['member-tier'])) {
+            return true;
+        }
+        
+        return $is_account_page;
     }
     
     /**
@@ -128,9 +151,14 @@ class WC_Points_Rewards_Account {
     }
     
     /**
-     * 🚀 新增：產生帳戶端點 URL 的輔助函數
+     * 🚀 修正：產生帳戶端點 URL（兼容所有永久連結結構）
      */
     public static function get_account_endpoint_url($endpoint) {
+        // 優先使用 WooCommerce 內建的端點 URL 生成
+        if (function_exists('wc_get_account_endpoint_url') && WC()->query && isset(WC()->query->query_vars[$endpoint])) {
+            return wc_get_account_endpoint_url($endpoint);
+        }
+        
         $account_page_id = wc_get_page_id('myaccount');
         $account_page_url = get_permalink($account_page_id);
         
@@ -141,10 +169,15 @@ class WC_Points_Rewards_Account {
         $permalink_structure = get_option('permalink_structure');
         
         if (empty($permalink_structure)) {
-            // 預設永久連結結構
-            return add_query_arg($endpoint, '1', $account_page_url);
+            // 預設永久連結結構 - 使用查詢參數
+            return add_query_arg($endpoint, '', $account_page_url);
         } else {
-            // 美化永久連結結構
+            // 美化永久連結結構 - 檢查是否已經註冊為 WooCommerce 端點
+            if (WC()->query && isset(WC()->query->query_vars[$endpoint])) {
+                return wc_get_account_endpoint_url($endpoint);
+            }
+            
+            // 後備方案：手動構建 URL
             return trailingslashit($account_page_url) . $endpoint . '/';
         }
     }
@@ -170,13 +203,20 @@ class WC_Points_Rewards_Account {
     }
     
     /**
-     * 添加端點
+     * 🚀 關鍵修正：添加端點（使用 WooCommerce 標準方式）
      */
     public function add_endpoints() {
-        // 🚀 關鍵修正：確保端點被正確註冊
+        // 使用 WooCommerce 的端點註冊方式
         add_rewrite_endpoint('points-rewards', EP_ROOT | EP_PAGES);
         add_rewrite_endpoint('points-history', EP_ROOT | EP_PAGES);
         add_rewrite_endpoint('member-tier', EP_ROOT | EP_PAGES);
+        
+        // 確保 WooCommerce 知道這些端點
+        if (WC()->query) {
+            WC()->query->query_vars['points-rewards'] = 'points-rewards';
+            WC()->query->query_vars['points-history'] = 'points-history';
+            WC()->query->query_vars['member-tier'] = 'member-tier';
+        }
         
         // 設定重新整理標記
         if (!get_option('wc_points_rewards_endpoints_flushed')) {
