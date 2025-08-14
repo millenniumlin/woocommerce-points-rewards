@@ -43,6 +43,13 @@ class WC_Points_Rewards_Account {
         // 添加我的帳戶選單項目
         add_filter('woocommerce_account_menu_items', array($this, 'add_account_menu_items'));
         
+        // 🚀 新增：過濾整個導航選單的 HTML 以修正 URL
+        add_filter('woocommerce_account_navigation', array($this, 'fix_account_navigation_urls'));
+        
+        // 🚀 新增：使用輸出緩衝修正導航 URL
+        add_action('woocommerce_account_navigation', array($this, 'start_navigation_buffer'), 1);
+        add_action('woocommerce_after_account_navigation', array($this, 'end_navigation_buffer'), 999);
+        
         // 🚀 關鍵修正：更早註冊端點，並使用正確的優先級
         add_action('init', array($this, 'add_endpoints'), 0);
         add_action('init', array($this, 'add_custom_rewrite_rules'), 5);
@@ -73,6 +80,21 @@ class WC_Points_Rewards_Account {
         
         // 🚀 關鍵修正：確保 WooCommerce 整合
         add_action('woocommerce_init', array($this, 'setup_woocommerce_integration'));
+        
+        // 🚀 新增：修正導航選單 URL 格式
+        add_filter('wc_get_endpoint_url', array($this, 'filter_navigation_endpoint_urls'), 10, 4);
+        add_action('wp_enqueue_scripts', array($this, 'fix_navigation_urls_with_js'), 20);
+        
+        // 🚀 新增：直接過濾 WooCommerce 端點 URL
+        add_filter('woocommerce_get_endpoint_url', array($this, 'filter_wc_endpoint_urls'), 10, 4);
+        
+        // 🚀 新增：嘗試過濾 wc_get_endpoint_url（如果存在）
+        if (function_exists('wc_get_endpoint_url')) {
+            add_filter('wc_get_endpoint_url', array($this, 'filter_navigation_endpoint_urls'), 10, 4);
+        }
+        
+        // 🚀 新增：在輸出前修正連結
+        add_action('wp_footer', array($this, 'fix_navigation_urls_on_footer'), 5);
     }
     
     /**
@@ -1181,6 +1203,170 @@ class WC_Points_Rewards_Account {
             font-weight: bold;
         }
         </style>
+        <?php
+    }
+    
+    /**
+     * 🚀 新增：修正帳戶導航選單中的 URL
+     */
+    public function fix_account_navigation_urls($navigation_html) {
+        // 如果沒有 HTML 內容，直接返回
+        if (empty($navigation_html)) {
+            return $navigation_html;
+        }
+        
+        // 使用正則表達式替換我們的端點 URL
+        $endpoints = array('points-rewards', 'points-history', 'member-tier');
+        
+        foreach ($endpoints as $endpoint) {
+            // 匹配路徑格式的 URL 並替換為查詢參數格式
+            $pattern = '#href=["\']([^"\']*)/my-account/' . preg_quote($endpoint, '#') . '/([^"\']*)["\']#i';
+            $replacement = 'href="$1/my-account/?'. $endpoint . '$2"';
+            $navigation_html = preg_replace($pattern, $replacement, $navigation_html);
+            
+            // 處理更通用的情況
+            $pattern = '#href=["\']([^"\']*/)' . preg_quote($endpoint, '#') . '/([^"\']*)["\']#i';
+            $replacement = 'href="$1?' . $endpoint . '$2"';
+            $navigation_html = preg_replace($pattern, $replacement, $navigation_html);
+        }
+        
+        return $navigation_html;
+    }
+    
+    /**
+     * 🚀 新增：開始導航選單輸出緩衝
+     */
+    public function start_navigation_buffer() {
+        ob_start();
+    }
+    
+    /**
+     * 🚀 新增：結束導航選單輸出緩衝並修正 URL
+     */
+    public function end_navigation_buffer() {
+        $navigation_html = ob_get_clean();
+        
+        // 修正 URL
+        $navigation_html = $this->fix_account_navigation_urls($navigation_html);
+        
+        echo $navigation_html;
+    }
+    
+    /**
+     * 🚀 新增：在頁腳修正導航連結（最終方案）
+     */
+    public function fix_navigation_urls_on_footer() {
+        if (!is_account_page()) {
+            return;
+        }
+        ?>
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            // 修正所有我們的端點連結
+            var endpoints = ['points-rewards', 'points-history', 'member-tier'];
+            var accountUrl = '';
+            
+            // 嘗試找到我的帳戶頁面 URL
+            $('.woocommerce-MyAccount-navigation a').first().each(function() {
+                var href = $(this).attr('href');
+                if (href) {
+                    var urlParts = href.split('/');
+                    // 重建基礎 URL
+                    for (var i = 0; i < urlParts.length; i++) {
+                        if (urlParts[i] === 'my-account' || urlParts[i].indexOf('page_id=') !== -1) {
+                            accountUrl = urlParts.slice(0, i + 1).join('/') + '/';
+                            break;
+                        }
+                    }
+                }
+            });
+            
+            if (!accountUrl) {
+                // 後備方案：從當前 URL 提取
+                accountUrl = window.location.origin + window.location.pathname.split('/my-account')[0] + '/my-account/';
+            }
+            
+            endpoints.forEach(function(endpoint) {
+                // 修正導航選單中的連結
+                $('.woocommerce-MyAccount-navigation-link--' + endpoint + ' a, a[href*="/' + endpoint + '/"]').each(function() {
+                    var $link = $(this);
+                    var currentHref = $link.attr('href');
+                    
+                    if (currentHref && (currentHref.indexOf('/' + endpoint + '/') !== -1 || currentHref.indexOf('/' + endpoint) !== -1)) {
+                        // 確保這是導航選單中的連結
+                        if ($link.closest('.woocommerce-MyAccount-navigation').length > 0) {
+                            var newHref = accountUrl + '?' + endpoint;
+                            $link.attr('href', newHref);
+                            console.log('Fixed navigation URL for ' + endpoint + ': ' + newHref);
+                        }
+                    }
+                });
+            });
+        });
+        </script>
+        <?php
+    }
+    
+    /**
+     * 🚀 新增：過濾導航端點 URL 以使用查詢參數格式
+     */
+    public function filter_navigation_endpoint_urls($url, $endpoint, $value, $permalink) {
+        // 只處理我們的端點
+        if (in_array($endpoint, array('points-rewards', 'points-history', 'member-tier'))) {
+            return $this->get_account_endpoint_url($endpoint);
+        }
+        return $url;
+    }
+    
+    /**
+     * 🚀 新增：過濾 WooCommerce 端點 URL（另一個 hook）
+     */
+    public function filter_wc_endpoint_urls($url, $endpoint, $value, $permalink) {
+        // 只處理我們的端點
+        if (in_array($endpoint, array('points-rewards', 'points-history', 'member-tier'))) {
+            return $this->get_account_endpoint_url($endpoint);
+        }
+        return $url;
+    }
+    
+    /**
+     * 🚀 新增：使用 JavaScript 修正導航選單 URL（後備方案）
+     */
+    public function fix_navigation_urls_with_js() {
+        if (!is_account_page()) {
+            return;
+        }
+        
+        ?>
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            // 修正導航選單中的點數相關連結
+            var endpoints = ['points-rewards', 'points-history', 'member-tier'];
+            
+            endpoints.forEach(function(endpoint) {
+                // 尋找包含該端點的導航連結
+                $('.woocommerce-MyAccount-navigation-link--' + endpoint + ' a').each(function() {
+                    var currentHref = $(this).attr('href');
+                    if (currentHref && currentHref.indexOf('/' + endpoint + '/') !== -1) {
+                        // 替換為查詢參數格式
+                        var newHref = currentHref.replace('/' + endpoint + '/', '/?' + endpoint);
+                        $(this).attr('href', newHref);
+                    }
+                });
+                
+                // 也處理沒有完整類別名稱的情況
+                $('a[href*="/' + endpoint + '/"]').each(function() {
+                    var $link = $(this);
+                    // 確認這是導航選單中的連結
+                    if ($link.closest('.woocommerce-MyAccount-navigation').length > 0) {
+                        var currentHref = $link.attr('href');
+                        var newHref = currentHref.replace('/' + endpoint + '/', '/?' + endpoint);
+                        $link.attr('href', newHref);
+                    }
+                });
+            });
+        });
+        </script>
         <?php
     }
 }
