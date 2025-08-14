@@ -356,8 +356,9 @@ class WC_Points_Rewards_Points_Calculator {
      * 檢查點數是否可以使用
      */
     public function can_use_points($cart_total, $points_to_use) {
-        $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
-        $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 50));
+        $settings = get_option('wc_points_rewards_settings', array());
+        $min_cart_total = isset($settings['min_cart_total']) ? floatval($settings['min_cart_total']) : 0;
+        $max_discount_percent = isset($settings['max_discount_percent']) ? floatval($settings['max_discount_percent']) : 100;
         
         // 檢查購物車金額是否達到最低要求
         if ($cart_total < $min_cart_total) {
@@ -369,5 +370,14 @@ class WC_Points_Rewards_Points_Calculator {
         $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
         
         return $discount_amount <= $max_discount_amount;
+    }
+    
+    /**
+     * 計算最大可兌換點數
+     */
+    public function calculate_max_redeemable_points($available_points, $max_discount_amount) {
+        $point_value = floatval(get_option('wc_points_rewards_points_value', 1));
+        $max_points_by_amount = $max_discount_amount / $point_value;
+        return min($available_points, $max_points_by_amount);
     }
 }

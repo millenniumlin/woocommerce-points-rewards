@@ -40,11 +40,11 @@ class WC_Points_Rewards_Checkout {
      * 初始化 hooks
      */
     private function init_hooks() {
-        // 購物車頁面顯示點數使用選項
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_section'));
+        // 購物車頁面顯示點數使用選項 - 在商品清單與購物車總計中間
+        add_action('woocommerce_cart_collaterals', array($this, 'display_cart_points_section'), 5);
         
-        // 結帳頁面顯示點數使用選項
-        add_action('woocommerce_review_order_after_order_total', array($this, 'display_checkout_points_section'));
+        // 結帳頁面顯示點數使用選項 - 在訂單摘要小計與運費上方
+        add_action('woocommerce_review_order_before_order_total', array($this, 'display_checkout_points_section'));
         
         // 處理點數折扣
         add_action('woocommerce_cart_calculate_fees', array($this, 'apply_points_discount'));
@@ -89,57 +89,94 @@ class WC_Points_Rewards_Checkout {
         $user_id = get_current_user_id();
         $database = WC_Points_Rewards_Database::instance();
         $calculator = WC_Points_Rewards_Points_Calculator::instance();
+        $settings = get_option('wc_points_rewards_settings', array());
         
         // 檢查是否啟用購物車點數折抵
-        $enable_cart_redemption = get_option('wc_points_rewards_enable_cart_redemption', 'yes');
-        if ($enable_cart_redemption !== 'yes') {
+        if (!isset($settings['enable_cart_redemption']) || $settings['enable_cart_redemption'] !== 'yes') {
             return;
         }
         
         $available_points = $database->get_user_points($user_id);
         $cart_total = WC()->cart->get_subtotal();
-        $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
+        $min_cart_total = isset($settings['min_cart_total']) ? floatval($settings['min_cart_total']) : 0;
         
         // 檢查購物車金額是否達到最低要求
         if ($cart_total < $min_cart_total) {
             if ($min_cart_total > 0) {
-                echo '<tr class="points-requirements">';
-                echo '<td colspan="2">';
-                echo '<div class="wc-points-message wc-points-info">';
-                echo sprintf(__('購物車滿 %s 即可使用點數折抵', 'wc-points-rewards'), wc_price($min_cart_total));
-                echo '</div>';
-                echo '</td>';
-                echo '</tr>';
+                $this->render_requirements_message($min_cart_total, $context);
             }
             return;
         }
         
         if ($available_points <= 0) {
-            echo '<tr class="points-no-balance">';
-            echo '<td colspan="2">';
-            echo '<div class="wc-points-message wc-points-info">';
-            echo __('您目前沒有可用的點數', 'wc-points-rewards');
-            echo '</div>';
-            echo '</td>';
-            echo '</tr>';
+            $this->render_no_points_message($context);
             return;
         }
         
-        // 計算最大可使用點數
-        $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 50));
+        // 計算最大可使用點數 - 使用三個核心設定
+        $max_discount_percent = isset($settings['max_discount_percent']) ? floatval($settings['max_discount_percent']) : 100;
         $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
-        
-        // 計算最大可用點數（考慮點數價值）
-        $point_value = floatval(get_option('wc_points_rewards_points_value', 1));
-        $max_points_by_amount = $max_discount_amount / $point_value;
-        $max_points = min($available_points, $max_points_by_amount);
+        $max_points = $calculator->calculate_max_redeemable_points($available_points, $max_discount_amount);
         
         $current_discount = WC()->session->get('wc_points_rewards_discount_amount', 0);
         
         // 傳遞變數到模板
         $max_usable_points = $max_points;
+        $context = $context; // 確保變數可用於模板
         
         include WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/views/cart-points-section.php';
+    }
+    
+    /**
+     * 渲染需求提示訊息
+     */
+    private function render_requirements_message($min_cart_total, $context) {
+        if ($context === 'cart') {
+            echo '<div class="wc-points-requirements-notice">';
+        } else {
+            echo '<tr class="points-requirements">';
+            echo '<td colspan="2">';
+            echo '<div class="wc-points-requirements-notice">';
+        }
+        
+        echo '<div class="wc-points-message wc-points-info">';
+        echo '<i class="wc-points-icon-info"></i>';
+        echo sprintf(__('購物車滿 %s 即可使用點數折抵', 'wc-points-rewards'), wc_price($min_cart_total));
+        echo '</div>';
+        
+        if ($context === 'cart') {
+            echo '</div>';
+        } else {
+            echo '</div>';
+            echo '</td>';
+            echo '</tr>';
+        }
+    }
+    
+    /**
+     * 渲染無點數提示訊息
+     */
+    private function render_no_points_message($context) {
+        if ($context === 'cart') {
+            echo '<div class="wc-points-no-balance-notice">';
+        } else {
+            echo '<tr class="points-no-balance">';
+            echo '<td colspan="2">';
+            echo '<div class="wc-points-no-balance-notice">';
+        }
+        
+        echo '<div class="wc-points-message wc-points-info">';
+        echo '<i class="wc-points-icon-info"></i>';
+        echo __('您目前沒有可用的點數', 'wc-points-rewards');
+        echo '</div>';
+        
+        if ($context === 'cart') {
+            echo '</div>';
+        } else {
+            echo '</div>';
+            echo '</td>';
+            echo '</tr>';
+        }
     }
     
     /**
