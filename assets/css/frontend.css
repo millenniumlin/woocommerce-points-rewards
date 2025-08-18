@@ -1,0 +1,193 @@
+/**
+ * WooCommerce Points & Rewards - Frontend Styles
+ * 提供購物車和結帳頁面的點數使用介面樣式
+ */
+
+/* 點數使用區塊主容器 */
+.wc-points-redemption-wrapper {
+    background: #f9f9f9;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 10px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* 點數資訊總覽區域 */
+.points-overview-section {
+    margin-bottom: 20px;
+}
+
+.points-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.points-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #ffffff;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.points-info-item:hover {
+    background: #f8f8f8;
+    border-color: #d1d1d1;
+}
+
+.points-label {
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+}
+
+.points-value {
+    font-weight: 700;
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.points-value.available-points {
+    color: #27ae60;
+}
+
+.points-value.used-points {
+    color: #e74c3c;
+}
+
+.points-value.remaining-points {
+    color: #f39c12;
+}
+
+.points-value.max-usable {
+    color: #3498db;
+}
+
+.points-value.discount-value {
+    color: #e74c3c;
+    font-size: 18px;
+}
+
+.points-note {
+    font-size: 12px;
+    color: #777;
+    font-style: italic;
+    margin-left: 8px;
+}
+
+/* 已使用點數狀態區域 */
+.points-applied-section {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.points-applied-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.points-applied-text {
+    color: #155724;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.points-applied-text::before {
+    content: "✓ ";
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* 點數輸入區域 */
+.points-input-section {
+    margin-bottom: 15px;
+}
+
+.points-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: stretch;
+}
+
+.points-input {
+    flex: 1;
+    padding: 12px 15px !important;
+    border: 2px solid #e1e1e1 !important;
+    border-radius: 6px !important;
+    font-size: 16px !important;
+    transition: border-color 0.3s ease !important;
+    box-shadow: none !important;
+}
+
+.points-input:focus {
+    border-color: #3498db !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+}
+
+.wc-points-apply-discount,
+.wc-points-remove-discount {
+    padding: 12px 24px !important;
+    background: #3498db !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 14px !important;
+    white-space: nowrap !important;
+}
+
+.wc-points-apply-discount:hover {
+    background: #2980b9 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.wc-points-remove-discount {
+    background: #e74c3c !important;
+}
+
+.wc-points-remove-discount:hover {
+    background: #c0392b !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .wc-points-redemption-wrapper {
+        padding: 15px;
+        margin: 5px 0;
+    }
+    
+    .points-info-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .points-input-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .points-applied-summary {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}

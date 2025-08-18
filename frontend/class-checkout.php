@@ -30,9 +30,15 @@ class WC_Points_Rewards_Checkout {
     }
     
     /**
+     * WooCommerce 相容性實例
+     */
+    private $wc_compatibility;
+    
+    /**
      * 建構函式
      */
     public function __construct() {
+        $this->wc_compatibility = WC_Points_Rewards_WooCommerce_Compatibility::instance();
         $this->init_hooks();
     }
     
@@ -40,24 +46,84 @@ class WC_Points_Rewards_Checkout {
      * 初始化 hooks
      */
     private function init_hooks() {
-        // 購物車頁面顯示點數使用選項
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_section'));
+        // 使用相容性類別取得適當的 hooks
+        $cart_hooks = $this->wc_compatibility->get_cart_hooks();
+        $checkout_hooks = $this->wc_compatibility->get_checkout_hooks();
         
-        // 結帳頁面顯示點數使用選項
-        add_action('woocommerce_review_order_after_order_total', array($this, 'display_checkout_points_section'));
+        // 購物車頁面顯示點數使用選項 - 支援多個 hooks
+        foreach ($cart_hooks as $hook_name => $hook) {
+            add_action($hook, array($this, 'display_cart_points_section'), 20);
+        }
         
-        // 處理點數折扣
+        // 結帳頁面顯示點數使用選項 - 支援多個 hooks
+        foreach ($checkout_hooks as $hook_name => $hook) {
+            add_action($hook, array($this, 'display_checkout_points_section'), 20);
+        }
+        
+        // 處理點數折扣 - 使用相容性檢查
         add_action('woocommerce_cart_calculate_fees', array($this, 'apply_points_discount'));
         
         // 訂單完成時記錄點數使用
         add_action('woocommerce_checkout_order_processed', array($this, 'record_points_usage'), 10, 2);
         
-        // AJAX 處理點數使用
+        // AJAX 處理點數使用 - 確保相容性
+        $this->wc_compatibility->handle_ajax_compatibility();
         add_action('wp_ajax_wc_points_rewards_apply_discount', array($this, 'ajax_apply_points_discount'));
+        add_action('wp_ajax_nopriv_wc_points_rewards_apply_discount', array($this, 'ajax_apply_points_discount'));
         add_action('wp_ajax_wc_points_rewards_remove_discount', array($this, 'ajax_remove_points_discount'));
+        add_action('wp_ajax_nopriv_wc_points_rewards_remove_discount', array($this, 'ajax_remove_points_discount'));
         
         // 購物車更新時檢查點數使用
         add_action('woocommerce_cart_updated', array($this, 'validate_points_usage'));
+        
+        // 載入前端資源
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
+    }
+    
+    /**
+     * 載入前端資源
+     */
+    public function enqueue_frontend_assets() {
+        // 只在需要的頁面載入
+        if (!$this->wc_compatibility->is_cart() && !$this->wc_compatibility->is_checkout()) {
+            return;
+        }
+        
+        // 載入 CSS
+        wp_enqueue_style(
+            'wc-points-rewards-frontend',
+            WC_POINTS_REWARDS_PLUGIN_URL . 'assets/css/frontend.css',
+            array(),
+            WC_POINTS_REWARDS_VERSION
+        );
+        
+        // 載入 JavaScript
+        wp_enqueue_script(
+            'wc-points-rewards-frontend',
+            WC_POINTS_REWARDS_PLUGIN_URL . 'assets/js/frontend.js',
+            array('jquery'),
+            WC_POINTS_REWARDS_VERSION,
+            true
+        );
+        
+        // 本地化腳本
+        wp_localize_script('wc-points-rewards-frontend', 'wcPointsRewards', array(
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('wc_points_rewards_nonce'),
+            'wcVersion' => $this->wc_compatibility->get_version(),
+            'isCart' => $this->wc_compatibility->is_cart(),
+            'isCheckout' => $this->wc_compatibility->is_checkout(),
+            'messages' => array(
+                'loading' => __('載入中...', 'wc-points-rewards'),
+                'error' => __('發生錯誤，請稍後再試', 'wc-points-rewards'),
+                'success' => __('操作成功', 'wc-points-rewards'),
+                'insufficient_points' => __('點數不足', 'wc-points-rewards'),
+                'invalid_amount' => __('請輸入有效的點數', 'wc-points-rewards'),
+                'apply_points' => __('使用點數', 'wc-points-rewards'),
+                'remove_points' => __('取消使用', 'wc-points-rewards'),
+                'processing' => __('處理中...', 'wc-points-rewards')
+            )
+        ));
     }
     
     /**
@@ -97,7 +163,7 @@ class WC_Points_Rewards_Checkout {
         }
         
         $available_points = $database->get_user_points($user_id);
-        $cart_total = WC()->cart->get_subtotal();
+        $cart_total = $this->wc_compatibility->get_cart_subtotal();
         $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
         
         // 檢查購物車金額是否達到最低要求
@@ -106,12 +172,14 @@ class WC_Points_Rewards_Checkout {
                 echo '<tr class="points-requirements">';
                 echo '<td colspan="2">';
                 echo '<div class="wc-points-message wc-points-info">';
-                echo sprintf(__('購物車滿 %s 即可使用點數折抵', 'wc-points-rewards'), wc_price($min_cart_total));
+                echo sprintf(__('購物車滿 %s 即可使用點數折抵', 'wc-points-rewards'), 
+                    $this->wc_compatibility->format_price($min_cart_total));
                 echo '</div>';
                 echo '</td>';
                 echo '</tr>';
             }
             return;
+        }
         }
         
         if ($available_points <= 0) {
@@ -139,7 +207,8 @@ class WC_Points_Rewards_Checkout {
         // 傳遞變數到模板
         $max_usable_points = $max_points;
         
-        include WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/views/cart-points-section.php';
+        // 使用增強版模板
+        include WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/views/cart-points-section-enhanced.php';
     }
     
     /**
@@ -147,13 +216,19 @@ class WC_Points_Rewards_Checkout {
      */
     public function apply_points_discount() {
         if (!is_admin() && !defined('DOING_AJAX')) {
-            $discount_amount = WC()->session->get('wc_points_rewards_discount_amount', 0);
+            $session = $this->wc_compatibility->get_session();
+            if (!$session) {
+                return;
+            }
+            
+            $discount_amount = $session->get('wc_points_rewards_discount_amount', 0);
             
             if ($discount_amount > 0) {
                 $calculator = WC_Points_Rewards_Points_Calculator::instance();
                 $discount_value = $calculator->calculate_discount_amount($discount_amount);
                 
-                WC()->cart->add_fee(
+                // 使用相容性方法添加費用
+                $this->wc_compatibility->add_cart_fee(
                     __('點數折抵', 'wc-points-rewards'),
                     -$discount_value,
                     false
@@ -223,24 +298,30 @@ class WC_Points_Rewards_Checkout {
             wp_send_json_error(__('點數不足', 'wc-points-rewards'));
         }
         
-        // 檢查購物車條件
-        $cart_total = WC()->cart->get_subtotal();
+        // 使用相容性方法檢查購物車條件
+        $cart_total = $this->wc_compatibility->get_cart_subtotal();
         if (!$calculator->can_use_points($cart_total, $points_to_use)) {
             wp_send_json_error(__('不符合點數使用條件', 'wc-points-rewards'));
         }
         
-        // 應用折扣
-        WC()->session->set('wc_points_rewards_discount_amount', $points_to_use);
+        // 使用相容性方法應用折扣
+        $session = $this->wc_compatibility->get_session();
+        if (!$session) {
+            wp_send_json_error(__('無法建立工作階段', 'wc-points-rewards'));
+        }
+        
+        $session->set('wc_points_rewards_discount_amount', $points_to_use);
         
         $discount_value = $calculator->calculate_discount_amount($points_to_use);
         
         wp_send_json_success(array(
             'message' => sprintf(__('已使用 %s 點數，折抵 %s', 'wc-points-rewards'), 
                 wc_points_rewards_number_format($points_to_use), 
-                wc_price($discount_value)
+                $this->wc_compatibility->format_price($discount_value)
             ),
             'discount_amount' => $discount_value,
-            'points_used' => $points_to_use
+            'points_used' => $points_to_use,
+            'wc_version' => $this->wc_compatibility->get_version()
         ));
     }
     
@@ -250,10 +331,14 @@ class WC_Points_Rewards_Checkout {
     public function ajax_remove_points_discount() {
         check_ajax_referer('wc_points_rewards_nonce', 'nonce');
         
-        WC()->session->__unset('wc_points_rewards_discount_amount');
+        $session = $this->wc_compatibility->get_session();
+        if ($session) {
+            $session->__unset('wc_points_rewards_discount_amount');
+        }
         
         wp_send_json_success(array(
-            'message' => __('已移除點數折抵', 'wc-points-rewards')
+            'message' => __('已移除點數折抵', 'wc-points-rewards'),
+            'wc_version' => $this->wc_compatibility->get_version()
         ));
     }
     
@@ -261,12 +346,17 @@ class WC_Points_Rewards_Checkout {
      * 驗證點數使用
      */
     public function validate_points_usage() {
-        $discount_amount = WC()->session->get('wc_points_rewards_discount_amount', 0);
+        $session = $this->wc_compatibility->get_session();
+        if (!$session) {
+            return;
+        }
+        
+        $discount_amount = $session->get('wc_points_rewards_discount_amount', 0);
         
         if ($discount_amount > 0) {
             $user_id = get_current_user_id();
             if (!$user_id) {
-                WC()->session->__unset('wc_points_rewards_discount_amount');
+                $session->__unset('wc_points_rewards_discount_amount');
                 return;
             }
             
@@ -274,12 +364,16 @@ class WC_Points_Rewards_Checkout {
             $calculator = WC_Points_Rewards_Points_Calculator::instance();
             
             $available_points = $database->get_user_points($user_id);
-            $cart_total = WC()->cart->get_subtotal();
+            $cart_total = $this->wc_compatibility->get_cart_subtotal();
             
             // 如果點數不足或不符合條件，移除折扣
             if ($discount_amount > $available_points || !$calculator->can_use_points($cart_total, $discount_amount)) {
-                WC()->session->__unset('wc_points_rewards_discount_amount');
-                wc_add_notice(__('您的點數使用已自動調整', 'wc-points-rewards'), 'notice');
+                $session->__unset('wc_points_rewards_discount_amount');
+                
+                // 顯示通知（使用相容的方法）
+                if (function_exists('wc_add_notice')) {
+                    wc_add_notice(__('您的點數使用已自動調整', 'wc-points-rewards'), 'notice');
+                }
             }
         }
     }

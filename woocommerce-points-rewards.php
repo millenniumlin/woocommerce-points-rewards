@@ -116,6 +116,11 @@ class WC_Points_Rewards {
             require_once WC_POINTS_REWARDS_PLUGIN_DIR . 'includes/class-ajax-handler.php';
         }
         
+        // WooCommerce 相容性類別
+        if (file_exists(WC_POINTS_REWARDS_PLUGIN_DIR . 'includes/class-woocommerce-compatibility.php')) {
+            require_once WC_POINTS_REWARDS_PLUGIN_DIR . 'includes/class-woocommerce-compatibility.php';
+        }
+        
         // 管理介面
         if (file_exists(WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/class-admin.php')) {
             require_once WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/class-admin.php';
@@ -161,6 +166,11 @@ class WC_Points_Rewards {
         }
         if (class_exists('WC_Points_Rewards_Ajax_Handler')) {
             WC_Points_Rewards_Ajax_Handler::instance();
+        }
+        
+        // WooCommerce 相容性
+        if (class_exists('WC_Points_Rewards_WooCommerce_Compatibility')) {
+            WC_Points_Rewards_WooCommerce_Compatibility::instance();
         }
         
         // 管理介面
