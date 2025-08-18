@@ -180,7 +180,6 @@ class WC_Points_Rewards_Checkout {
             }
             return;
         }
-        }
         
         if ($available_points <= 0) {
             echo '<tr class="points-no-balance">';
