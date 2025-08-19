@@ -24,14 +24,14 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
 ?>
 
 <tr class="points-redemption-section">
-    <th><?php _e('使用點數', 'wc-points-rewards'); ?></th>
+    <th><?php _e('', 'wc-points-rewards'); ?></th>
     <td>
         <div class="wc-points-redemption-wrapper">
             <!-- 點數資訊總覽 -->
             <div class="points-overview-section">
                 <div class="points-info-grid">
                     <div class="points-info-item">
-                        <span class="points-label"><?php _e('可用點數', 'wc-points-rewards'); ?>：</span>
+                        <span class="points-label"><?php _e('您目前的點數：', 'wc-points-rewards'); ?></span>
                         <span class="points-value available-points"><?php echo wc_points_rewards_number_format($available_points); ?></span>
                     </div>
                     
@@ -50,9 +50,6 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                     <div class="points-info-item">
                         <span class="points-label"><?php _e('本次最多可用', 'wc-points-rewards'); ?>：</span>
                         <span class="points-value max-usable"><?php echo wc_points_rewards_number_format($max_usable_points); ?></span>
-                        <?php if ($max_discount_percent < 100): ?>
-                            <span class="points-note">（<?php printf(__('最多可折抵 %s%%', 'wc-points-rewards'), $max_discount_percent); ?>）</span>
-                        <?php endif; ?>
                     </div>
                     
                     <?php if ($used_points > 0 && $discount_amount > 0): ?>
@@ -74,13 +71,15 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                                 wc_price($discount_amount)
                             ); ?>
                         </span>
+                        <?php if (!isset($context_type) || $context_type !== 'checkout'): ?>
                         <button type="button" class="button button-secondary wc-points-remove-discount" data-nonce="<?php echo wp_create_nonce('wc_points_rewards_nonce'); ?>">
                             <?php _e('取消使用', 'wc-points-rewards'); ?>
                         </button>
+                        <?php endif; ?>
                     </div>
                 </div>
-            <?php else: ?>
-                <!-- 點數輸入區域 -->
+            <?php elseif (!isset($context_type) || $context_type !== 'checkout'): ?>
+                <!-- 點數輸入區域 - 只在購物車頁面顯示 -->
                 <div class="points-input-section">
                     <div class="points-input-group">
                         <input type="number" 
@@ -95,25 +94,7 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                         </button>
                     </div>
                     
-                    <div class="points-quick-actions">
-                        <?php 
-                        $quick_options = array(
-                            array('points' => min($max_usable_points, 100), 'label' => __('使用 100 點', 'wc-points-rewards')),
-                            array('points' => round($max_usable_points * 0.5), 'label' => __('使用 50%', 'wc-points-rewards')),
-                            array('points' => $max_usable_points, 'label' => __('全部使用', 'wc-points-rewards'))
-                        );
-                        
-                        foreach ($quick_options as $option):
-                            if ($option['points'] > 0):
-                        ?>
-                        <button type="button" class="button-link points-quick-use" data-points="<?php echo esc_attr($option['points']); ?>">
-                            <?php echo esc_html($option['label']); ?>
-                        </button>
-                        <?php 
-                            endif;
-                        endforeach; 
-                        ?>
-                    </div>
+                    <!-- 移除快速操作按鈕 -->
                 </div>
             <?php endif; ?>
             
@@ -122,6 +103,7 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
     </td>
 </tr>
 
+<?php if (!isset($context_type) || $context_type !== 'checkout'): ?>
 <script type="text/javascript">
 jQuery(document).ready(function($) {
     // 點數使用快捷按鈕
@@ -215,3 +197,4 @@ jQuery(document).ready(function($) {
     }
 });
 </script>
+<?php endif; ?>

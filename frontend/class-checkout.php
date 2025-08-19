@@ -40,11 +40,11 @@ class WC_Points_Rewards_Checkout {
      * 初始化 hooks
      */
     private function init_hooks() {
-        // 購物車頁面顯示點數使用選項
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_section'));
+        // 購物車頁面顯示點數使用選項 - 移動到總計上方，運送方式下方
+        add_action('woocommerce_cart_totals_before_order_total', array($this, 'display_cart_points_section'));
         
-        // 結帳頁面顯示點數使用選項
-        add_action('woocommerce_review_order_after_order_total', array($this, 'display_checkout_points_section'));
+        // 結帳頁面顯示點數使用選項 - 移動到小計上方，商品清單下方
+        add_action('woocommerce_review_order_before_cart_contents', array($this, 'display_checkout_points_section'));
         
         // 處理點數折扣
         add_action('woocommerce_cart_calculate_fees', array($this, 'apply_points_discount'));
@@ -138,6 +138,7 @@ class WC_Points_Rewards_Checkout {
         
         // 傳遞變數到模板
         $max_usable_points = $max_points;
+        $context_type = $context; // 傳遞上下文到模板
         
         include WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/views/cart-points-section.php';
     }

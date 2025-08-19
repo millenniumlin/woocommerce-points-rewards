@@ -61,8 +61,8 @@ class WC_Points_Rewards_Points_Calculator {
         // 生日設定時也檢查是否當天生日
         add_action('wc_points_rewards_birthday_set', array($this, 'check_immediate_birthday_bonus'));
         
-        // 購物車中顯示可獲得的點數
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_info'));
+        // 購物車中顯示可獲得的點數 - 移動到小計後面，運送方式前面
+        add_action('woocommerce_cart_totals_after_subtotal', array($this, 'display_cart_points_info'));
         
         // 產品頁面顯示可獲得的點數
         add_action('woocommerce_single_product_summary', array($this, 'display_product_points_info'), 25);
@@ -316,12 +316,10 @@ class WC_Points_Rewards_Points_Calculator {
             $total_points = $points + $bonus_points;
             
             echo '<tr class="points-info">';
-            echo '<th>' . __('可獲得點數', 'wc-points-rewards') . '</th>';
+            echo '<th>' . __('本次消費可獲得：', 'wc-points-rewards') . '</th>';
             echo '<td>';
             echo sprintf(__('%s 點', 'wc-points-rewards'), wc_points_rewards_number_format($total_points));
-            if ($tier_bonus > 0) {
-                echo '<small> (' . sprintf(__('基礎 %s + 等級加成 %s%%', 'wc-points-rewards'), wc_points_rewards_number_format($points), $tier_bonus) . ')</small>';
-            }
+            // 隱藏百分比文字，只顯示點數
             echo '</td>';
             echo '</tr>';
         }
