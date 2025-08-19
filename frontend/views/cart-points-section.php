@@ -99,7 +99,7 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                                    class="input-text points-input" 
                                    min="1" 
                                    max="<?php echo esc_attr($max_usable_points); ?>" 
-                                   step="0.01" 
+                                   step="<?php echo pow(10, -wc_get_price_decimals()); ?>" 
                                    placeholder="<?php _e('請輸入您要折抵的數量', 'wc-points-rewards'); ?>" />
                             <button type="button" class="button button-primary wc-points-apply-discount" data-nonce="<?php echo wp_create_nonce('wc_points_rewards_nonce'); ?>">
                                 <?php _e('使用點數', 'wc-points-rewards'); ?>

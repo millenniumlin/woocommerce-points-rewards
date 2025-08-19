@@ -10,114 +10,207 @@
 
 .points-redemption-section {
     border-top: 1px solid #e2e4e7;
+    background: #f9f9f9;
 }
 
 .points-redemption-section th {
     font-weight: 600;
     text-align: left;
-    padding: 1em 0.5em;
+    padding: 1.5em 1em;
     vertical-align: top;
-    width: 20%;
+    width: 25%;
+    background: #f0f0f1;
+    color: #2c3338;
+    border-right: 1px solid #e2e4e7;
 }
 
 .points-redemption-section td {
-    padding: 1em 0.5em;
+    padding: 1.5em 1em;
     vertical-align: top;
+    background: #ffffff;
 }
 
 .wc-points-redemption-wrapper {
     width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 /* Points Info Grid */
 .points-overview-section {
-    margin-bottom: 1em;
+    margin-bottom: 1.5em;
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 1em;
+    border: 1px solid #e9ecef;
 }
 
 .points-info-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5em;
-    margin-bottom: 1em;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    margin-bottom: 0;
 }
 
 .points-info-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 0.5em 0;
-    border-bottom: 1px solid #f0f0f1;
+    padding: 0.75em;
+    background: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
 }
 
-.points-info-item:last-child {
-    border-bottom: none;
+.points-info-item:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+}
+
+.points-info-item.discount-amount {
+    grid-column: 1 / -1;
+    background: #d1e7dd;
+    border-color: #a3cfbb;
 }
 
 .points-label {
     font-weight: 500;
-    color: #555;
+    color: #495057;
+    font-size: 0.9em;
 }
 
 .points-value {
-    font-weight: 600;
+    font-weight: 700;
     color: #2c3338;
+    font-size: 1.1em;
+}
+
+.points-value.available-points {
+    color: #0d6efd;
+}
+
+.points-value.used-points {
+    color: #dc3545;
+}
+
+.points-value.remaining-points {
+    color: #198754;
 }
 
 .points-value.discount-value {
-    color: #00a32a;
+    color: #198754;
+    font-size: 1.2em;
 }
 
 /* Input Section */
 .points-input-section {
-    margin-top: 1em;
+    margin-top: 1.5em;
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 1.5em;
+    border: 2px solid #e9ecef;
+    transition: border-color 0.3s ease;
+}
+
+.points-input-section:focus-within {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
 .points-input-group {
     display: flex;
-    gap: 0.5em;
+    gap: 1em;
     width: 100%;
+    align-items: stretch;
 }
 
 .points-input-group input[type="number"] {
     flex: 1;
-    padding: 0.75em;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    position: relative;
+    padding: 1em;
+    border: 2px solid #ced4da;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.points-input-group input[type="number"]:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
 .points-input-group input[type="number"]::placeholder {
-    color: #999;
+    color: #6c757d;
     font-style: italic;
+    font-weight: 400;
 }
 
-/* Add bottom text for input hint */
-.points-input-group input[type="number"]:focus::after {
-    content: "請輸入您要折抵的數量";
-    position: absolute;
-    bottom: -20px;
-    left: 0;
-    font-size: 12px;
-    color: #666;
-    font-style: italic;
+/* Remove spinner for better UX */
+.points-input-group input[type="number"]::-webkit-outer-spin-button,
+.points-input-group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.points-input-group input[type="number"] {
+    -moz-appearance: textfield;
 }
 
 .points-input-group .button {
     flex: 0 0 auto;
-    min-width: 120px;
-    padding: 0.75em 1.5em;
-    white-space: nowrap;
+    min-width: 140px;
+    padding: 1em 2em;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    text-transform: none;
+    font-size: 14px;
+}
+
+.points-input-group .button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.points-input-hint {
+    font-size: 13px;
+    color: #6c757d;
+    font-style: italic;
+    margin-top: 0.75em;
+    display: block;
+    padding-left: 0.5em;
 }
 
 /* Applied Points Section */
 .points-applied-section {
-    background: #f8f9fa;
-    border: 1px solid #e2e4e7;
-    border-radius: 4px;
-    padding: 1em;
-    margin-top: 1em;
+    background: linear-gradient(135deg, #d1e7dd 0%, #a3cfbb 100%);
+    border: 2px solid #198754;
+    border-radius: 8px;
+    padding: 1.5em;
+    margin-top: 1.5em;
+    position: relative;
+    overflow: hidden;
+}
+
+.points-applied-section::before {
+    content: "✓";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 40px;
+    height: 40px;
+    background: #198754;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
 }
 
 .points-applied-summary {
@@ -125,32 +218,104 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.5em;
+    gap: 1em;
 }
 
 .points-applied-text {
-    color: #00a32a;
-    font-weight: 500;
+    color: #0f5132;
+    font-weight: 600;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.points-applied-text::before {
+    content: "🎯";
+    font-size: 1.2em;
+}
+
+.wc-points-remove-discount {
+    background: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+    padding: 0.75em 1.5em !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.wc-points-remove-discount:hover {
+    background: #c82333 !important;
+    border-color: #bd2130 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
 /* Messages */
 .points-messages {
-    margin-top: 1em;
-    padding: 0.75em;
-    border-radius: 4px;
+    margin-top: 1.5em;
+    padding: 1em 1.5em;
+    border-radius: 6px;
     font-weight: 500;
+    border-left: 4px solid;
+    position: relative;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.points-messages::before {
+    content: "";
+    position: absolute;
+    left: 1em;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-size: 12px;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .points-messages.wc-points-success {
     background: #d1e7dd;
     color: #0f5132;
-    border: 1px solid #a3cfbb;
+    border-left-color: #198754;
+}
+
+.points-messages.wc-points-success::before {
+    background: #198754 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>') center;
 }
 
 .points-messages.wc-points-error {
     background: #f8d7da;
     color: #721c24;
-    border: 1px solid #f1aeb5;
+    border-left-color: #dc3545;
+}
+
+.points-messages.wc-points-error::before {
+    background: #dc3545 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>') center;
+}
+
+.points-messages.wc-points-warning {
+    background: #fff3cd;
+    color: #664d03;
+    border-left-color: #ffc107;
+}
+
+.points-messages.wc-points-warning::before {
+    background: #ffc107 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>') center;
 }
 
 /* Checkout specific styles */
@@ -177,20 +342,30 @@
     .points-redemption-section td {
         display: block;
         width: 100%;
-        padding: 0.5em 0;
+        padding: 1em;
     }
     
     .points-redemption-section th {
         border-bottom: none;
-        padding-bottom: 0.25em;
+        border-right: none;
+        padding-bottom: 0.5em;
+        background: #f8f9fa;
+        text-align: center;
+        border-radius: 6px 6px 0 0;
+    }
+    
+    .points-redemption-section td {
+        border-radius: 0 0 6px 6px;
     }
     
     .points-info-grid {
-        flex-direction: column;
+        grid-template-columns: 1fr;
+        gap: 0.75em;
     }
     
     .points-input-group {
         flex-direction: column;
+        gap: 1em;
     }
     
     .points-input-group input[type="number"],
@@ -200,8 +375,14 @@
     
     .points-applied-summary {
         flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
+        align-items: stretch;
+        text-align: center;
+        gap: 1em;
+    }
+    
+    .points-applied-section::before {
+        top: 10px;
+        right: 10px;
     }
 }
 
@@ -209,13 +390,21 @@
 @media screen and (max-width: 480px) {
     .points-redemption-section th,
     .points-redemption-section td {
-        padding: 0.25em 0;
+        padding: 0.75em;
+    }
+    
+    .points-overview-section,
+    .points-input-section,
+    .points-applied-section {
+        padding: 1em;
+        margin-top: 1em;
     }
     
     .points-info-item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.25em;
+        gap: 0.5em;
+        text-align: left;
     }
     
     .points-label,
@@ -223,20 +412,65 @@
         width: 100%;
     }
     
+    .points-value {
+        text-align: right;
+        font-size: 1.2em;
+    }
+    
     .points-input-group {
-        gap: 0.75em;
+        gap: 1em;
     }
     
     .points-input-group input[type="number"] {
         font-size: 16px; /* Prevent zoom on iOS */
+        padding: 1.25em;
+    }
+    
+    .points-input-group .button {
+        padding: 1.25em;
+        font-size: 16px;
+    }
+    
+    .points-messages {
+        padding-left: 3em; /* Make room for icon */
     }
 }
 
-/* Input hint styling */
-.points-input-hint {
-    font-size: 12px;
-    color: #666;
-    font-style: italic;
-    margin-top: 0.25em;
-    display: block;
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .points-redemption-section {
+        border: 2px solid #000;
+    }
+    
+    .points-info-item,
+    .points-input-section,
+    .points-applied-section {
+        border: 2px solid #000;
+    }
+    
+    .points-input-group input[type="number"] {
+        border: 2px solid #000;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .points-info-item,
+    .points-input-group .button,
+    .wc-points-remove-discount {
+        transition: none;
+    }
+    
+    .points-info-item:hover,
+    .points-input-group .button:hover,
+    .wc-points-remove-discount:hover {
+        transform: none;
+    }
+    
+    @keyframes slideIn {
+        from, to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 }

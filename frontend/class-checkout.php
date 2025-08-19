@@ -104,7 +104,7 @@ class WC_Points_Rewards_Checkout {
         }
         
         $available_points = $database->get_user_points($user_id);
-        $cart_total = WC()->cart->get_subtotal();
+        $cart_total = WC()->cart->get_total('edit'); // 使用與 AJAX 一致的總計計算方式
         $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
         
         // 檢查購物車金額是否達到最低要求 (僅購物車頁面)
@@ -152,6 +152,7 @@ class WC_Points_Rewards_Checkout {
      * 應用點數折扣
      */
     public function apply_points_discount() {
+        // 確保在前端且不是 AJAX 請求時才應用折扣
         if (!is_admin() && !defined('DOING_AJAX')) {
             $discount_amount = WC()->session->get('wc_points_rewards_discount_amount', 0);
             
@@ -159,11 +160,14 @@ class WC_Points_Rewards_Checkout {
                 $calculator = WC_Points_Rewards_Points_Calculator::instance();
                 $discount_value = $calculator->calculate_discount_amount($discount_amount);
                 
-                WC()->cart->add_fee(
-                    __('點數折抵', 'wc-points-rewards'),
-                    -$discount_value,
-                    false
-                );
+                // 確保折扣值大於 0 才添加費用
+                if ($discount_value > 0) {
+                    WC()->cart->add_fee(
+                        __('點數折抵', 'wc-points-rewards'),
+                        -$discount_value,
+                        false
+                    );
+                }
             }
         }
     }
@@ -230,7 +234,7 @@ class WC_Points_Rewards_Checkout {
         }
         
         // 檢查購物車條件
-        $cart_total = WC()->cart->get_subtotal();
+        $cart_total = WC()->cart->get_total('edit'); // 使用可編輯格式的總計
         if (!$calculator->can_use_points($cart_total, $points_to_use)) {
             wp_send_json_error(__('不符合點數使用條件', 'wc-points-rewards'));
         }
