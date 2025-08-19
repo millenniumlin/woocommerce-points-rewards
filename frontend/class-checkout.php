@@ -96,12 +96,19 @@ class WC_Points_Rewards_Checkout {
             return;
         }
         
+        $current_discount = WC()->session->get('wc_points_rewards_discount_amount', 0);
+        
+        // 在結帳頁面，只有當有使用點數時才顯示
+        if ($context === 'checkout' && $current_discount <= 0) {
+            return;
+        }
+        
         $available_points = $database->get_user_points($user_id);
         $cart_total = WC()->cart->get_subtotal();
         $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
         
-        // 檢查購物車金額是否達到最低要求
-        if ($cart_total < $min_cart_total) {
+        // 檢查購物車金額是否達到最低要求 (僅購物車頁面)
+        if ($context === 'cart' && $cart_total < $min_cart_total) {
             if ($min_cart_total > 0) {
                 echo '<tr class="points-requirements">';
                 echo '<td colspan="2">';
@@ -114,7 +121,7 @@ class WC_Points_Rewards_Checkout {
             return;
         }
         
-        if ($available_points <= 0) {
+        if ($context === 'cart' && $available_points <= 0) {
             echo '<tr class="points-no-balance">';
             echo '<td colspan="2">';
             echo '<div class="wc-points-message wc-points-info">';
@@ -133,8 +140,6 @@ class WC_Points_Rewards_Checkout {
         $point_value = floatval(get_option('wc_points_rewards_points_value', 1));
         $max_points_by_amount = $max_discount_amount / $point_value;
         $max_points = min($available_points, $max_points_by_amount);
-        
-        $current_discount = WC()->session->get('wc_points_rewards_discount_amount', 0);
         
         // 傳遞變數到模板
         $max_usable_points = $max_points;
