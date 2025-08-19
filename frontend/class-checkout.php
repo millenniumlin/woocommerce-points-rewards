@@ -43,8 +43,8 @@ class WC_Points_Rewards_Checkout {
         // 購物車頁面顯示點數使用選項 - 移動到總計上方，運送方式下方
         add_action('woocommerce_cart_totals_before_order_total', array($this, 'display_cart_points_section'));
         
-        // 結帳頁面顯示點數使用選項 - 移動到小計上方，商品清單下方
-        add_action('woocommerce_review_order_before_cart_contents', array($this, 'display_checkout_points_section'));
+        // 結帳頁面顯示點數使用選項 - 移動到小計上方
+        add_action('woocommerce_review_order_after_cart_contents', array($this, 'display_checkout_points_section'));
         
         // 處理點數折扣
         add_action('woocommerce_cart_calculate_fees', array($this, 'apply_points_discount'));
