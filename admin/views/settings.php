@@ -17,11 +17,15 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
         // 基本設定
         'enable_points_system' => sanitize_text_field($_POST['enable_points_system'] ?? 'no'),
         'points_name' => sanitize_text_field($_POST['points_name'] ?? '點'),
+        'points_value' => floatval($_POST['points_value'] ?? 0.01),
         
         // 點數獲得
         'points_per_amount' => floatval($_POST['points_per_amount'] ?? 100),
         'points_amount' => floatval($_POST['points_amount'] ?? 1),
         'points_expiry_months' => intval($_POST['points_expiry_months'] ?? 12),
+        'registration_points' => floatval($_POST['registration_points'] ?? 100),
+        'enable_birthday_points' => sanitize_text_field($_POST['enable_birthday_points'] ?? 'yes'),
+        'birthday_points' => floatval($_POST['birthday_points'] ?? 200),
         
         // 購物車點數使用設定
         'enable_cart_redemption' => sanitize_text_field($_POST['enable_cart_redemption'] ?? 'yes'),
@@ -70,6 +74,15 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                     </td>
                 </tr>
                 
+                <tr>
+                    <th scope="row"><?php _e('點數價值', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <input type="number" name="points_value" value="<?php echo esc_attr($settings['points_value'] ?? 0.01); ?>" min="0.001" step="0.001" class="small-text">
+                        <?php echo get_woocommerce_currency_symbol(); ?>
+                        <p class="description"><?php _e('1點等於多少錢（例如：0.01表示1點=0.01元）', 'wc-points-rewards'); ?></p>
+                    </td>
+                </tr>
+                
                 <!-- 小數位數設定說明 -->
                 <tr>
                     <th scope="row"><?php _e('小數位數顯示', 'wc-points-rewards'); ?></th>
@@ -106,6 +119,34 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                         <input type="number" name="points_expiry_months" value="<?php echo esc_attr($settings['points_expiry_months'] ?? 12); ?>" min="1" class="small-text">
                         <?php _e('個月', 'wc-points-rewards'); ?>
                         <p class="description"><?php _e('點數的有效期限，超過此期限點數將自動過期', 'wc-points-rewards'); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('註冊贈送點數', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <input type="number" name="registration_points" value="<?php echo esc_attr($settings['registration_points'] ?? 100); ?>" min="0" class="small-text">
+                        <?php echo wc_points_rewards_get_points_name(); ?>
+                        <p class="description"><?php _e('新用戶註冊時贈送的點數', 'wc-points-rewards'); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('啟用生日點數', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="enable_birthday_points" value="yes" <?php checked($settings['enable_birthday_points'] ?? 'yes', 'yes'); ?>>
+                            <?php _e('在用戶生日月份贈送點數', 'wc-points-rewards'); ?>
+                        </label>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('生日贈送點數', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <input type="number" name="birthday_points" value="<?php echo esc_attr($settings['birthday_points'] ?? 200); ?>" min="0" class="small-text">
+                        <?php echo wc_points_rewards_get_points_name(); ?>
+                        <p class="description"><?php _e('用戶生日月份贈送的點數', 'wc-points-rewards'); ?></p>
                     </td>
                 </tr>
             </table>

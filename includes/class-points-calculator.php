@@ -141,7 +141,7 @@ class WC_Points_Rewards_Points_Calculator {
      * 根據金額計算基礎點數
      */
     public function calculate_points_for_amount($amount) {
-        $points_per_amount = floatval(get_option('wc_points_rewards_points_per_amount', 100));
+        $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 100;
         $decimal_places = wc_get_price_decimals(); // 使用 WooCommerce 小數位數設定
         
         if ($points_per_amount <= 0) {
@@ -169,13 +169,13 @@ class WC_Points_Rewards_Points_Calculator {
      */
     public function award_registration_points($user_id) {
         // 檢查註冊點數是否設定且大於0
-        $points = floatval(get_option('wc_points_rewards_registration_points', 0));
+        $points = isset($this->settings['registration_points']) ? floatval($this->settings['registration_points']) : 0;
         
         if ($points > 0) {
             $database = WC_Points_Rewards_Database::instance();
             
             // 計算過期時間
-            $expiry_months = intval(get_option('wc_points_rewards_points_expiry_months', 12));
+            $expiry_months = isset($this->settings['points_expiry_months']) ? intval($this->settings['points_expiry_months']) : 12;
             $expiry_date = null;
             if ($expiry_months > 0) {
                 $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
@@ -198,7 +198,7 @@ class WC_Points_Rewards_Points_Calculator {
      */
     public function award_birthday_points($user_id) {
         // 檢查生日點數是否設定且大於0
-        $points = floatval(get_option('wc_points_rewards_birthday_points', 0));
+        $points = isset($this->settings['birthday_points']) ? floatval($this->settings['birthday_points']) : 0;
         
         if ($points > 0) {
             $database = WC_Points_Rewards_Database::instance();
@@ -221,7 +221,7 @@ class WC_Points_Rewards_Points_Calculator {
             
             if (!$existing_birthday_points) {
                 // 計算過期時間
-                $expiry_months = intval(get_option('wc_points_rewards_points_expiry_months', 12));
+                $expiry_months = isset($this->settings['points_expiry_months']) ? intval($this->settings['points_expiry_months']) : 12;
                 $expiry_date = null;
                 if ($expiry_months > 0) {
                     $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
@@ -245,12 +245,12 @@ class WC_Points_Rewards_Points_Calculator {
      */
     public function check_birthday_points() {
         // 檢查是否啟用生日點數功能
-        $enable_birthday_points = get_option('wc_points_rewards_enable_birthday_points', 'yes');
+        $enable_birthday_points = isset($this->settings['enable_birthday_points']) ? $this->settings['enable_birthday_points'] : 'yes';
         if ($enable_birthday_points !== 'yes') {
             return;
         }
         
-        $birthday_points = floatval(get_option('wc_points_rewards_birthday_points', 0));
+        $birthday_points = isset($this->settings['birthday_points']) ? floatval($this->settings['birthday_points']) : 0;
         
         if ($birthday_points <= 0) {
             return;

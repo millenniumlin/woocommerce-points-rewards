@@ -89,14 +89,16 @@ function wc_points_rewards_format_percentage($percentage) {
  * 獲取點數名稱
  */
 function wc_points_rewards_get_points_name() {
-    return get_option('wc_points_rewards_points_name', __('點', 'wc-points-rewards'));
+    $settings = get_option('wc_points_rewards_settings', array());
+    return isset($settings['points_name']) ? $settings['points_name'] : __('點', 'wc-points-rewards');
 }
 
 /**
  * 獲取點數價值（1點等於多少錢）
  */
 function wc_points_rewards_get_points_value() {
-    return floatval(get_option('wc_points_rewards_points_value', '0.01'));
+    $settings = get_option('wc_points_rewards_settings', array());
+    return isset($settings['points_value']) ? floatval($settings['points_value']) : 0.01;
 }
 
 /**
