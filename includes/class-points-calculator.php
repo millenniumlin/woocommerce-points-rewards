@@ -348,7 +348,7 @@ class WC_Points_Rewards_Points_Calculator {
      */
     public function calculate_discount_amount($points) {
         // 使用設定中的點數價值：1點 = 多少元
-        $point_value = floatval(get_option('wc_points_rewards_points_value', 1));
+        $point_value = isset($this->settings['points_value']) ? floatval($this->settings['points_value']) : 0.01;
         return $points * $point_value;
     }
     
@@ -356,8 +356,8 @@ class WC_Points_Rewards_Points_Calculator {
      * 檢查點數是否可以使用
      */
     public function can_use_points($cart_total, $points_to_use) {
-        $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));
-        $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', 50));
+        $min_cart_total = isset($this->settings['min_cart_total']) ? floatval($this->settings['min_cart_total']) : 0;
+        $max_discount_percent = isset($this->settings['max_discount_percent']) ? floatval($this->settings['max_discount_percent']) : 50;
         
         // 檢查購物車金額是否達到最低要求
         if ($cart_total < $min_cart_total) {

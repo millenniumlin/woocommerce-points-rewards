@@ -263,13 +263,19 @@ class WC_Points_Rewards_Frontend {
      * 載入腳本和樣式 - 已移除非功能性前端資源
      */
     public function enqueue_scripts() {
-        // 前端 CSS/JS 資源已移除，因為對前台沒有作用
-        // 如需要特定樣式，建議在主題中處理或使用內聯樣式
-        
-        // 🚀 修正：只在確實需要 AJAX 的頁面才設定本地化腳本
+        // 🚀 修正：只在確實需要 AJAX 的頁面才載入腳本和本地化數據
         if (is_checkout() || is_cart()) {
+            // 載入前端 JavaScript
+            wp_enqueue_script(
+                'wc-points-rewards-frontend',
+                WC_POINTS_REWARDS_PLUGIN_URL . 'assets/js/frontend.js',
+                array('jquery'),
+                WC_POINTS_REWARDS_VERSION,
+                true
+            );
+            
             // 為 AJAX 功能提供必要的本地化數據
-            wp_localize_script('jquery', 'wcPointsRewards', array(
+            wp_localize_script('wc-points-rewards-frontend', 'wcPointsRewards', array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('wc_points_rewards_nonce'),
                 'messages' => array(
