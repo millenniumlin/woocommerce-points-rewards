@@ -40,11 +40,11 @@ class WC_Points_Rewards_Checkout {
      * 初始化 hooks
      */
     private function init_hooks() {
-        // 購物車頁面顯示點數使用選項
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_section'));
+        // 購物車頁面顯示點數使用選項 - 移動到 order total 之前
+        add_action('woocommerce_cart_totals_before_order_total', array($this, 'display_cart_points_section'));
         
-        // 結帳頁面顯示點數使用選項
-        add_action('woocommerce_review_order_after_order_total', array($this, 'display_checkout_points_section'));
+        // 結帳頁面顯示點數使用選項 - 移動到 order total 之前
+        add_action('woocommerce_review_order_before_order_total', array($this, 'display_checkout_points_section'));
         
         // 處理點數折扣
         add_action('woocommerce_cart_calculate_fees', array($this, 'apply_points_discount'));
@@ -96,6 +96,13 @@ class WC_Points_Rewards_Checkout {
             return;
         }
         
+        // 結帳頁面只顯示已使用的點數，不提供編輯功能
+        if ($context === 'checkout') {
+            include WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/views/checkout-points-section.php';
+            return;
+        }
+        
+        // 以下是購物車頁面的邏輯
         $available_points = $database->get_user_points($user_id);
         $cart_total = WC()->cart->get_subtotal();
         $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', 0));

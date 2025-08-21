@@ -95,25 +95,7 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                         </button>
                     </div>
                     
-                    <div class="points-quick-actions">
-                        <?php 
-                        $quick_options = array(
-                            array('points' => min($max_usable_points, 100), 'label' => __('使用 100 點', 'wc-points-rewards')),
-                            array('points' => round($max_usable_points * 0.5), 'label' => __('使用 50%', 'wc-points-rewards')),
-                            array('points' => $max_usable_points, 'label' => __('全部使用', 'wc-points-rewards'))
-                        );
-                        
-                        foreach ($quick_options as $option):
-                            if ($option['points'] > 0):
-                        ?>
-                        <button type="button" class="button-link points-quick-use" data-points="<?php echo esc_attr($option['points']); ?>">
-                            <?php echo esc_html($option['label']); ?>
-                        </button>
-                        <?php 
-                            endif;
-                        endforeach; 
-                        ?>
-                    </div>
+
                 </div>
             <?php endif; ?>
             
@@ -124,12 +106,6 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
 
 <script type="text/javascript">
 jQuery(document).ready(function($) {
-    // 點數使用快捷按鈕
-    $('.points-quick-use').on('click', function() {
-        var points = $(this).data('points');
-        $('#points-to-use').val(points);
-    });
-    
     // 應用點數折扣
     $('.wc-points-apply-discount').on('click', function() {
         var $button = $(this);

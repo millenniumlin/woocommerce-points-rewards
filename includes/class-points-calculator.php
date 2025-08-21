@@ -61,8 +61,8 @@ class WC_Points_Rewards_Points_Calculator {
         // 生日設定時也檢查是否當天生日
         add_action('wc_points_rewards_birthday_set', array($this, 'check_immediate_birthday_bonus'));
         
-        // 購物車中顯示可獲得的點數
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'display_cart_points_info'));
+        // 購物車中顯示可獲得的點數 - 移動到 shipping 之後，subtotal 下方
+        add_action('woocommerce_cart_totals_after_shipping', array($this, 'display_cart_points_info'));
         
         // 產品頁面顯示可獲得的點數
         add_action('woocommerce_single_product_summary', array($this, 'display_product_points_info'), 25);
