@@ -279,6 +279,7 @@ class WC_Points_Rewards_Frontend {
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('wc_points_rewards_nonce'),
                 'pointValue' => wc_points_rewards_get_points_value(),
+                'currencySymbol' => get_woocommerce_currency_symbol(),
                 'messages' => array(
                     'loading' => __('載入中...', 'wc-points-rewards'),
                     'error' => __('發生錯誤，請稍後再試', 'wc-points-rewards'),

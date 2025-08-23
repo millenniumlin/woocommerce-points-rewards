@@ -95,6 +95,10 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                         </button>
                     </div>
                     
+                    <!-- 折抵金額預覽 -->
+                    <div class="discount-preview-container">
+                        <!-- 動態生成的折抵預覽將插入此處 -->
+                    </div>
 
                 </div>
             <?php endif; ?>
