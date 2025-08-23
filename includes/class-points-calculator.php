@@ -38,7 +38,20 @@ class WC_Points_Rewards_Points_Calculator {
      * 建構函式
      */
     public function __construct() {
-        $this->settings = get_option('wc_points_rewards_settings', array());
+        // 修正：從個別選項載入設定
+        $this->settings = array(
+            'enable_points_system' => get_option('wc_points_rewards_enable_points_system', 'yes'),
+            'points_per_amount' => get_option('wc_points_rewards_points_per_amount', '1'),
+            'points_value' => get_option('wc_points_rewards_points_value', '1'),
+            'points_expiry_months' => get_option('wc_points_rewards_points_expiry_months', '12'),
+            'registration_points' => get_option('wc_points_rewards_registration_points', '100'),
+            'birthday_points' => get_option('wc_points_rewards_birthday_points', '100'),
+            'enable_cart_redemption' => get_option('wc_points_rewards_enable_cart_redemption', 'yes'),
+            'min_cart_total' => get_option('wc_points_rewards_min_cart_total', '0'),
+            'max_discount_percent' => get_option('wc_points_rewards_max_discount_percent', '100'),
+            'enable_tiers' => get_option('wc_points_rewards_enable_tiers', 'yes'),
+            'enable_notifications' => get_option('wc_points_rewards_enable_notifications', 'yes'),
+        );
         $this->init_hooks();
     }
     
@@ -142,15 +155,14 @@ class WC_Points_Rewards_Points_Calculator {
      */
     public function calculate_points_for_amount($amount) {
         $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 1;
-        $points_amount = isset($this->settings['points_amount']) ? floatval($this->settings['points_amount']) : 1;
         $decimal_places = wc_get_price_decimals(); // 使用 WooCommerce 小數位數設定
         
         if ($points_per_amount <= 0) {
             return 0;
         }
         
-        // 計算基礎點數：每消費 $points_per_amount 元獲得 $points_amount 點
-        $points = ($amount / $points_per_amount) * $points_amount;
+        // 計算基礎點數：每消費 $points_per_amount 元獲得 1 點
+        $points = $amount / $points_per_amount;
         
         return round($points, $decimal_places);
     }
@@ -308,9 +320,7 @@ class WC_Points_Rewards_Points_Calculator {
         }
         
         // 檢查是否啟用點數系統
-        $settings = get_option('wc_points_rewards_settings', array());
-        $enable_points_system = isset($settings['enable_points_system']) ? $settings['enable_points_system'] : 'yes';
-        if ($enable_points_system !== 'yes') {
+        if (!wc_points_rewards_is_enabled()) {
             return;
         }
         
