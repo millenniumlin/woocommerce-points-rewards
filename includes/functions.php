@@ -116,17 +116,16 @@ function wc_points_rewards_format_points_value($points = 1) {
  * 獲取外掛設定
  */
 function wc_points_rewards_get_option($key, $default = null) {
-    $settings = get_option('wc_points_rewards_settings', array());
-    return isset($settings[$key]) ? $settings[$key] : $default;
+    // 修正：直接從個別選項讀取
+    return get_option('wc_points_rewards_' . $key, $default);
 }
 
 /**
  * 更新外掛設定
  */
 function wc_points_rewards_update_option($key, $value) {
-    $settings = get_option('wc_points_rewards_settings', array());
-    $settings[$key] = $value;
-    return update_option('wc_points_rewards_settings', $settings);
+    // 修正：直接更新個別選項
+    return update_option('wc_points_rewards_' . $key, $value);
 }
 
 /**

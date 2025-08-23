@@ -38,7 +38,11 @@ class WC_Points_Rewards_Notifications {
      * 建構函式
      */
     public function __construct() {
-        $this->settings = get_option('wc_points_rewards_settings', array());
+        // 修正：從個別選項載入設定
+        $this->settings = array(
+            'enable_notifications' => get_option('wc_points_rewards_enable_notifications', 'yes'),
+            'expiry_notification_days' => get_option('wc_points_rewards_expiry_notification_days', '7'),
+        );
         $this->init_hooks();
     }
     

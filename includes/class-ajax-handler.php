@@ -127,8 +127,7 @@ class WC_Points_Rewards_Ajax_Handler {
                     $database = WC_Points_Rewards_Database::instance();
                     
                     // 計算過期時間
-                    $settings = get_option('wc_points_rewards_settings', array());
-                    $expiry_months = isset($settings['points_expiry_months']) ? intval($settings['points_expiry_months']) : 12;
+                    $expiry_months = intval(get_option('wc_points_rewards_points_expiry_months', '12'));
                     $expiry_date = null;
                     if ($expiry_months > 0) {
                         $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));

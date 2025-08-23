@@ -131,13 +131,7 @@ class WC_Points_Rewards_Frontend {
      * 顯示功能已完全移除 - 不再顯示任何前台點數資訊
      */
     public function setup_display_hooks() {
-        // 🚀 關鍵修正：從主設定數組獲取設定
-        $settings = get_option('wc_points_rewards_settings', array());
-        
         // 🚀 顯示功能完全移除 - 商品列表頁和單一商品頁面都不顯示點數
-        // 保留選單顯示控制（如果需要的話）
-        $show_in_menu = isset($settings['show_in_menu']) ? $settings['show_in_menu'] : 'yes';
-        
         // 所有產品相關的點數顯示已被移除
         // 原有的 show_in_shop_loop 和 show_in_single_product 功能不再使用
     }

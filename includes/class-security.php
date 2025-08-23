@@ -268,10 +268,9 @@ class WC_Points_Rewards_Security {
         }
         
         $database = WC_Points_Rewards_Database::instance();
-        $settings = get_option('wc_points_rewards_settings', array());
         
         // 計算過期時間
-        $expiry_months = isset($settings['points_expiry_months']) ? intval($settings['points_expiry_months']) : 12;
+        $expiry_months = intval(get_option('wc_points_rewards_points_expiry_months', '12'));
         $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
         
         $result = $database->add_points(
