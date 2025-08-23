@@ -140,7 +140,7 @@ class WC_Points_Rewards_Checkout {
         }
         
         // 計算最大可使用點數
-        $max_discount_percent = isset($settings['max_discount_percent']) ? floatval($settings['max_discount_percent']) : 50;
+        $max_discount_percent = isset($settings['max_discount_percent']) ? floatval($settings['max_discount_percent']) : 100;
         $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
         
         // 計算最大可用點數（考慮點數價值）

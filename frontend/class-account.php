@@ -180,6 +180,11 @@ class WC_Points_Rewards_Account {
      * 添加我的帳戶選單項目
      */
     public function add_account_menu_items($items) {
+        // 檢查是否啟用點數系統
+        if (!wc_points_rewards_is_enabled()) {
+            return $items;
+        }
+        
         // 在訂單後面插入點數相關選單
         $new_items = array();
         
@@ -338,6 +343,12 @@ class WC_Points_Rewards_Account {
      * 修正 D-1: 我的點數頁面內容
      */
     public function points_rewards_content() {
+        // 檢查是否啟用點數系統
+        if (!wc_points_rewards_is_enabled()) {
+            echo '<div class="woocommerce-message">' . __('點數系統目前未啟用', 'wc-points-rewards') . '</div>';
+            return;
+        }
+        
         $user_id = get_current_user_id();
         
         if (!$user_id) {
@@ -379,6 +390,12 @@ class WC_Points_Rewards_Account {
      * 修正 D-2: 點數記錄頁面內容
      */
     public function points_history_content() {
+        // 檢查是否啟用點數系統
+        if (!wc_points_rewards_is_enabled()) {
+            echo '<div class="woocommerce-message">' . __('點數系統目前未啟用', 'wc-points-rewards') . '</div>';
+            return;
+        }
+        
         $user_id = get_current_user_id();
         
         if (!$user_id) {
@@ -430,6 +447,12 @@ class WC_Points_Rewards_Account {
      * 修正 D-3: 會員等級頁面內容
      */
     public function member_tier_content() {
+        // 檢查是否啟用點數系統
+        if (!wc_points_rewards_is_enabled()) {
+            echo '<div class="woocommerce-message">' . __('點數系統目前未啟用', 'wc-points-rewards') . '</div>';
+            return;
+        }
+        
         $user_id = get_current_user_id();
         
         if (!$user_id) {
@@ -635,6 +658,11 @@ class WC_Points_Rewards_Account {
      * 在帳戶儀表板顯示點數資訊
      */
     public function display_dashboard_points_info() {
+        // 檢查是否啟用點數系統
+        if (!wc_points_rewards_is_enabled()) {
+            return;
+        }
+        
         $user_id = get_current_user_id();
         $database = WC_Points_Rewards_Database::instance();
         

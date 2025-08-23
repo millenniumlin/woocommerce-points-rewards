@@ -48,10 +48,10 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                     <?php endif; ?>
                     
                     <div class="points-info-item">
-                        <span class="points-label"><?php _e('最多折抵點數', 'wc-points-rewards'); ?>：</span>
+                        <span class="points-label"><?php _e('本次最多可用', 'wc-points-rewards'); ?>：</span>
                         <span class="points-value max-usable"><?php echo wc_points_rewards_number_format($max_usable_points); ?></span>
                         <?php if ($max_discount_percent < 100): ?>
-                            <span class="points-note">（<?php printf(__('小計金額 %s%%', 'wc-points-rewards'), $max_discount_percent); ?>）</span>
+                            <span class="points-note">（<?php printf(__('最多可折抵 %s%%', 'wc-points-rewards'), $max_discount_percent); ?>）</span>
                         <?php endif; ?>
                     </div>
                     
@@ -88,7 +88,7 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                                class="input-text points-input" 
                                min="1" 
                                max="<?php echo esc_attr($max_usable_points); ?>" 
-                               step="<?php echo esc_attr(isset($settings['points_value']) ? $settings['points_value'] : '1'); ?>" 
+                               step="1" 
                                placeholder="<?php _e('輸入要使用的點數', 'wc-points-rewards'); ?>" />
                         <button type="button" class="button button-primary wc-points-apply-discount" data-nonce="<?php echo wp_create_nonce('wc_points_rewards_nonce'); ?>">
                             <?php _e('使用點數', 'wc-points-rewards'); ?>
