@@ -293,7 +293,7 @@ class WC_Points_Rewards {
             'show_in_menu' => 'no',  // 預設不在選單顯示
             
             // 原有設定
-            'points_per_amount' => 100, // 每100元回饋1點
+            'points_per_amount' => 1, // 每1元回饋1點
             'points_amount' => 1,
             'registration_points' => 100,
             'birthday_points' => 200,

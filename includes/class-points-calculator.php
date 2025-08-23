@@ -141,7 +141,7 @@ class WC_Points_Rewards_Points_Calculator {
      * 根據金額計算基礎點數
      */
     public function calculate_points_for_amount($amount) {
-        $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 100;
+        $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 1;
         $points_amount = isset($this->settings['points_amount']) ? floatval($this->settings['points_amount']) : 1;
         $decimal_places = wc_get_price_decimals(); // 使用 WooCommerce 小數位數設定
         

@@ -20,7 +20,7 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
         'points_value' => floatval($_POST['points_value'] ?? 1),
         
         // 點數獲得
-        'points_per_amount' => floatval($_POST['points_per_amount'] ?? 100),
+        'points_per_amount' => floatval($_POST['points_per_amount'] ?? 1),
         'points_amount' => floatval($_POST['points_amount'] ?? 1),
         'points_expiry_months' => intval($_POST['points_expiry_months'] ?? 12),
         'registration_points' => floatval($_POST['registration_points'] ?? 100),
@@ -104,12 +104,12 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                     <td>
                         <label>
                             <?php _e('每', 'wc-points-rewards'); ?>
-                            <input type="number" name="points_per_amount" value="<?php echo esc_attr($settings['points_per_amount'] ?? 100); ?>" min="1" step="0.01" class="small-text">
+                            <input type="number" name="points_per_amount" value="<?php echo esc_attr($settings['points_per_amount'] ?? 1); ?>" min="1" step="0.01" class="small-text">
                             <?php _e('元回饋', 'wc-points-rewards'); ?>
                             <input type="number" name="points_amount" value="<?php echo esc_attr($settings['points_amount'] ?? 1); ?>" min="0.01" step="0.01" class="small-text">
                             <?php echo wc_points_rewards_get_points_name(); ?>
                         </label>
-                        <p class="description"><?php _e('例如：每100元回饋1點', 'wc-points-rewards'); ?></p>
+                        <p class="description"><?php _e('例如：每1元回饋1點', 'wc-points-rewards'); ?></p>
                     </td>
                 </tr>
                 
