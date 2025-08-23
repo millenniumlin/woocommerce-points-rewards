@@ -356,7 +356,7 @@ class WC_Points_Rewards_Points_Calculator {
      */
     public function calculate_discount_amount($points) {
         // 使用設定中的點數價值：1點 = 多少元
-        $point_value = isset($this->settings['points_value']) ? floatval($this->settings['points_value']) : 0.01;
+        $point_value = isset($this->settings['points_value']) ? floatval($this->settings['points_value']) : 1;
         return $points * $point_value;
     }
     

@@ -308,7 +308,7 @@ class WC_Points_Rewards {
             
             // 點數名稱設定
             'points_name' => '點',
-            'points_value' => 0.01  // 1點 = 0.01元
+            'points_value' => 1  // 1點 = 1元
         );
         
         add_option('wc_points_rewards_settings', $default_settings);

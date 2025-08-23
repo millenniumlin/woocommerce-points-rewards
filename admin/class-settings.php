@@ -301,7 +301,7 @@ class WC_Points_Rewards_Settings {
             'enable_points_system' => get_option('wc_points_rewards_enable_points_system', 'yes'),
             'points_per_amount' => get_option('wc_points_rewards_points_per_amount', '100'),
             'points_name' => get_option('wc_points_rewards_points_name', '點'),
-            'points_value' => get_option('wc_points_rewards_points_value', '0.01'),
+            'points_value' => get_option('wc_points_rewards_points_value', '1'),
             'points_expiry_months' => get_option('wc_points_rewards_points_expiry_months', '12'),
             'registration_points' => get_option('wc_points_rewards_registration_points', '100'),
             'birthday_points' => get_option('wc_points_rewards_birthday_points', '200'),

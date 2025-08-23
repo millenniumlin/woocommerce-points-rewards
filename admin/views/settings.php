@@ -17,7 +17,7 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
         // 基本設定
         'enable_points_system' => sanitize_text_field($_POST['enable_points_system'] ?? 'no'),
         'points_name' => sanitize_text_field($_POST['points_name'] ?? '點'),
-        'points_value' => floatval($_POST['points_value'] ?? 0.01),
+        'points_value' => floatval($_POST['points_value'] ?? 1),
         
         // 點數獲得
         'points_per_amount' => floatval($_POST['points_per_amount'] ?? 100),
@@ -77,9 +77,9 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                 <tr>
                     <th scope="row"><?php _e('點數價值', 'wc-points-rewards'); ?></th>
                     <td>
-                        <input type="number" name="points_value" value="<?php echo esc_attr($settings['points_value'] ?? 0.01); ?>" min="0.001" step="0.001" class="small-text">
+                        <input type="number" name="points_value" value="<?php echo esc_attr($settings['points_value'] ?? 1); ?>" min="0.001" step="0.001" class="small-text">
                         <?php echo get_woocommerce_currency_symbol(); ?>
-                        <p class="description"><?php _e('1點等於多少錢（例如：0.01表示1點=0.01元）', 'wc-points-rewards'); ?></p>
+                        <p class="description"><?php _e('1點等於多少錢（例如：1表示1點=1元）', 'wc-points-rewards'); ?></p>
                     </td>
                 </tr>
                 

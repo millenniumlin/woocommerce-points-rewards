@@ -98,7 +98,7 @@ function wc_points_rewards_get_points_name() {
  */
 function wc_points_rewards_get_points_value() {
     $settings = get_option('wc_points_rewards_settings', array());
-    return isset($settings['points_value']) ? floatval($settings['points_value']) : 0.01;
+    return isset($settings['points_value']) ? floatval($settings['points_value']) : 1;
 }
 
 /**

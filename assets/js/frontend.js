@@ -126,7 +126,7 @@ jQuery(document).ready(function($) {
             
             if (points > 0 && points <= max) {
                 // Calculate and show discount preview using dynamic point value
-                var pointValue = wcPointsRewards.pointValue || 0.01;
+                var pointValue = wcPointsRewards.pointValue || 1;
                 var discountAmount = points * pointValue;
                 
                 if ($preview.length === 0) {

@@ -144,13 +144,14 @@ class WC_Points_Rewards_Checkout {
         $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
         
         // 計算最大可用點數（考慮點數價值）
-        $point_value = isset($settings['points_value']) ? floatval($settings['points_value']) : 0.01;
+        $point_value = isset($settings['points_value']) ? floatval($settings['points_value']) : 1;
         $max_points_by_amount = $max_discount_amount / $point_value;
         $max_points = min($available_points, $max_points_by_amount);
         
         $current_discount = WC()->session->get('wc_points_rewards_discount_amount', 0);
         
         // 傳遞變數到模板
+        // 可用變數: $settings, $available_points, $cart_total, $max_discount_percent, $max_usable_points
         $max_usable_points = $max_points;
         
         include WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/views/cart-points-section.php';
