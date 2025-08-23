@@ -90,8 +90,14 @@ class WC_Points_Rewards_Checkout {
         $database = WC_Points_Rewards_Database::instance();
         $calculator = WC_Points_Rewards_Points_Calculator::instance();
         
-        // 檢查是否啟用購物車點數折抵
+        // 檢查是否啟用點數系統
         $settings = get_option('wc_points_rewards_settings', array());
+        $enable_points_system = isset($settings['enable_points_system']) ? $settings['enable_points_system'] : 'yes';
+        if ($enable_points_system !== 'yes') {
+            return;
+        }
+        
+        // 檢查是否啟用購物車點數折抵
         $enable_cart_redemption = isset($settings['enable_cart_redemption']) ? $settings['enable_cart_redemption'] : 'yes';
         if ($enable_cart_redemption !== 'yes') {
             return;

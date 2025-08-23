@@ -162,7 +162,7 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                     <td>
                         <label>
                             <input type="checkbox" name="enable_cart_redemption" value="yes" <?php checked($settings['enable_cart_redemption'] ?? 'yes', 'yes'); ?>>
-                            <?php _e('允許客戶在購物車頁面使用點數折抵', 'wc-points-rewards'); ?>
+                            <?php _e('允許客戶在購物車使用點數折抵', 'wc-points-rewards'); ?>
                         </label>
                     </td>
                 </tr>

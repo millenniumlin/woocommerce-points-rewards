@@ -142,14 +142,15 @@ class WC_Points_Rewards_Points_Calculator {
      */
     public function calculate_points_for_amount($amount) {
         $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 100;
+        $points_amount = isset($this->settings['points_amount']) ? floatval($this->settings['points_amount']) : 1;
         $decimal_places = wc_get_price_decimals(); // 使用 WooCommerce 小數位數設定
         
         if ($points_per_amount <= 0) {
             return 0;
         }
         
-        // 計算基礎點數：每消費 $points_per_amount 元獲得 1 點
-        $points = floor($amount / $points_per_amount);
+        // 計算基礎點數：每消費 $points_per_amount 元獲得 $points_amount 點
+        $points = ($amount / $points_per_amount) * $points_amount;
         
         return round($points, $decimal_places);
     }
@@ -306,6 +307,13 @@ class WC_Points_Rewards_Points_Calculator {
             return;
         }
         
+        // 檢查是否啟用點數系統
+        $settings = get_option('wc_points_rewards_settings', array());
+        $enable_points_system = isset($settings['enable_points_system']) ? $settings['enable_points_system'] : 'yes';
+        if ($enable_points_system !== 'yes') {
+            return;
+        }
+        
         $cart_total = WC()->cart->get_subtotal();
         $points = $this->calculate_points_for_amount($cart_total);
         
@@ -318,7 +326,7 @@ class WC_Points_Rewards_Points_Calculator {
             echo '<tr class="points-info">';
             echo '<th>' . __('可獲得點數', 'wc-points-rewards') . '</th>';
             echo '<td>';
-            echo sprintf(__('%s 點', 'wc-points-rewards'), wc_points_rewards_number_format($total_points));
+            echo sprintf(__('%s', 'wc-points-rewards'), wc_points_rewards_number_format($total_points));
             if ($tier_bonus > 0) {
                 echo '<small> (' . sprintf(__('基礎 %s + 等級加成 %s%%', 'wc-points-rewards'), wc_points_rewards_number_format($points), $tier_bonus) . ')</small>';
             }
