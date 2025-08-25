@@ -300,12 +300,33 @@ class WC_Points_Rewards_Checkout {
             // 應用折扣
             WC()->session->set('wc_points_rewards_discount_amount', $points_to_use);
             
+            // 立即嘗試應用折扣到購物車
+            $discount_value = $calculator->calculate_discount_amount($points_to_use);
+            
+            // 檢查是否已經有相同的費用，避免重複添加
+            $fees = WC()->cart->get_fees();
+            $discount_found = false;
+            
+            foreach ($fees as $fee) {
+                if ($fee->name === __('點數折抵', 'wc-points-rewards')) {
+                    $discount_found = true;
+                    break;
+                }
+            }
+            
+            // 如果還沒有折扣費用，立即添加
+            if (!$discount_found) {
+                WC()->cart->add_fee(
+                    __('點數折抵', 'wc-points-rewards'),
+                    -$discount_value,
+                    false
+                );
+            }
+            
             // 強制重新計算購物車總計以確保折扣立即生效
             if (WC()->cart) {
                 WC()->cart->calculate_totals();
             }
-            
-            $discount_value = $calculator->calculate_discount_amount($points_to_use);
             
             // 記錄成功應用點數的日誌
             error_log(sprintf('WC Points Rewards: 成功應用點數 - 用戶ID: %d, 點數: %s, 折抵金額: %s', 
