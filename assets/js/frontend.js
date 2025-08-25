@@ -64,11 +64,28 @@ jQuery(document).ready(function($) {
                 success: function(response) {
                     if (response.success) {
                         PointsRedemption.showMessage(response.data.message, 'success');
-                        $('body').trigger('update_checkout');
-                        // Reload to update the cart display
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
+                        
+                        // 如果後端指示需要重新載入購物車，則觸發購物車更新
+                        if (response.data.reload_cart) {
+                            // 對於購物車頁面，觸發購物車總計更新
+                            if ($('body').hasClass('woocommerce-cart')) {
+                                $('body').trigger('update_checkout');
+                                $('body').trigger('updated_wc_div');
+                                // 使用較短的延遲時間重新載入
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 500);
+                            } else {
+                                // 對於結帳頁面，觸發結帳更新
+                                $('body').trigger('update_checkout');
+                            }
+                        } else {
+                            // 使用標準的購物車更新
+                            $('body').trigger('update_checkout');
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000);
+                        }
                     } else {
                         // 處理具體的錯誤信息
                         var errorMessage = response.data || wcPointsRewards.messages.error;
@@ -121,11 +138,28 @@ jQuery(document).ready(function($) {
                 success: function(response) {
                     if (response.success) {
                         PointsRedemption.showMessage(response.data.message, 'success');
-                        $('body').trigger('update_checkout');
-                        // Reload to update the cart display
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
+                        
+                        // 如果後端指示需要重新載入購物車，則觸發購物車更新
+                        if (response.data.reload_cart) {
+                            // 對於購物車頁面，觸發購物車總計更新
+                            if ($('body').hasClass('woocommerce-cart')) {
+                                $('body').trigger('update_checkout');
+                                $('body').trigger('updated_wc_div');
+                                // 使用較短的延遲時間重新載入
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 500);
+                            } else {
+                                // 對於結帳頁面，觸發結帳更新
+                                $('body').trigger('update_checkout');
+                            }
+                        } else {
+                            // 使用標準的購物車更新
+                            $('body').trigger('update_checkout');
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000);
+                        }
                     } else {
                         PointsRedemption.showMessage(response.data, 'error');
                     }
