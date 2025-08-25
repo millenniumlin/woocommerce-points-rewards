@@ -213,7 +213,12 @@ class WC_Points_Rewards_Checkout {
      * AJAX: 應用點數折扣
      */
     public function ajax_apply_points_discount() {
-        check_ajax_referer('wc_points_rewards_nonce', 'nonce');
+        try {
+            check_ajax_referer('wc_points_rewards_nonce', 'nonce');
+        } catch (Exception $e) {
+            error_log('WC Points Rewards: Nonce驗證失敗 - ' . $e->getMessage());
+            wp_send_json_error(__('安全驗證失敗，請重新整理頁面再試', 'wc-points-rewards'));
+        }
         
         if (!is_user_logged_in()) {
             wp_send_json_error(__('請先登入', 'wc-points-rewards'));
@@ -225,35 +230,77 @@ class WC_Points_Rewards_Checkout {
             wp_send_json_error(__('請輸入有效的點數', 'wc-points-rewards'));
         }
         
-        $user_id = get_current_user_id();
-        $database = WC_Points_Rewards_Database::instance();
-        $calculator = WC_Points_Rewards_Points_Calculator::instance();
-        
-        // 檢查用戶點數餘額
-        $available_points = $database->get_user_points($user_id);
-        if ($points_to_use > $available_points) {
-            wp_send_json_error(__('點數不足', 'wc-points-rewards'));
+        try {
+            $user_id = get_current_user_id();
+            $database = WC_Points_Rewards_Database::instance();
+            $calculator = WC_Points_Rewards_Points_Calculator::instance();
+            
+            // 檢查用戶點數餘額
+            $available_points = $database->get_user_points($user_id);
+            if ($points_to_use > $available_points) {
+                wp_send_json_error(__('點數不足', 'wc-points-rewards'));
+            }
+            
+            // 檢查購物車條件（管理員可以跳過限制）
+            $cart_total = WC()->cart->get_subtotal();
+            $can_use_points = $calculator->can_use_points($cart_total, $points_to_use);
+            
+            // 如果是管理員，允許跳過某些限制
+            if (!$can_use_points && current_user_can('manage_woocommerce')) {
+                $settings = get_option('wc_points_rewards_settings', array());
+                $allow_admin_override = isset($settings['allow_admin_override']) && $settings['allow_admin_override'] === 'yes';
+                
+                if ($allow_admin_override) {
+                    $can_use_points = true;
+                    error_log(sprintf('WC Points Rewards: 管理員覆蓋點數限制 - 用戶ID: %d, 點數: %s', $user_id, $points_to_use));
+                }
+            }
+            
+            if (!$can_use_points) {
+                // 提供更詳細的錯誤信息
+                $settings = get_option('wc_points_rewards_settings', array());
+                $min_cart_total = isset($settings['min_cart_total']) ? floatval($settings['min_cart_total']) : 0;
+                $max_discount_percent = isset($settings['max_discount_percent']) ? floatval($settings['max_discount_percent']) : 100;
+                $discount_amount = $calculator->calculate_discount_amount($points_to_use);
+                $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
+                
+                $error_message = __('不符合點數使用條件', 'wc-points-rewards');
+                
+                if ($cart_total < $min_cart_total) {
+                    $error_message = sprintf(__('購物車金額須達 %s 才能使用點數', 'wc-points-rewards'), wc_price($min_cart_total));
+                } elseif ($discount_amount > $max_discount_amount) {
+                    $error_message = sprintf(__('最多只能折抵 %s%% 的金額（%s）', 'wc-points-rewards'), $max_discount_percent, wc_price($max_discount_amount));
+                }
+                
+                // 記錄錯誤日誌供調試
+                error_log(sprintf('WC Points Rewards: 點數使用被拒絕 - 用戶ID: %d, 點數: %s, 購物車總額: %s, 最低要求: %s, 最大折抵: %s%%, 嘗試折抵: %s', 
+                    $user_id, $points_to_use, $cart_total, $min_cart_total, $max_discount_percent, $discount_amount));
+                
+                wp_send_json_error($error_message);
+            }
+            
+            // 應用折扣
+            WC()->session->set('wc_points_rewards_discount_amount', $points_to_use);
+            
+            $discount_value = $calculator->calculate_discount_amount($points_to_use);
+            
+            // 記錄成功應用點數的日誌
+            error_log(sprintf('WC Points Rewards: 成功應用點數 - 用戶ID: %d, 點數: %s, 折抵金額: %s', 
+                $user_id, $points_to_use, $discount_value));
+            
+            wp_send_json_success(array(
+                'message' => sprintf(__('已使用 %s 點數，折抵 %s', 'wc-points-rewards'), 
+                    wc_points_rewards_number_format($points_to_use), 
+                    wc_price($discount_value)
+                ),
+                'discount_amount' => $discount_value,
+                'points_used' => $points_to_use
+            ));
+            
+        } catch (Exception $e) {
+            error_log('WC Points Rewards: AJAX處理錯誤 - ' . $e->getMessage());
+            wp_send_json_error(__('系統發生錯誤，請稍後再試或聯繫管理員', 'wc-points-rewards'));
         }
-        
-        // 檢查購物車條件
-        $cart_total = WC()->cart->get_subtotal();
-        if (!$calculator->can_use_points($cart_total, $points_to_use)) {
-            wp_send_json_error(__('不符合點數使用條件', 'wc-points-rewards'));
-        }
-        
-        // 應用折扣
-        WC()->session->set('wc_points_rewards_discount_amount', $points_to_use);
-        
-        $discount_value = $calculator->calculate_discount_amount($points_to_use);
-        
-        wp_send_json_success(array(
-            'message' => sprintf(__('已使用 %s 點數，折抵 %s', 'wc-points-rewards'), 
-                wc_points_rewards_number_format($points_to_use), 
-                wc_price($discount_value)
-            ),
-            'discount_amount' => $discount_value,
-            'points_used' => $points_to_use
-        ));
     }
     
     /**

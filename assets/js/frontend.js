@@ -70,11 +70,32 @@ jQuery(document).ready(function($) {
                             location.reload();
                         }, 1000);
                     } else {
-                        PointsRedemption.showMessage(response.data, 'error');
+                        // 處理具體的錯誤信息
+                        var errorMessage = response.data || wcPointsRewards.messages.error;
+                        PointsRedemption.showMessage(errorMessage, 'error');
                     }
                 },
-                error: function() {
-                    PointsRedemption.showMessage(wcPointsRewards.messages.error, 'error');
+                error: function(xhr, textStatus, errorThrown) {
+                    // 記錄詳細錯誤信息到控制台
+                    console.error('WC Points Rewards AJAX Error:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        textStatus: textStatus,
+                        errorThrown: errorThrown
+                    });
+                    
+                    // 顯示友好的錯誤信息
+                    var errorMessage = wcPointsRewards.messages.error;
+                    if (xhr.status === 403) {
+                        errorMessage = '權限不足，請重新登入';
+                    } else if (xhr.status === 500) {
+                        errorMessage = '伺服器錯誤，請稍後再試';
+                    } else if (xhr.status === 0) {
+                        errorMessage = '網路連線問題，請檢查網路狀態';
+                    }
+                    
+                    PointsRedemption.showMessage(errorMessage, 'error');
                 },
                 complete: function() {
                     $button.prop('disabled', false).text('使用點數');

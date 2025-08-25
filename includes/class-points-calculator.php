@@ -375,7 +375,7 @@ class WC_Points_Rewards_Points_Calculator {
      */
     public function can_use_points($cart_total, $points_to_use) {
         $min_cart_total = isset($this->settings['min_cart_total']) ? floatval($this->settings['min_cart_total']) : 0;
-        $max_discount_percent = isset($this->settings['max_discount_percent']) ? floatval($this->settings['max_discount_percent']) : 50;
+        $max_discount_percent = isset($this->settings['max_discount_percent']) ? floatval($this->settings['max_discount_percent']) : 100;
         
         // 檢查購物車金額是否達到最低要求
         if ($cart_total < $min_cart_total) {
@@ -387,5 +387,21 @@ class WC_Points_Rewards_Points_Calculator {
         $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
         
         return $discount_amount <= $max_discount_amount;
+    }
+    
+    /**
+     * 強制檢查點數使用 - 用於管理員覆蓋或特殊情況
+     */
+    public function can_force_use_points($cart_total, $points_to_use, $user_id = 0) {
+        // 如果是管理員且設置允許覆蓋，則允許使用
+        if ($user_id && current_user_can('manage_woocommerce')) {
+            $allow_admin_override = isset($this->settings['allow_admin_override']) && $this->settings['allow_admin_override'] === 'yes';
+            if ($allow_admin_override) {
+                return true;
+            }
+        }
+        
+        // 否則使用正常檢查
+        return $this->can_use_points($cart_total, $points_to_use);
     }
 }
