@@ -133,7 +133,8 @@ jQuery(document).ready(function($) {
                     $preview = $('<div class="discount-preview"></div>').insertAfter('#points-to-use');
                 }
                 
-                $preview.html('折抵金額：<strong>' + (wcPointsRewards.currencySymbol || '$') + discountAmount.toFixed(2) + '</strong>');
+                var decimals = wcPointsRewards.priceDecimals || 2;
+                $preview.html('折抵金額：<strong>' + (wcPointsRewards.currencySymbol || '$') + discountAmount.toFixed(decimals) + '</strong>');
             } else {
                 $('.discount-preview').remove();
             }
