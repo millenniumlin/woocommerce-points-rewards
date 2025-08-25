@@ -216,6 +216,106 @@ function wc_points_rewards_calculate_points_value($points) {
 }
 
 /**
+ * 強制使用點數 - 跳過所有限制（僅供管理員使用）
+ * 此函數可以添加到主題的 functions.php 中來強制啟用點數使用
+ */
+function wc_points_rewards_force_enable_points_usage() {
+    if (!current_user_can('manage_woocommerce')) {
+        return false;
+    }
+    
+    // 添加一個 hook 來允許管理員跳過所有限制
+    add_filter('wc_points_rewards_can_use_points', '__return_true', 999);
+    add_filter('wc_points_rewards_override_restrictions', '__return_true', 999);
+    
+    return true;
+}
+
+/**
+ * 檢查是否啟用了管理員覆蓋功能
+ */
+function wc_points_rewards_is_admin_override_enabled() {
+    $settings = get_option('wc_points_rewards_settings', array());
+    return isset($settings['allow_admin_override']) && $settings['allow_admin_override'] === 'yes';
+}
+
+/**
+ * 為當前用戶強制啟用點數使用（緊急修復功能）
+ * 可以在主題的 functions.php 中調用此函數來臨時解決點數使用問題
+ */
+function wc_points_rewards_emergency_enable_points() {
+    if (!is_admin() && !current_user_can('manage_woocommerce')) {
+        return;
+    }
+    
+    // 臨時設置允許管理員覆蓋
+    add_filter('pre_option_wc_points_rewards_settings', function($value) {
+        if (!is_array($value)) {
+            $value = get_option('wc_points_rewards_settings', array());
+        }
+        $value['allow_admin_override'] = 'yes';
+        $value['max_discount_percent'] = '100';
+        $value['min_cart_total'] = '0';
+        return $value;
+    });
+}
+
+/**
+ * 調試點數使用問題的助手函數
+ */
+function wc_points_rewards_debug_points_usage($user_id = null, $points_to_use = 0) {
+    if (!current_user_can('manage_woocommerce')) {
+        return array('error' => '權限不足');
+    }
+    
+    if (!$user_id) {
+        $user_id = get_current_user_id();
+    }
+    
+    if (!class_exists('WC_Points_Rewards_Database') || !class_exists('WC_Points_Rewards_Points_Calculator')) {
+        return array('error' => '點數系統未初始化');
+    }
+    
+    $database = WC_Points_Rewards_Database::instance();
+    $calculator = WC_Points_Rewards_Points_Calculator::instance();
+    $settings = get_option('wc_points_rewards_settings', array());
+    
+    $available_points = $database->get_user_points($user_id);
+    $cart_total = WC()->cart ? WC()->cart->get_subtotal() : 0;
+    
+    $debug_info = array(
+        'user_id' => $user_id,
+        'available_points' => $available_points,
+        'points_to_use' => $points_to_use,
+        'cart_total' => $cart_total,
+        'settings' => array(
+            'min_cart_total' => isset($settings['min_cart_total']) ? $settings['min_cart_total'] : '0',
+            'max_discount_percent' => isset($settings['max_discount_percent']) ? $settings['max_discount_percent'] : '100',
+            'points_value' => isset($settings['points_value']) ? $settings['points_value'] : '1',
+            'allow_admin_override' => isset($settings['allow_admin_override']) ? $settings['allow_admin_override'] : 'no'
+        ),
+        'checks' => array()
+    );
+    
+    // 執行各項檢查
+    $debug_info['checks']['sufficient_points'] = $points_to_use <= $available_points;
+    $debug_info['checks']['min_cart_total'] = $cart_total >= floatval($settings['min_cart_total'] ?? 0);
+    
+    if ($points_to_use > 0) {
+        $discount_amount = $calculator->calculate_discount_amount($points_to_use);
+        $max_discount_amount = ($cart_total * floatval($settings['max_discount_percent'] ?? 100)) / 100;
+        $debug_info['checks']['max_discount_check'] = $discount_amount <= $max_discount_amount;
+        $debug_info['discount_amount'] = $discount_amount;
+        $debug_info['max_discount_amount'] = $max_discount_amount;
+    }
+    
+    $debug_info['can_use_points'] = $calculator->can_use_points($cart_total, $points_to_use);
+    $debug_info['is_admin'] = current_user_can('manage_woocommerce');
+    
+    return $debug_info;
+}
+
+/**
  * 🚀 修正：產生帳戶端點 URL（確保與所有永久連結結構兼容）
  */
 function wc_points_rewards_get_account_endpoint_url($endpoint) {
