@@ -56,6 +56,10 @@ class WC_Points_Rewards_Checkout {
         add_action('wp_ajax_wc_points_rewards_apply_discount', array($this, 'ajax_apply_points_discount'));
         add_action('wp_ajax_wc_points_rewards_remove_discount', array($this, 'ajax_remove_points_discount'));
         
+        // 為非登入用戶提供AJAX端點（雖然會返回錯誤，但避免404）
+        add_action('wp_ajax_nopriv_wc_points_rewards_apply_discount', array($this, 'ajax_apply_points_discount'));
+        add_action('wp_ajax_nopriv_wc_points_rewards_remove_discount', array($this, 'ajax_remove_points_discount'));
+        
         // 購物車更新時檢查點數使用
         add_action('woocommerce_cart_updated', array($this, 'validate_points_usage'));
         
