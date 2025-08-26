@@ -208,11 +208,15 @@ class WC_Points_Rewards_Checkout {
      * 記錄點數使用
      */
     public function record_points_usage($order_id, $posted_data) {
+        error_log('WC Points Rewards: record_points_usage called for order ' . $order_id);
+        
         $discount_amount = WC()->session->get('wc_points_rewards_discount_amount', 0);
+        error_log('WC Points Rewards: Session discount amount - ' . $discount_amount);
         
         if ($discount_amount > 0) {
             $order = wc_get_order($order_id);
             $user_id = $order->get_user_id();
+            error_log('WC Points Rewards: Order user ID - ' . $user_id);
             
             if ($user_id) {
                 $database = WC_Points_Rewards_Database::instance();
@@ -220,7 +224,8 @@ class WC_Points_Rewards_Checkout {
                 
                 // 記錄點數使用
                 $description = sprintf(__('訂單 #%s 使用點數折抵', 'wc-points-rewards'), $order->get_order_number());
-                $database->add_points(
+                
+                $points_added = $database->add_points(
                     $user_id,
                     -$discount_amount, // 負數表示扣除
                     'redeemed',
@@ -228,14 +233,30 @@ class WC_Points_Rewards_Checkout {
                     $order_id
                 );
                 
+                if ($points_added) {
+                    error_log(sprintf('WC Points Rewards: 成功記錄點數扣除 - 用戶ID: %d, 點數: %s, 訂單: %s', 
+                        $user_id, $discount_amount, $order_id));
+                } else {
+                    error_log(sprintf('WC Points Rewards: 點數扣除記錄失敗 - 用戶ID: %d, 點數: %s, 訂單: %s', 
+                        $user_id, $discount_amount, $order_id));
+                }
+                
                 // 記錄到訂單 meta
                 $discount_value = $calculator->calculate_discount_amount($discount_amount);
                 update_post_meta($order_id, '_points_discount_amount', $discount_value);
                 update_post_meta($order_id, '_points_used', $discount_amount);
                 
+                error_log(sprintf('WC Points Rewards: 訂單 meta 已更新 - 折抵金額: %s, 使用點數: %s', 
+                    $discount_value, $discount_amount));
+                
                 // 清除 session
                 WC()->session->__unset('wc_points_rewards_discount_amount');
+                error_log('WC Points Rewards: Session 已清除');
+            } else {
+                error_log('WC Points Rewards: 訂單沒有關聯的用戶ID');
             }
+        } else {
+            error_log('WC Points Rewards: 沒有點數折扣需要記錄');
         }
     }
     
@@ -246,6 +267,17 @@ class WC_Points_Rewards_Checkout {
         // 增強的錯誤日誌記錄
         error_log('WC Points Rewards: AJAX apply discount started');
         error_log('WC Points Rewards: POST data - ' . print_r($_POST, true));
+        
+        // 確保 WooCommerce 已載入
+        if (!function_exists('WC') || !WC()) {
+            error_log('WC Points Rewards: WooCommerce not loaded during AJAX');
+            wp_send_json_error(__('購物車系統尚未載入，請稍後再試', 'wc-points-rewards'));
+        }
+        
+        // 初始化 WooCommerce 會話（如果需要）
+        if (WC()->session && !WC()->session->get_session_cookie()) {
+            WC()->session->set_customer_session_cookie(true);
+        }
         
         try {
             check_ajax_referer('wc_points_rewards_nonce', 'nonce');
@@ -285,10 +317,10 @@ class WC_Points_Rewards_Checkout {
             $database = WC_Points_Rewards_Database::instance();
             $calculator = WC_Points_Rewards_Points_Calculator::instance();
             
-            // 檢查 WooCommerce 是否可用
-            if (!function_exists('WC') || !WC() || !WC()->cart) {
-                error_log('WC Points Rewards: WooCommerce not available');
-                wp_send_json_error(__('購物車系統暫時無法使用', 'wc-points-rewards'));
+            // 檢查 WooCommerce 購物車是否可用
+            if (!WC()->cart) {
+                error_log('WC Points Rewards: WooCommerce cart not available');
+                wp_send_json_error(__('購物車暫時無法使用', 'wc-points-rewards'));
             }
             
             // 檢查用戶點數餘額

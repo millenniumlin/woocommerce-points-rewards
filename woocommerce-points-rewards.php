@@ -177,7 +177,7 @@ class WC_Points_Rewards {
         }
         
         // 前端功能
-        if (!is_admin()) {
+        if (!is_admin() || wp_doing_ajax()) {
             if (class_exists('WC_Points_Rewards_Frontend')) {
                 WC_Points_Rewards_Frontend::instance();
             }
