@@ -38,19 +38,21 @@ class WC_Points_Rewards_Points_Calculator {
      * 建構函式
      */
     public function __construct() {
-        // 修正：從個別選項載入設定
+        // 修正：從設定陣列載入設定
+        $settings_array = get_option('wc_points_rewards_settings', array());
+        
         $this->settings = array(
-            'enable_points_system' => get_option('wc_points_rewards_enable_points_system', 'yes'),
-            'points_per_amount' => get_option('wc_points_rewards_points_per_amount', '1'),
-            'points_value' => get_option('wc_points_rewards_points_value', '1'),
-            'points_expiry_months' => get_option('wc_points_rewards_points_expiry_months', '12'),
-            'registration_points' => get_option('wc_points_rewards_registration_points', '100'),
-            'birthday_points' => get_option('wc_points_rewards_birthday_points', '100'),
-            'enable_cart_redemption' => get_option('wc_points_rewards_enable_cart_redemption', 'yes'),
-            'min_cart_total' => get_option('wc_points_rewards_min_cart_total', '0'),
-            'max_discount_percent' => get_option('wc_points_rewards_max_discount_percent', '100'),
-            'enable_tiers' => get_option('wc_points_rewards_enable_tiers', 'yes'),
-            'enable_notifications' => get_option('wc_points_rewards_enable_notifications', 'yes'),
+            'enable_points_system' => isset($settings_array['enable_points_system']) ? $settings_array['enable_points_system'] : 'yes',
+            'points_per_amount' => isset($settings_array['points_per_amount']) ? $settings_array['points_per_amount'] : '1',
+            'points_value' => isset($settings_array['points_value']) ? $settings_array['points_value'] : '1',
+            'points_expiry_months' => isset($settings_array['points_expiry_months']) ? $settings_array['points_expiry_months'] : '12',
+            'registration_points' => isset($settings_array['registration_points']) ? $settings_array['registration_points'] : '100',
+            'birthday_points' => isset($settings_array['birthday_points']) ? $settings_array['birthday_points'] : '100',
+            'enable_cart_redemption' => isset($settings_array['enable_cart_redemption']) ? $settings_array['enable_cart_redemption'] : 'yes',
+            'min_cart_total' => isset($settings_array['min_cart_total']) ? $settings_array['min_cart_total'] : '0',
+            'max_discount_percent' => isset($settings_array['max_discount_percent']) ? $settings_array['max_discount_percent'] : '100',
+            'enable_tiers' => isset($settings_array['enable_tiers']) ? $settings_array['enable_tiers'] : 'yes',
+            'enable_notifications' => isset($settings_array['enable_notifications']) ? $settings_array['enable_notifications'] : 'yes',
         );
         $this->init_hooks();
     }

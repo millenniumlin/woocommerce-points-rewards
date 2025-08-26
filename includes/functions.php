@@ -58,8 +58,9 @@ function wc_points_rewards_number_format($value, $decimals = null) {
  * 檢查功能是否啟用
  */
 function wc_points_rewards_is_enabled() {
-    // 修正：直接從個別選項讀取，而非從組合設定陣列
-    return get_option('wc_points_rewards_enable_points_system', 'yes') === 'yes';
+    // 修正：從設定陣列讀取
+    $settings = get_option('wc_points_rewards_settings', array());
+    return isset($settings['enable_points_system']) ? $settings['enable_points_system'] === 'yes' : true;
 }
 
 /**
@@ -89,16 +90,18 @@ function wc_points_rewards_format_percentage($percentage) {
  * 獲取點數名稱
  */
 function wc_points_rewards_get_points_name() {
-    // 修正：直接從個別選項讀取
-    return get_option('wc_points_rewards_points_name', __('點', 'wc-points-rewards'));
+    // 修正：從設定陣列讀取
+    $settings = get_option('wc_points_rewards_settings', array());
+    return isset($settings['points_name']) ? $settings['points_name'] : __('點', 'wc-points-rewards');
 }
 
 /**
  * 獲取點數價值（1點等於多少錢）
  */
 function wc_points_rewards_get_points_value() {
-    // 修正：直接從個別選項讀取
-    return floatval(get_option('wc_points_rewards_points_value', '1'));
+    // 修正：從設定陣列讀取
+    $settings = get_option('wc_points_rewards_settings', array());
+    return floatval(isset($settings['points_value']) ? $settings['points_value'] : '1');
 }
 
 /**
@@ -116,16 +119,19 @@ function wc_points_rewards_format_points_value($points = 1) {
  * 獲取外掛設定
  */
 function wc_points_rewards_get_option($key, $default = null) {
-    // 修正：直接從個別選項讀取
-    return get_option('wc_points_rewards_' . $key, $default);
+    // 修正：從設定陣列讀取
+    $settings = get_option('wc_points_rewards_settings', array());
+    return isset($settings[$key]) ? $settings[$key] : $default;
 }
 
 /**
  * 更新外掛設定
  */
 function wc_points_rewards_update_option($key, $value) {
-    // 修正：直接更新個別選項
-    return update_option('wc_points_rewards_' . $key, $value);
+    // 修正：更新到設定陣列
+    $settings = get_option('wc_points_rewards_settings', array());
+    $settings[$key] = $value;
+    return update_option('wc_points_rewards_settings', $settings);
 }
 
 /**

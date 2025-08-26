@@ -60,6 +60,10 @@ class WC_Points_Rewards_Checkout {
         add_action('wp_ajax_nopriv_wc_points_rewards_apply_discount', array($this, 'ajax_apply_points_discount'));
         add_action('wp_ajax_nopriv_wc_points_rewards_remove_discount', array($this, 'ajax_remove_points_discount'));
         
+        // 添加測試端點用於調試
+        add_action('wp_ajax_wc_points_rewards_test_system', array($this, 'ajax_test_system'));
+        add_action('wp_ajax_nopriv_wc_points_rewards_test_system', array($this, 'ajax_test_system'));
+        
         // 購物車更新時檢查點數使用
         add_action('woocommerce_cart_updated', array($this, 'validate_points_usage'));
         
@@ -97,13 +101,17 @@ class WC_Points_Rewards_Checkout {
         $database = WC_Points_Rewards_Database::instance();
         $calculator = WC_Points_Rewards_Points_Calculator::instance();
         
+        // 獲取所有設定一次，避免重複查詢
+        $settings = get_option('wc_points_rewards_settings', array());
+        
         // 檢查是否啟用點數系統
         if (!wc_points_rewards_is_enabled()) {
             return;
         }
         
         // 檢查是否啟用購物車點數折抵
-        $enable_cart_redemption = get_option('wc_points_rewards_enable_cart_redemption', 'yes');
+        $settings = get_option('wc_points_rewards_settings', array());
+        $enable_cart_redemption = isset($settings['enable_cart_redemption']) ? $settings['enable_cart_redemption'] : 'yes';
         if ($enable_cart_redemption !== 'yes') {
             return;
         }
@@ -117,7 +125,7 @@ class WC_Points_Rewards_Checkout {
         // 以下是購物車頁面的邏輯
         $available_points = $database->get_user_points($user_id);
         $cart_total = WC()->cart->get_subtotal();
-        $min_cart_total = floatval(get_option('wc_points_rewards_min_cart_total', '0'));
+        $min_cart_total = isset($settings['min_cart_total']) ? floatval($settings['min_cart_total']) : 0;
         
         // 檢查購物車金額是否達到最低要求
         if ($cart_total < $min_cart_total) {
@@ -145,7 +153,7 @@ class WC_Points_Rewards_Checkout {
         }
         
         // 計算最大可使用點數
-        $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', '100'));
+        $max_discount_percent = isset($settings['max_discount_percent']) ? floatval($settings['max_discount_percent']) : 100;
         $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
         
         // 計算最大可用點數（考慮點數價值）
@@ -235,6 +243,10 @@ class WC_Points_Rewards_Checkout {
      * AJAX: 應用點數折扣
      */
     public function ajax_apply_points_discount() {
+        // 增強的錯誤日誌記錄
+        error_log('WC Points Rewards: AJAX apply discount started');
+        error_log('WC Points Rewards: POST data - ' . print_r($_POST, true));
+        
         try {
             check_ajax_referer('wc_points_rewards_nonce', 'nonce');
         } catch (Exception $e) {
@@ -243,29 +255,57 @@ class WC_Points_Rewards_Checkout {
         }
         
         if (!is_user_logged_in()) {
+            error_log('WC Points Rewards: 用戶未登入');
             wp_send_json_error(__('請先登入', 'wc-points-rewards'));
         }
         
         $points_to_use = floatval($_POST['points'] ?? 0);
+        error_log('WC Points Rewards: Points to use - ' . $points_to_use);
         
         if ($points_to_use <= 0) {
+            error_log('WC Points Rewards: 無效的點數值 - ' . $points_to_use);
             wp_send_json_error(__('請輸入有效的點數', 'wc-points-rewards'));
         }
         
         try {
             $user_id = get_current_user_id();
+            error_log('WC Points Rewards: User ID - ' . $user_id);
+            
+            // 檢查必要的類別是否存在
+            if (!class_exists('WC_Points_Rewards_Database')) {
+                error_log('WC Points Rewards: Database class missing');
+                wp_send_json_error(__('點數系統暫時無法使用', 'wc-points-rewards'));
+            }
+            
+            if (!class_exists('WC_Points_Rewards_Points_Calculator')) {
+                error_log('WC Points Rewards: Calculator class missing');
+                wp_send_json_error(__('點數系統暫時無法使用', 'wc-points-rewards'));
+            }
+            
             $database = WC_Points_Rewards_Database::instance();
             $calculator = WC_Points_Rewards_Points_Calculator::instance();
             
+            // 檢查 WooCommerce 是否可用
+            if (!function_exists('WC') || !WC() || !WC()->cart) {
+                error_log('WC Points Rewards: WooCommerce not available');
+                wp_send_json_error(__('購物車系統暫時無法使用', 'wc-points-rewards'));
+            }
+            
             // 檢查用戶點數餘額
             $available_points = $database->get_user_points($user_id);
+            error_log('WC Points Rewards: Available points - ' . $available_points);
+            
             if ($points_to_use > $available_points) {
+                error_log('WC Points Rewards: 點數不足 - 需要:' . $points_to_use . ', 可用:' . $available_points);
                 wp_send_json_error(__('點數不足', 'wc-points-rewards'));
             }
             
             // 檢查購物車條件（管理員可以跳過限制）
             $cart_total = WC()->cart->get_subtotal();
+            error_log('WC Points Rewards: Cart total - ' . $cart_total);
+            
             $can_use_points = $calculator->can_use_points($cart_total, $points_to_use);
+            error_log('WC Points Rewards: Can use points - ' . ($can_use_points ? 'yes' : 'no'));
             
             // 如果是管理員，允許跳過某些限制
             if (!$can_use_points && current_user_can('manage_woocommerce')) {
@@ -303,9 +343,11 @@ class WC_Points_Rewards_Checkout {
             
             // 應用折扣
             WC()->session->set('wc_points_rewards_discount_amount', $points_to_use);
+            error_log('WC Points Rewards: Session discount amount set - ' . $points_to_use);
             
             // 立即嘗試應用折扣到購物車
             $discount_value = $calculator->calculate_discount_amount($points_to_use);
+            error_log('WC Points Rewards: Calculated discount value - ' . $discount_value);
             
             // 檢查是否已經有相同的費用，避免重複添加
             $fees = WC()->cart->get_fees();
@@ -314,6 +356,7 @@ class WC_Points_Rewards_Checkout {
             foreach ($fees as $fee) {
                 if ($fee->name === __('點數折抵', 'wc-points-rewards')) {
                     $discount_found = true;
+                    error_log('WC Points Rewards: Existing discount found');
                     break;
                 }
             }
@@ -325,11 +368,13 @@ class WC_Points_Rewards_Checkout {
                     -$discount_value,
                     false
                 );
+                error_log('WC Points Rewards: Fee added to cart - ' . (-$discount_value));
             }
             
             // 強制重新計算購物車總計以確保折扣立即生效
             if (WC()->cart) {
                 WC()->cart->calculate_totals();
+                error_log('WC Points Rewards: Cart totals recalculated');
             }
             
             // 記錄成功應用點數的日誌
@@ -348,6 +393,7 @@ class WC_Points_Rewards_Checkout {
             
         } catch (Exception $e) {
             error_log('WC Points Rewards: AJAX處理錯誤 - ' . $e->getMessage());
+            error_log('WC Points Rewards: 錯誤堆疊 - ' . $e->getTraceAsString());
             wp_send_json_error(__('系統發生錯誤，請稍後再試或聯繫管理員', 'wc-points-rewards'));
         }
     }
@@ -433,5 +479,75 @@ class WC_Points_Rewards_Checkout {
                 WC()->cart->add_fee(__('點數折抵', 'wc-points-rewards'), -$discount_value, false);
             }
         }
+    }
+    
+    /**
+     * AJAX: 測試系統狀態（調試用）
+     */
+    public function ajax_test_system() {
+        $tests = array();
+        
+        // 測試 WordPress 函數
+        $tests['wordpress'] = array(
+            'wp_create_nonce' => function_exists('wp_create_nonce'),
+            'check_ajax_referer' => function_exists('check_ajax_referer'),
+            'wp_send_json_error' => function_exists('wp_send_json_error'),
+            'is_user_logged_in' => function_exists('is_user_logged_in'),
+            'get_current_user_id' => function_exists('get_current_user_id'),
+        );
+        
+        // 測試 WooCommerce 函數
+        $tests['woocommerce'] = array(
+            'WC_function' => function_exists('WC'),
+            'WC_instance' => (function_exists('WC') && WC()),
+            'WC_cart' => (function_exists('WC') && WC() && WC()->cart),
+            'WC_session' => (function_exists('WC') && WC() && WC()->session),
+            'wc_price' => function_exists('wc_price'),
+        );
+        
+        // 測試外掛類別
+        $tests['plugin_classes'] = array(
+            'WC_Points_Rewards_Database' => class_exists('WC_Points_Rewards_Database'),
+            'WC_Points_Rewards_Points_Calculator' => class_exists('WC_Points_Rewards_Points_Calculator'),
+            'WC_Points_Rewards_Checkout' => class_exists('WC_Points_Rewards_Checkout'),
+        );
+        
+        // 測試設定
+        $settings = get_option('wc_points_rewards_settings', array());
+        $tests['settings'] = array(
+            'settings_exist' => !empty($settings),
+            'enable_points_system' => isset($settings['enable_points_system']) ? $settings['enable_points_system'] : 'not_set',
+            'enable_cart_redemption' => isset($settings['enable_cart_redemption']) ? $settings['enable_cart_redemption'] : 'not_set',
+            'points_value' => isset($settings['points_value']) ? $settings['points_value'] : 'not_set',
+        );
+        
+        // 測試用戶狀態
+        if (is_user_logged_in()) {
+            $user_id = get_current_user_id();
+            $tests['user'] = array(
+                'logged_in' => true,
+                'user_id' => $user_id,
+                'can_manage_woocommerce' => current_user_can('manage_woocommerce'),
+            );
+            
+            // 測試點數資料庫
+            if (class_exists('WC_Points_Rewards_Database')) {
+                $database = WC_Points_Rewards_Database::instance();
+                $tests['user']['points_balance'] = $database->get_user_points($user_id);
+            }
+        } else {
+            $tests['user'] = array(
+                'logged_in' => false,
+            );
+        }
+        
+        // 測試 AJAX 動作註冊
+        global $wp_filter;
+        $tests['ajax_hooks'] = array(
+            'apply_discount' => isset($wp_filter['wp_ajax_wc_points_rewards_apply_discount']),
+            'remove_discount' => isset($wp_filter['wp_ajax_wc_points_rewards_remove_discount']),
+        );
+        
+        wp_send_json_success($tests);
     }
 }
