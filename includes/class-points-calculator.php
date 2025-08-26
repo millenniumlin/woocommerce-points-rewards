@@ -44,6 +44,7 @@ class WC_Points_Rewards_Points_Calculator {
         $this->settings = array(
             'enable_points_system' => isset($settings_array['enable_points_system']) ? $settings_array['enable_points_system'] : 'yes',
             'points_per_amount' => isset($settings_array['points_per_amount']) ? $settings_array['points_per_amount'] : '1',
+            'points_amount' => isset($settings_array['points_amount']) ? $settings_array['points_amount'] : '1',
             'points_value' => isset($settings_array['points_value']) ? $settings_array['points_value'] : '1',
             'points_expiry_months' => isset($settings_array['points_expiry_months']) ? $settings_array['points_expiry_months'] : '12',
             'registration_points' => isset($settings_array['registration_points']) ? $settings_array['registration_points'] : '100',
@@ -157,14 +158,15 @@ class WC_Points_Rewards_Points_Calculator {
      */
     public function calculate_points_for_amount($amount) {
         $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 1;
+        $points_amount = isset($this->settings['points_amount']) ? floatval($this->settings['points_amount']) : 1;
         $decimal_places = wc_get_price_decimals(); // 使用 WooCommerce 小數位數設定
         
         if ($points_per_amount <= 0) {
             return 0;
         }
         
-        // 計算基礎點數：每消費 $points_per_amount 元獲得 1 點
-        $points = $amount / $points_per_amount;
+        // 計算基礎點數：每消費 $points_per_amount 元獲得 $points_amount 點
+        $points = ($amount / $points_per_amount) * $points_amount;
         
         return round($points, $decimal_places);
     }
