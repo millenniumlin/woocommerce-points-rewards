@@ -113,14 +113,15 @@ if (!isset($max_discount_percent)) {
                 </div>
             <?php else: ?>
                 <!-- 點數輸入區域 -->
+                <?php if ($max_usable_points > 0): ?>
                 <div class="points-input-section">
                     <div class="points-input-group">
                         <input type="number" 
                                id="points-to-use" 
                                class="input-text points-input" 
-                               min="1" 
+                               min="0.01" 
                                max="<?php echo esc_attr($max_usable_points); ?>" 
-                               step="1" 
+                               step="0.01" 
                                placeholder="<?php _e('輸入要使用的點數', 'wc-points-rewards'); ?>" />
                         <button type="button" class="button button-primary wc-points-apply-discount" data-nonce="<?php echo wp_create_nonce('wc_points_rewards_nonce'); ?>">
                             <?php _e('使用點數', 'wc-points-rewards'); ?>
@@ -133,6 +134,11 @@ if (!isset($max_discount_percent)) {
                     </div>
 
                 </div>
+                <?php else: ?>
+                <div class="points-no-usable">
+                    <p><?php _e('目前無法使用點數（請檢查購物車金額或點數餘額）', 'wc-points-rewards'); ?></p>
+                </div>
+                <?php endif; ?>
             <?php endif; ?>
             
             <div class="points-messages" style="display: none;"></div>
