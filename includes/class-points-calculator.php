@@ -38,6 +38,14 @@ class WC_Points_Rewards_Points_Calculator {
      * 建構函式
      */
     public function __construct() {
+        $this->load_settings();
+        $this->init_hooks();
+    }
+    
+    /**
+     * 載入設定
+     */
+    private function load_settings() {
         // 修正：從設定陣列載入設定
         $settings_array = get_option('wc_points_rewards_settings', array());
         
@@ -55,7 +63,13 @@ class WC_Points_Rewards_Points_Calculator {
             'enable_tiers' => isset($settings_array['enable_tiers']) ? $settings_array['enable_tiers'] : 'yes',
             'enable_notifications' => isset($settings_array['enable_notifications']) ? $settings_array['enable_notifications'] : 'yes',
         );
-        $this->init_hooks();
+    }
+    
+    /**
+     * 重新載入設定 - 用於確保設定是最新的
+     */
+    public function reload_settings() {
+        $this->load_settings();
     }
     
     /**
@@ -157,6 +171,9 @@ class WC_Points_Rewards_Points_Calculator {
      * 根據金額計算基礎點數
      */
     public function calculate_points_for_amount($amount) {
+        // 確保使用最新的設定
+        $this->reload_settings();
+        
         $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 1;
         $points_amount = isset($this->settings['points_amount']) ? floatval($this->settings['points_amount']) : 1;
         $decimal_places = wc_get_price_decimals(); // 使用 WooCommerce 小數位數設定
@@ -369,6 +386,9 @@ class WC_Points_Rewards_Points_Calculator {
      * 計算點數折抵金額
      */
     public function calculate_discount_amount($points) {
+        // 確保使用最新的設定
+        $this->reload_settings();
+        
         // 使用設定中的點數價值：1點 = 多少元
         $point_value = isset($this->settings['points_value']) ? floatval($this->settings['points_value']) : 1;
         return $points * $point_value;
@@ -378,6 +398,9 @@ class WC_Points_Rewards_Points_Calculator {
      * 檢查點數是否可以使用
      */
     public function can_use_points($cart_total, $points_to_use) {
+        // 確保使用最新的設定
+        $this->reload_settings();
+        
         $min_cart_total = isset($this->settings['min_cart_total']) ? floatval($this->settings['min_cart_total']) : 0;
         $max_discount_percent = isset($this->settings['max_discount_percent']) ? floatval($this->settings['max_discount_percent']) : 100;
         

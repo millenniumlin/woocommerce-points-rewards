@@ -110,7 +110,6 @@ class WC_Points_Rewards_Checkout {
         }
         
         // 檢查是否啟用購物車點數折抵
-        $settings = get_option('wc_points_rewards_settings', array());
         $enable_cart_redemption = isset($settings['enable_cart_redemption']) ? $settings['enable_cart_redemption'] : 'yes';
         if ($enable_cart_redemption !== 'yes') {
             return;
