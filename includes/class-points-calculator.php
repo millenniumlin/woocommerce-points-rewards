@@ -369,10 +369,10 @@ class WC_Points_Rewards_Points_Calculator {
                 echo '<small> (' . sprintf(__('基礎 %s + 等級加成 %s%%', 'wc-points-rewards'), wc_points_rewards_number_format($points), $tier_bonus) . ')</small>';
             }
             // 顯示點數比例說明
-            echo '<small class="points-ratio-info"> (' . sprintf(__('每 %s 元 = %s 點', 'wc-points-rewards'), 
+            echo '<br><small class="points-ratio-info">' . sprintf(__('每 %s 元 = %s 點', 'wc-points-rewards'), 
                 wc_points_rewards_number_format($points_per_amount), 
                 wc_points_rewards_number_format($points_amount)
-            ) . ')</small>';
+            ) . '</small>';
             echo '</td>';
             echo '</tr>';
         }
