@@ -19,8 +19,16 @@ if ($used_points > 0) {
     $discount_amount = $calculator->calculate_discount_amount($used_points);
 }
 
-// 計算本次最多可用點數 - 使用已傳入的變數
-$max_usable_points = isset($max_points) ? $max_points : $available_points;
+// 計算本次最多可用點數 - 使用已傳入的變數，確保正確性
+$max_usable_points = isset($max_usable_points) ? $max_usable_points : (isset($max_points) ? $max_points : $available_points);
+
+// 確保 max_discount_percent 變數存在
+if (!isset($max_discount_percent)) {
+    $calculator = WC_Points_Rewards_Points_Calculator::instance();
+    $calculator->reload_settings();
+    $settings = get_option('wc_points_rewards_settings', array());
+    $max_discount_percent = isset($settings['max_discount_percent']) ? floatval($settings['max_discount_percent']) : 100;
+}
 ?>
 
 <tr class="points-redemption-section">
@@ -50,7 +58,7 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                     <div class="points-info-item">
                         <span class="points-label"><?php _e('本次最多可用', 'wc-points-rewards'); ?>：</span>
                         <span class="points-value max-usable"><?php echo wc_points_rewards_number_format($max_usable_points); ?></span>
-                        <?php if (isset($max_discount_percent) && $max_discount_percent < 100): ?>
+                        <?php if (isset($max_discount_percent)): ?>
                             <span class="points-note">（<?php printf(__('最多可折抵 %s%%', 'wc-points-rewards'), $max_discount_percent); ?>）</span>
                         <?php endif; ?>
                     </div>
@@ -61,6 +69,30 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                         <span class="points-value discount-value">-<?php echo wc_price($discount_amount); ?></span>
                     </div>
                     <?php endif; ?>
+                </div>
+            </div>
+            
+            <!-- 點數比例資訊區塊 - 確保與後台設定同步 -->
+            <div class="points-info">
+                <div class="points-ratio-info-section">
+                    <small class="points-ratio-explanation">
+                        <?php 
+                        // 確保使用與後台一致的點數比例設定
+                        $points_per_amount = isset($points_per_amount) ? $points_per_amount : 100;
+                        $points_amount = isset($points_amount) ? $points_amount : 1;
+                        
+                        printf(__('點數比例：每消費 %s 元 = %s 點', 'wc-points-rewards'), 
+                            wc_points_rewards_number_format($points_per_amount), 
+                            wc_points_rewards_number_format($points_amount)
+                        ); 
+                        ?>
+                        <br>
+                        <?php
+                        // 顯示點數價值
+                        $point_value = wc_points_rewards_get_points_value();
+                        printf(__('點數價值：1 點 = %s', 'wc-points-rewards'), wc_price($point_value));
+                        ?>
+                    </small>
                 </div>
             </div>
             

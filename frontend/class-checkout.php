@@ -166,9 +166,14 @@ class WC_Points_Rewards_Checkout {
         
         $current_discount = WC()->session->get('wc_points_rewards_discount_amount', 0);
         
-        // 傳遞變數到模板
+        // 傳遞變數到模板 - 確保所有必要的變數都有定義
         $max_usable_points = $max_points;
+        $max_points = $max_points; // 確保向後兼容
         // $max_discount_percent 變數已在上方定義，模板可直接使用
+        
+        // 傳遞額外的設定變數供模板使用
+        $points_per_amount = isset($settings['points_per_amount']) ? floatval($settings['points_per_amount']) : 100;
+        $points_amount = isset($settings['points_amount']) ? floatval($settings['points_amount']) : 1;
         
         include WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/views/cart-points-section.php';
     }
