@@ -345,6 +345,9 @@ class WC_Points_Rewards_Points_Calculator {
             return;
         }
         
+        // 確保使用最新的設定
+        $this->reload_settings();
+        
         $cart_total = WC()->cart->get_subtotal();
         $points = $this->calculate_points_for_amount($cart_total);
         
@@ -354,6 +357,10 @@ class WC_Points_Rewards_Points_Calculator {
             $bonus_points = $points * ($tier_bonus / 100);
             $total_points = $points + $bonus_points;
             
+            // 顯示點數比例資訊
+            $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 100;
+            $points_amount = isset($this->settings['points_amount']) ? floatval($this->settings['points_amount']) : 1;
+            
             echo '<tr class="points-info">';
             echo '<th>' . __('可獲得點數', 'wc-points-rewards') . '</th>';
             echo '<td>';
@@ -361,6 +368,11 @@ class WC_Points_Rewards_Points_Calculator {
             if ($tier_bonus > 0) {
                 echo '<small> (' . sprintf(__('基礎 %s + 等級加成 %s%%', 'wc-points-rewards'), wc_points_rewards_number_format($points), $tier_bonus) . ')</small>';
             }
+            // 顯示點數比例說明
+            echo '<small class="points-ratio-info"> (' . sprintf(__('每 %s 元 = %s 點', 'wc-points-rewards'), 
+                wc_points_rewards_number_format($points_per_amount), 
+                wc_points_rewards_number_format($points_amount)
+            ) . ')</small>';
             echo '</td>';
             echo '</tr>';
         }

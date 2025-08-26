@@ -101,6 +101,9 @@ class WC_Points_Rewards_Checkout {
         $database = WC_Points_Rewards_Database::instance();
         $calculator = WC_Points_Rewards_Points_Calculator::instance();
         
+        // 確保計算器使用最新設定
+        $calculator->reload_settings();
+        
         // 獲取所有設定一次，避免重複查詢
         $settings = get_option('wc_points_rewards_settings', array());
         
@@ -128,6 +131,7 @@ class WC_Points_Rewards_Checkout {
         
         // 檢查購物車金額是否達到最低要求
         if ($cart_total < $min_cart_total) {
+            // 如果未達到最低金額要求，不顯示點數使用區塊
             if ($min_cart_total > 0) {
                 echo '<tr class="points-requirements">';
                 echo '<td colspan="2">';
@@ -285,6 +289,9 @@ class WC_Points_Rewards_Checkout {
             $database = WC_Points_Rewards_Database::instance();
             $calculator = WC_Points_Rewards_Points_Calculator::instance();
             
+            // 確保計算器使用最新設定
+            $calculator->reload_settings();
+            
             // 檢查 WooCommerce 購物車是否可用
             if (!WC()->cart) {
                 wp_send_json_error(__('購物車暫時無法使用', 'wc-points-rewards'));
@@ -410,6 +417,9 @@ class WC_Points_Rewards_Checkout {
             
             $database = WC_Points_Rewards_Database::instance();
             $calculator = WC_Points_Rewards_Points_Calculator::instance();
+            
+            // 確保計算器使用最新設定
+            $calculator->reload_settings();
             
             $available_points = $database->get_user_points($user_id);
             $cart_total = WC()->cart->get_subtotal();

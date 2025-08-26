@@ -50,7 +50,7 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                     <div class="points-info-item">
                         <span class="points-label"><?php _e('本次最多可用', 'wc-points-rewards'); ?>：</span>
                         <span class="points-value max-usable"><?php echo wc_points_rewards_number_format($max_usable_points); ?></span>
-                        <?php if ($max_discount_percent < 100): ?>
+                        <?php if (isset($max_discount_percent) && $max_discount_percent < 100): ?>
                             <span class="points-note">（<?php printf(__('最多可折抵 %s%%', 'wc-points-rewards'), $max_discount_percent); ?>）</span>
                         <?php endif; ?>
                     </div>
