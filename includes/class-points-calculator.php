@@ -51,7 +51,7 @@ class WC_Points_Rewards_Points_Calculator {
         
         $this->settings = array(
             'enable_points_system' => isset($settings_array['enable_points_system']) ? $settings_array['enable_points_system'] : 'yes',
-            'points_per_amount' => isset($settings_array['points_per_amount']) ? $settings_array['points_per_amount'] : '1',
+            'points_per_amount' => isset($settings_array['points_per_amount']) ? $settings_array['points_per_amount'] : '100',
             'points_amount' => isset($settings_array['points_amount']) ? $settings_array['points_amount'] : '1',
             'points_value' => isset($settings_array['points_value']) ? $settings_array['points_value'] : '1',
             'points_expiry_months' => isset($settings_array['points_expiry_months']) ? $settings_array['points_expiry_months'] : '12',
@@ -174,7 +174,7 @@ class WC_Points_Rewards_Points_Calculator {
         // 確保使用最新的設定
         $this->reload_settings();
         
-        $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 1;
+        $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 100;
         $points_amount = isset($this->settings['points_amount']) ? floatval($this->settings['points_amount']) : 1;
         $decimal_places = wc_get_price_decimals(); // 使用 WooCommerce 小數位數設定
         

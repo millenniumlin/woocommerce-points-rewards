@@ -90,7 +90,7 @@ class WC_Points_Rewards_Install {
             'decimal_places' => 0,
             
             // 點數獲得設定
-            'points_per_amount' => 1,
+            'points_per_amount' => 100,
             'points_amount' => 1,
             'enable_registration_points' => 'yes',
             'registration_points' => 100,
@@ -247,7 +247,7 @@ class WC_Points_Rewards_Install {
             'enable_points_system' => 'yes',
             'points_name' => '點',
             'decimal_places' => 0,
-            'points_per_amount' => 1,
+            'points_per_amount' => 100,
             'points_amount' => 1,
             'enable_registration_points' => 'yes',
             'registration_points' => 100,
