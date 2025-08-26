@@ -109,7 +109,7 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                             <input type="number" name="points_amount" value="<?php echo esc_attr($settings['points_amount'] ?? 1); ?>" min="0.01" step="0.01" class="small-text">
                             <?php echo wc_points_rewards_get_points_name(); ?>
                         </label>
-                        <p class="description"><?php _e('例如：每1元回饋1點', 'wc-points-rewards'); ?></p>
+                        <p class="description"><?php _e('例如：每100元回饋1點', 'wc-points-rewards'); ?></p>
                     </td>
                 </tr>
                 
