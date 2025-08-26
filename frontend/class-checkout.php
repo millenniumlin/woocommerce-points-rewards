@@ -164,6 +164,7 @@ class WC_Points_Rewards_Checkout {
         
         // 傳遞變數到模板
         $max_usable_points = $max_points;
+        // $max_discount_percent 變數已在上方定義，模板可直接使用
         
         include WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/views/cart-points-section.php';
     }
