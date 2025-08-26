@@ -208,15 +208,11 @@ class WC_Points_Rewards_Checkout {
      * 記錄點數使用
      */
     public function record_points_usage($order_id, $posted_data) {
-        error_log('WC Points Rewards: record_points_usage called for order ' . $order_id);
-        
         $discount_amount = WC()->session->get('wc_points_rewards_discount_amount', 0);
-        error_log('WC Points Rewards: Session discount amount - ' . $discount_amount);
         
         if ($discount_amount > 0) {
             $order = wc_get_order($order_id);
             $user_id = $order->get_user_id();
-            error_log('WC Points Rewards: Order user ID - ' . $user_id);
             
             if ($user_id) {
                 $database = WC_Points_Rewards_Database::instance();
@@ -233,30 +229,14 @@ class WC_Points_Rewards_Checkout {
                     $order_id
                 );
                 
-                if ($points_added) {
-                    error_log(sprintf('WC Points Rewards: 成功記錄點數扣除 - 用戶ID: %d, 點數: %s, 訂單: %s', 
-                        $user_id, $discount_amount, $order_id));
-                } else {
-                    error_log(sprintf('WC Points Rewards: 點數扣除記錄失敗 - 用戶ID: %d, 點數: %s, 訂單: %s', 
-                        $user_id, $discount_amount, $order_id));
-                }
-                
                 // 記錄到訂單 meta
                 $discount_value = $calculator->calculate_discount_amount($discount_amount);
                 update_post_meta($order_id, '_points_discount_amount', $discount_value);
                 update_post_meta($order_id, '_points_used', $discount_amount);
                 
-                error_log(sprintf('WC Points Rewards: 訂單 meta 已更新 - 折抵金額: %s, 使用點數: %s', 
-                    $discount_value, $discount_amount));
-                
                 // 清除 session
                 WC()->session->__unset('wc_points_rewards_discount_amount');
-                error_log('WC Points Rewards: Session 已清除');
-            } else {
-                error_log('WC Points Rewards: 訂單沒有關聯的用戶ID');
             }
-        } else {
-            error_log('WC Points Rewards: 沒有點數折扣需要記錄');
         }
     }
     
@@ -264,13 +244,8 @@ class WC_Points_Rewards_Checkout {
      * AJAX: 應用點數折扣
      */
     public function ajax_apply_points_discount() {
-        // 增強的錯誤日誌記錄
-        error_log('WC Points Rewards: AJAX apply discount started');
-        error_log('WC Points Rewards: POST data - ' . print_r($_POST, true));
-        
         // 確保 WooCommerce 已載入
         if (!function_exists('WC') || !WC()) {
-            error_log('WC Points Rewards: WooCommerce not loaded during AJAX');
             wp_send_json_error(__('購物車系統尚未載入，請稍後再試', 'wc-points-rewards'));
         }
         
@@ -282,35 +257,28 @@ class WC_Points_Rewards_Checkout {
         try {
             check_ajax_referer('wc_points_rewards_nonce', 'nonce');
         } catch (Exception $e) {
-            error_log('WC Points Rewards: Nonce驗證失敗 - ' . $e->getMessage());
             wp_send_json_error(__('安全驗證失敗，請重新整理頁面再試', 'wc-points-rewards'));
         }
         
         if (!is_user_logged_in()) {
-            error_log('WC Points Rewards: 用戶未登入');
             wp_send_json_error(__('請先登入', 'wc-points-rewards'));
         }
         
         $points_to_use = floatval($_POST['points'] ?? 0);
-        error_log('WC Points Rewards: Points to use - ' . $points_to_use);
         
         if ($points_to_use <= 0) {
-            error_log('WC Points Rewards: 無效的點數值 - ' . $points_to_use);
             wp_send_json_error(__('請輸入有效的點數', 'wc-points-rewards'));
         }
         
         try {
             $user_id = get_current_user_id();
-            error_log('WC Points Rewards: User ID - ' . $user_id);
             
             // 檢查必要的類別是否存在
             if (!class_exists('WC_Points_Rewards_Database')) {
-                error_log('WC Points Rewards: Database class missing');
                 wp_send_json_error(__('點數系統暫時無法使用', 'wc-points-rewards'));
             }
             
             if (!class_exists('WC_Points_Rewards_Points_Calculator')) {
-                error_log('WC Points Rewards: Calculator class missing');
                 wp_send_json_error(__('點數系統暫時無法使用', 'wc-points-rewards'));
             }
             
@@ -319,25 +287,19 @@ class WC_Points_Rewards_Checkout {
             
             // 檢查 WooCommerce 購物車是否可用
             if (!WC()->cart) {
-                error_log('WC Points Rewards: WooCommerce cart not available');
                 wp_send_json_error(__('購物車暫時無法使用', 'wc-points-rewards'));
             }
             
             // 檢查用戶點數餘額
             $available_points = $database->get_user_points($user_id);
-            error_log('WC Points Rewards: Available points - ' . $available_points);
             
             if ($points_to_use > $available_points) {
-                error_log('WC Points Rewards: 點數不足 - 需要:' . $points_to_use . ', 可用:' . $available_points);
                 wp_send_json_error(__('點數不足', 'wc-points-rewards'));
             }
             
             // 檢查購物車條件（管理員可以跳過限制）
             $cart_total = WC()->cart->get_subtotal();
-            error_log('WC Points Rewards: Cart total - ' . $cart_total);
-            
             $can_use_points = $calculator->can_use_points($cart_total, $points_to_use);
-            error_log('WC Points Rewards: Can use points - ' . ($can_use_points ? 'yes' : 'no'));
             
             // 如果是管理員，允許跳過某些限制
             if (!$can_use_points && current_user_can('manage_woocommerce')) {
@@ -346,7 +308,6 @@ class WC_Points_Rewards_Checkout {
                 
                 if ($allow_admin_override) {
                     $can_use_points = true;
-                    error_log(sprintf('WC Points Rewards: 管理員覆蓋點數限制 - 用戶ID: %d, 點數: %s', $user_id, $points_to_use));
                 }
             }
             
@@ -366,20 +327,14 @@ class WC_Points_Rewards_Checkout {
                     $error_message = sprintf(__('最多只能折抵 %s%% 的金額（%s）', 'wc-points-rewards'), $max_discount_percent, wc_price($max_discount_amount));
                 }
                 
-                // 記錄錯誤日誌供調試
-                error_log(sprintf('WC Points Rewards: 點數使用被拒絕 - 用戶ID: %d, 點數: %s, 購物車總額: %s, 最低要求: %s, 最大折抵: %s%%, 嘗試折抵: %s', 
-                    $user_id, $points_to_use, $cart_total, $min_cart_total, $max_discount_percent, $discount_amount));
-                
                 wp_send_json_error($error_message);
             }
             
             // 應用折扣
             WC()->session->set('wc_points_rewards_discount_amount', $points_to_use);
-            error_log('WC Points Rewards: Session discount amount set - ' . $points_to_use);
             
             // 立即嘗試應用折扣到購物車
             $discount_value = $calculator->calculate_discount_amount($points_to_use);
-            error_log('WC Points Rewards: Calculated discount value - ' . $discount_value);
             
             // 檢查是否已經有相同的費用，避免重複添加
             $fees = WC()->cart->get_fees();
@@ -388,7 +343,6 @@ class WC_Points_Rewards_Checkout {
             foreach ($fees as $fee) {
                 if ($fee->name === __('點數折抵', 'wc-points-rewards')) {
                     $discount_found = true;
-                    error_log('WC Points Rewards: Existing discount found');
                     break;
                 }
             }
@@ -400,18 +354,12 @@ class WC_Points_Rewards_Checkout {
                     -$discount_value,
                     false
                 );
-                error_log('WC Points Rewards: Fee added to cart - ' . (-$discount_value));
             }
             
             // 強制重新計算購物車總計以確保折扣立即生效
             if (WC()->cart) {
                 WC()->cart->calculate_totals();
-                error_log('WC Points Rewards: Cart totals recalculated');
             }
-            
-            // 記錄成功應用點數的日誌
-            error_log(sprintf('WC Points Rewards: 成功應用點數 - 用戶ID: %d, 點數: %s, 折抵金額: %s', 
-                $user_id, $points_to_use, $discount_value));
             
             wp_send_json_success(array(
                 'message' => sprintf(__('已使用 %s 點數，折抵 %s', 'wc-points-rewards'), 
@@ -424,8 +372,6 @@ class WC_Points_Rewards_Checkout {
             ));
             
         } catch (Exception $e) {
-            error_log('WC Points Rewards: AJAX處理錯誤 - ' . $e->getMessage());
-            error_log('WC Points Rewards: 錯誤堆疊 - ' . $e->getTraceAsString());
             wp_send_json_error(__('系統發生錯誤，請稍後再試或聯繫管理員', 'wc-points-rewards'));
         }
     }
