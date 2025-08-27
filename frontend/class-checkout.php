@@ -93,6 +93,11 @@ class WC_Points_Rewards_Checkout {
      * 渲染點數使用區塊
      */
     private function render_points_section($context = 'cart') {
+        // 確保 WooCommerce 可用
+        if (!function_exists('WC') || !WC()->cart) {
+            return;
+        }
+        
         $user_id = get_current_user_id();
         $database = WC_Points_Rewards_Database::instance();
         $calculator = WC_Points_Rewards_Points_Calculator::instance();
@@ -167,6 +172,11 @@ class WC_Points_Rewards_Checkout {
     public function apply_points_discount() {
         // 修正：移除 DOING_AJAX 限制，確保在 AJAX 請求中也能應用折扣
         if (!is_admin()) {
+            // 確保 WooCommerce 可用
+            if (!function_exists('WC') || !WC()->session || !WC()->cart) {
+                return;
+            }
+            
             $discount_amount = WC()->session->get('wc_points_rewards_discount_amount', 0);
             
             if ($discount_amount > 0) {
@@ -235,6 +245,10 @@ class WC_Points_Rewards_Checkout {
      * AJAX: 應用點數折扣
      */
     public function ajax_apply_points_discount() {
+        // 調試日誌：記錄 AJAX 請求開始
+        error_log('WC Points Rewards: AJAX apply_discount 開始處理');
+        error_log('WC Points Rewards: POST 數據 - ' . print_r($_POST, true));
+        
         try {
             check_ajax_referer('wc_points_rewards_nonce', 'nonce');
         } catch (Exception $e) {
@@ -253,6 +267,11 @@ class WC_Points_Rewards_Checkout {
         }
         
         try {
+            // 確保 WooCommerce 和購物車在 AJAX 請求中可用
+            if (!class_exists('WooCommerce') || !function_exists('WC') || !WC()->cart) {
+                wp_send_json_error(__('購物車未初始化，請重新整理頁面', 'wc-points-rewards'));
+            }
+            
             $user_id = get_current_user_id();
             $database = WC_Points_Rewards_Database::instance();
             $calculator = WC_Points_Rewards_Points_Calculator::instance();
@@ -348,7 +367,13 @@ class WC_Points_Rewards_Checkout {
             
         } catch (Exception $e) {
             error_log('WC Points Rewards: AJAX處理錯誤 - ' . $e->getMessage());
-            wp_send_json_error(__('系統發生錯誤，請稍後再試或聯繫管理員', 'wc-points-rewards'));
+            error_log('WC Points Rewards: 完整錯誤追踪 - ' . $e->getTraceAsString());
+            
+            // 提供更詳細的錯誤信息給前端調試
+            wp_send_json_error(array(
+                'message' => __('系統發生錯誤，請稍後再試或聯繫管理員', 'wc-points-rewards'),
+                'debug' => WP_DEBUG ? $e->getMessage() : null
+            ));
         }
     }
     
@@ -357,6 +382,11 @@ class WC_Points_Rewards_Checkout {
      */
     public function ajax_remove_points_discount() {
         check_ajax_referer('wc_points_rewards_nonce', 'nonce');
+        
+        // 確保 WooCommerce 和購物車在 AJAX 請求中可用
+        if (!class_exists('WooCommerce') || !function_exists('WC') || !WC()->session) {
+            wp_send_json_error(__('購物車未初始化，請重新整理頁面', 'wc-points-rewards'));
+        }
         
         WC()->session->__unset('wc_points_rewards_discount_amount');
         
@@ -375,6 +405,11 @@ class WC_Points_Rewards_Checkout {
      * 驗證點數使用
      */
     public function validate_points_usage() {
+        // 確保 WooCommerce 可用
+        if (!function_exists('WC') || !WC()->session || !WC()->cart) {
+            return;
+        }
+        
         $discount_amount = WC()->session->get('wc_points_rewards_discount_amount', 0);
         
         if ($discount_amount > 0) {
@@ -402,6 +437,11 @@ class WC_Points_Rewards_Checkout {
      * 確保在購物車計算後點數折扣有被正確應用
      */
     public function ensure_discount_applied() {
+        // 確保 WooCommerce 可用
+        if (!function_exists('WC') || !WC()->session || !WC()->cart) {
+            return;
+        }
+        
         // 這個方法在購物車計算完成後確保點數折扣被正確顯示
         $discount_amount = WC()->session->get('wc_points_rewards_discount_amount', 0);
         
