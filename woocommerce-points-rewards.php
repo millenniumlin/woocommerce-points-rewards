@@ -176,8 +176,8 @@ class WC_Points_Rewards {
             }
         }
         
-        // 前端功能
-        if (!is_admin()) {
+        // 前端功能（包括 AJAX 請求）
+        if (!is_admin() || (defined('DOING_AJAX') && DOING_AJAX)) {
             if (class_exists('WC_Points_Rewards_Frontend')) {
                 WC_Points_Rewards_Frontend::instance();
             }

@@ -39,18 +39,10 @@ jQuery(document).ready(function($) {
         handleApplyDiscount: function(e) {
             e.preventDefault();
             
-            // 調試日誌
-            console.log('WC Points Rewards: Apply discount clicked');
-            
             var $button = $(this);
             var $input = $('#points-to-use');
             var points = parseFloat($input.val());
             var nonce = $button.data('nonce');
-            
-            // 調試日誌
-            console.log('WC Points Rewards: Points to use:', points);
-            console.log('WC Points Rewards: Nonce:', nonce);
-            console.log('WC Points Rewards: AJAX URL:', wcPointsRewards.ajaxUrl);
             
             // Validate input
             if (!points || points <= 0) {
@@ -70,7 +62,6 @@ jQuery(document).ready(function($) {
                     nonce: nonce
                 },
                 success: function(response) {
-                    console.log('WC Points Rewards: AJAX Response:', response);
                     if (response.success) {
                         PointsRedemption.showMessage(response.data.message, 'success');
                         
@@ -105,16 +96,8 @@ jQuery(document).ready(function($) {
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {
-                    // 記錄詳細錯誤信息到控制台
-                    console.error('WC Points Rewards AJAX Error:', {
-                        status: xhr.status,
-                        statusText: xhr.statusText,
-                        responseText: xhr.responseText,
-                        textStatus: textStatus,
-                        errorThrown: errorThrown
-                    });
-                    
-                    console.log('WC Points Rewards: Full XHR object:', xhr);
+                    // Log error for debugging
+                    console.error('WC Points Rewards AJAX Error:', xhr.status, xhr.statusText);
                     
                     // 顯示友好的錯誤信息
                     var errorMessage = wcPointsRewards.messages.error;
