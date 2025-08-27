@@ -65,38 +65,16 @@ jQuery(document).ready(function($) {
                     if (response.success) {
                         PointsRedemption.showMessage(response.data.message, 'success');
                         
-                        // 強制更新購物車內容和總計
-                        if ($('body').hasClass('woocommerce-cart')) {
-                            // 購物車頁面：更新購物車片段和強制重新計算
-                            $('body').trigger('wc_fragment_refresh');
-                            $('body').trigger('updated_wc_div');
-                            // 強制更新購物車總計表格
-                            $('[name="update_cart"]').trigger('click');
-                            
-                            // 短暫延遲後重新載入確保內容更新
-                            setTimeout(function() {
-                                location.reload();
-                            }, 800);
-                        } else if ($('body').hasClass('woocommerce-checkout')) {
-                            // 結帳頁面：觸發結帳更新
-                            $('body').trigger('update_checkout');
-                            
-                            // 延遲重新載入以確保更新完成
-                            setTimeout(function() {
-                                location.reload();
-                            }, 1200);
-                        } else {
-                            // 其他頁面：立即重新載入
-                            location.reload();
-                        }
+                        // 重新載入頁面以更新購物車顯示
+                        location.reload();
                     } else {
-                        // 處理具體的錯誤信息
+                        // 顯示具體的錯誤信息
                         var errorMessage = response.data || wcPointsRewards.messages.error;
                         PointsRedemption.showMessage(errorMessage, 'error');
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {
-                    // 記錄詳細錯誤信息到控制台
+                    // 記錄詳細錯誤信息到控制台供調試
                     console.error('WC Points Rewards AJAX Error:', {
                         status: xhr.status,
                         statusText: xhr.statusText,
@@ -105,14 +83,22 @@ jQuery(document).ready(function($) {
                         errorThrown: errorThrown
                     });
                     
-                    // 顯示友好的錯誤信息
+                    // 嘗試解析服務器返回的錯誤信息
                     var errorMessage = wcPointsRewards.messages.error;
-                    if (xhr.status === 403) {
-                        errorMessage = '權限不足，請重新登入';
-                    } else if (xhr.status === 500) {
-                        errorMessage = '伺服器錯誤，請稍後再試';
-                    } else if (xhr.status === 0) {
-                        errorMessage = '網路連線問題，請檢查網路狀態';
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response && response.data) {
+                            errorMessage = response.data;
+                        }
+                    } catch (e) {
+                        // 使用默認錯誤信息
+                        if (xhr.status === 403) {
+                            errorMessage = '權限不足，請重新登入';
+                        } else if (xhr.status === 500) {
+                            errorMessage = '伺服器錯誤，請稍後再試';
+                        } else if (xhr.status === 0) {
+                            errorMessage = '網路連線問題，請檢查網路狀態';
+                        }
                     }
                     
                     PointsRedemption.showMessage(errorMessage, 'error');
@@ -142,30 +128,8 @@ jQuery(document).ready(function($) {
                     if (response.success) {
                         PointsRedemption.showMessage(response.data.message, 'success');
                         
-                        // 強制更新購物車內容和總計
-                        if ($('body').hasClass('woocommerce-cart')) {
-                            // 購物車頁面：更新購物車片段和強制重新計算
-                            $('body').trigger('wc_fragment_refresh');
-                            $('body').trigger('updated_wc_div');
-                            // 強制更新購物車總計表格
-                            $('[name="update_cart"]').trigger('click');
-                            
-                            // 短暫延遲後重新載入確保內容更新
-                            setTimeout(function() {
-                                location.reload();
-                            }, 800);
-                        } else if ($('body').hasClass('woocommerce-checkout')) {
-                            // 結帳頁面：觸發結帳更新
-                            $('body').trigger('update_checkout');
-                            
-                            // 延遲重新載入以確保更新完成
-                            setTimeout(function() {
-                                location.reload();
-                            }, 1200);
-                        } else {
-                            // 其他頁面：立即重新載入
-                            location.reload();
-                        }
+                        // 重新載入頁面以更新購物車顯示
+                        location.reload();
                     } else {
                         PointsRedemption.showMessage(response.data, 'error');
                     }
