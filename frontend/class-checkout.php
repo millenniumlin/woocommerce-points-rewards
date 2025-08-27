@@ -244,6 +244,11 @@ class WC_Points_Rewards_Checkout {
             wp_send_json_error(__('請先登入', 'wc-points-rewards'));
         }
         
+        // 檢查購物車是否存在
+        if (!WC()->cart || WC()->cart->is_empty()) {
+            wp_send_json_error(__('購物車為空', 'wc-points-rewards'));
+        }
+        
         $points_to_use = floatval($_POST['points'] ?? 0);
         
         if ($points_to_use <= 0) {
