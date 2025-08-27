@@ -3,8 +3,8 @@
  * Plugin Name: WooCommerce Points & Rewards 會員系統
  * Plugin URI: https://github.com/millenniumlin/woocommerce-points-rewards
  * Description: 完整的 WooCommerce 累積消費點數獎勵系統，支援會員等級、點數回饋、折抵功能等。
- * Version: 1.0.7
- * Author: Copilot x millenniumlim
+ * Version: 1.4.7
+ * Author: Github Copilot x millenniumlim
  * License: GPL v2 or later
  * Text Domain: wc-points-rewards
  * Domain Path: /languages
