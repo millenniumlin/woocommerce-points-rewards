@@ -338,7 +338,7 @@ class WC_Points_Rewards_Points_Calculator {
             echo '<tr class="points-info">';
             echo '<th>' . __('可獲得點數', 'wc-points-rewards') . '</th>';
             echo '<td>';
-            echo sprintf(__('%s', 'wc-points-rewards'), wc_points_rewards_number_format($total_points));
+            echo sprintf(__('%s 點', 'wc-points-rewards'), wc_points_rewards_number_format($total_points));
             if ($tier_bonus > 0) {
                 echo '<small> (' . sprintf(__('基礎 %s + 等級加成 %s%%', 'wc-points-rewards'), wc_points_rewards_number_format($points), $tier_bonus) . ')</small>';
             }

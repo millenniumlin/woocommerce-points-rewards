@@ -55,6 +55,11 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                         <?php endif; ?>
                     </div>
                     
+                    <div class="points-info-item">
+                        <span class="points-label"><?php _e('最多可折抵', 'wc-points-rewards'); ?>：</span>
+                        <span class="points-value max-discount"><?php echo wc_price($max_discount_amount); ?></span>
+                    </div>
+                    
                     <?php if ($used_points > 0 && $discount_amount > 0): ?>
                     <div class="points-info-item discount-amount">
                         <span class="points-label"><?php _e('已使用點數折抵金額', 'wc-points-rewards'); ?>：</span>
