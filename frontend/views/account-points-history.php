@@ -11,26 +11,6 @@ if (!defined('ABSPATH')) {
 ?>
 
 <div class="wc-points-rewards-history">
-    <!-- 篩選選項 -->
-    <div class="history-filters">
-        <form method="get" class="points-filter-form">
-            <select name="filter_type" onchange="this.form.submit()">
-                <option value=""><?php _e('所有類型', 'wc-points-rewards'); ?></option>
-                <option value="earned" <?php selected($type_filter, 'earned'); ?>><?php _e('獲得點數', 'wc-points-rewards'); ?></option>
-                <option value="redeemed" <?php selected($type_filter, 'redeemed'); ?>><?php _e('使用點數', 'wc-points-rewards'); ?></option>
-                <option value="expired" <?php selected($type_filter, 'expired'); ?>><?php _e('過期點數', 'wc-points-rewards'); ?></option>
-                <option value="admin" <?php selected($type_filter, 'admin'); ?>><?php _e('管理員調整', 'wc-points-rewards'); ?></option>
-            </select>
-            
-            <!-- 保持其他查詢參數 -->
-            <?php foreach ($_GET as $key => $value): ?>
-                <?php if ($key !== 'filter_type'): ?>
-                    <input type="hidden" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($value); ?>" />
-                <?php endif; ?>
-            <?php endforeach; ?>
-        </form>
-    </div>
-    
     <?php if (!empty($history)): ?>
     <!-- 點數記錄表格 -->
     <div class="points-history-table-wrapper">
