@@ -319,7 +319,7 @@ class WC_Points_Rewards_Settings {
     }
     
     /**
-     * 儲存設定
+     * 儲存設定 - 改進輸入驗證和清理
      */
     public function save_settings() {
         // 驗證 nonce
@@ -332,31 +332,93 @@ class WC_Points_Rewards_Settings {
             wp_die(__('您沒有權限執行此操作', 'wc-points-rewards'));
         }
         
-        // 儲存設定
-        $settings_to_save = array(
-            'enable_points_system',
-            'points_per_amount',
-            'points_name',
-            'points_value',
-            'points_expiry_months',
-            'registration_points',
-            'birthday_points',
-            'enable_cart_redemption',
-            'min_cart_total',
-            'max_discount_percent',
-            'enable_tiers',
-            'tier_period',
-            'enable_notifications',
-            'expiry_notification_days'
+        // 定義設定驗證規則
+        $settings_validation = array(
+            'enable_points_system' => array('type' => 'checkbox', 'default' => 'yes'),
+            'points_per_amount' => array('type' => 'positive_number', 'min' => 0.01, 'max' => 10000, 'default' => 1),
+            'points_name' => array('type' => 'text', 'max_length' => 50, 'default' => '點'),
+            'points_value' => array('type' => 'positive_number', 'min' => 0.01, 'max' => 1000, 'default' => 1),
+            'points_expiry_months' => array('type' => 'integer', 'min' => 0, 'max' => 120, 'default' => 12),
+            'registration_points' => array('type' => 'non_negative_number', 'min' => 0, 'max' => 999999, 'default' => 100),
+            'birthday_points' => array('type' => 'non_negative_number', 'min' => 0, 'max' => 999999, 'default' => 100),
+            'enable_cart_redemption' => array('type' => 'checkbox', 'default' => 'yes'),
+            'min_cart_total' => array('type' => 'non_negative_number', 'min' => 0, 'max' => 999999, 'default' => 0),
+            'max_discount_percent' => array('type' => 'non_negative_number', 'min' => 0, 'max' => 100, 'default' => 50),
+            'enable_tiers' => array('type' => 'checkbox', 'default' => 'yes'),
+            'tier_period' => array('type' => 'text', 'default' => 'yearly'),
+            'enable_notifications' => array('type' => 'checkbox', 'default' => 'yes'),
+            'expiry_notification_days' => array('type' => 'integer', 'min' => 1, 'max' => 365, 'default' => 30)
         );
         
-        foreach ($settings_to_save as $setting) {
-            $value = isset($_POST['wc_points_rewards_' . $setting]) ? sanitize_text_field($_POST['wc_points_rewards_' . $setting]) : '';
+        $errors = array();
+        
+        foreach ($settings_validation as $setting => $rules) {
+            $post_key = 'wc_points_rewards_' . $setting;
+            $raw_value = $_POST[$post_key] ?? '';
+            
+            switch ($rules['type']) {
+                case 'checkbox':
+                    $value = ($raw_value === 'yes') ? 'yes' : 'no';
+                    break;
+                    
+                case 'text':
+                    $value = sanitize_text_field($raw_value);
+                    if (isset($rules['max_length']) && strlen($value) > $rules['max_length']) {
+                        $value = substr($value, 0, $rules['max_length']);
+                    }
+                    break;
+                    
+                case 'integer':
+                    $value = intval($raw_value);
+                    if (isset($rules['min']) && $value < $rules['min']) {
+                        $value = $rules['min'];
+                        $errors[] = sprintf(__('%s 設定值過小，已調整為最小值 %d', 'wc-points-rewards'), $setting, $rules['min']);
+                    }
+                    if (isset($rules['max']) && $value > $rules['max']) {
+                        $value = $rules['max'];
+                        $errors[] = sprintf(__('%s 設定值過大，已調整為最大值 %d', 'wc-points-rewards'), $setting, $rules['max']);
+                    }
+                    break;
+                    
+                case 'positive_number':
+                case 'non_negative_number':
+                    $value = floatval($raw_value);
+                    $min_value = ($rules['type'] === 'positive_number') ? max(0.01, $rules['min'] ?? 0.01) : ($rules['min'] ?? 0);
+                    
+                    if ($value < $min_value) {
+                        $value = $min_value;
+                        $errors[] = sprintf(__('%s 設定值過小，已調整為最小值 %s', 'wc-points-rewards'), $setting, $min_value);
+                    }
+                    if (isset($rules['max']) && $value > $rules['max']) {
+                        $value = $rules['max'];
+                        $errors[] = sprintf(__('%s 設定值過大，已調整為最大值 %s', 'wc-points-rewards'), $setting, $rules['max']);
+                    }
+                    break;
+                    
+                default:
+                    $value = sanitize_text_field($raw_value);
+            }
+            
+            // 如果值為空，使用預設值
+            if (empty($value) && isset($rules['default'])) {
+                $value = $rules['default'];
+            }
+            
             update_option('wc_points_rewards_' . $setting, $value);
         }
         
-        // 重定向回設定頁面
-        wp_redirect(admin_url('admin.php?page=wc-points-rewards-settings&updated=1'));
+        // 記錄安全事件
+        if (class_exists('WC_Points_Rewards_Security')) {
+            $security = WC_Points_Rewards_Security::instance();
+            $security->log_security_event('settings_updated', '管理員更新點數系統設定', get_current_user_id());
+        }
+        
+        // 重定向回設定頁面，並顯示任何錯誤訊息
+        $redirect_url = admin_url('admin.php?page=wc-points-rewards-settings&updated=1');
+        if (!empty($errors)) {
+            $redirect_url .= '&errors=' . urlencode(implode('|', $errors));
+        }
+        wp_redirect($redirect_url);
         exit;
     }
 }

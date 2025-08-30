@@ -153,7 +153,15 @@ class WC_Points_Rewards_Points_Calculator {
     /**
      * 根據金額計算基礎點數
      */
+    /**
+     * 計算指定金額可獲得的點數 - 改進精度處理
+     */
     public function calculate_points_for_amount($amount) {
+        $amount = floatval($amount);
+        if ($amount <= 0) {
+            return 0;
+        }
+        
         $points_per_amount = isset($this->settings['points_per_amount']) ? floatval($this->settings['points_per_amount']) : 1;
         $decimal_places = wc_get_price_decimals(); // 使用 WooCommerce 小數位數設定
         
@@ -161,8 +169,17 @@ class WC_Points_Rewards_Points_Calculator {
             return 0;
         }
         
+        // 使用更精確的計算方式，避免浮點數精度問題
+        // 將金額轉換為分（或最小單位），進行整數運算，再轉回
+        $scale = pow(10, $decimal_places);
+        $amount_scaled = intval(round($amount * $scale));
+        $points_per_amount_scaled = intval(round($points_per_amount * $scale));
+        
         // 計算基礎點數：每消費 $points_per_amount 元獲得 1 點
-        $points = $amount / $points_per_amount;
+        $points = $amount_scaled / $points_per_amount_scaled;
+        
+        // 確保結果在合理範圍內
+        $points = min($points, 999999999.99);
         
         return round($points, $decimal_places);
     }
@@ -224,13 +241,13 @@ class WC_Points_Rewards_Points_Calculator {
             
             $existing_birthday_points = $wpdb->get_var($wpdb->prepare("
                 SELECT COUNT(*) 
-                FROM $points_table 
+                FROM `{$points_table}` 
                 WHERE user_id = %d 
-                AND type = 'earned' 
+                AND type = %s 
                 AND description = %s 
                 AND YEAR(created_at) = %d 
                 AND MONTH(created_at) = %d
-            ", $user_id, __('生日贈送點數', 'wc-points-rewards'), $current_year, $current_month));
+            ", $user_id, 'earned', __('生日贈送點數', 'wc-points-rewards'), $current_year, $current_month));
             
             if (!$existing_birthday_points) {
                 // 計算過期時間
@@ -362,20 +379,58 @@ class WC_Points_Rewards_Points_Calculator {
     }
     
     /**
-     * 計算點數折抵金額
+     * 計算點數折抵金額 - 改進精度處理
      */
     public function calculate_discount_amount($points) {
+        $points = floatval($points);
+        if ($points <= 0) {
+            return 0;
+        }
+        
         // 使用設定中的點數價值：1點 = 多少元
         $point_value = isset($this->settings['points_value']) ? floatval($this->settings['points_value']) : 1;
-        return $points * $point_value;
+        
+        if ($point_value <= 0) {
+            return 0;
+        }
+        
+        // 使用更精確的計算，避免浮點數精度問題
+        $decimal_places = wc_get_price_decimals();
+        $scale = pow(10, $decimal_places);
+        
+        $points_scaled = intval(round($points * $scale));
+        $point_value_scaled = intval(round($point_value * $scale));
+        
+        $discount_amount = ($points_scaled * $point_value_scaled) / ($scale * $scale);
+        
+        // 確保結果在合理範圍內
+        $discount_amount = min($discount_amount, 999999999.99);
+        
+        return round($discount_amount, $decimal_places);
     }
     
     /**
-     * 檢查點數是否可以使用
+     * 檢查點數是否可以使用 - 改進驗證邏輯
      */
     public function can_use_points($cart_total, $points_to_use) {
+        $cart_total = floatval($cart_total);
+        $points_to_use = floatval($points_to_use);
+        
+        // 基本驗證
+        if ($cart_total <= 0 || $points_to_use <= 0) {
+            return false;
+        }
+        
+        // 檢查點數是否在合理範圍內
+        if ($points_to_use > 999999999.99) {
+            return false;
+        }
+        
         $min_cart_total = isset($this->settings['min_cart_total']) ? floatval($this->settings['min_cart_total']) : 0;
         $max_discount_percent = isset($this->settings['max_discount_percent']) ? floatval($this->settings['max_discount_percent']) : 100;
+        
+        // 確保百分比在合理範圍內
+        $max_discount_percent = max(0, min($max_discount_percent, 100));
         
         // 檢查購物車金額是否達到最低要求
         if ($cart_total < $min_cart_total) {

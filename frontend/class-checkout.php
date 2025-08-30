@@ -258,8 +258,14 @@ class WC_Points_Rewards_Checkout {
         
         $points_to_use = floatval($_POST['points'] ?? 0);
         
+        // 加強輸入驗證
         if ($points_to_use <= 0) {
             wp_send_json_error(__('請輸入有效的點數', 'wc-points-rewards'));
+        }
+        
+        // 防止極大數值攻擊
+        if ($points_to_use > 999999999.99) {
+            wp_send_json_error(__('點數數值過大', 'wc-points-rewards'));
         }
         
         try {
