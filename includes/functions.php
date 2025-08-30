@@ -216,12 +216,24 @@ function wc_points_rewards_calculate_points_value($points) {
 }
 
 /**
- * 強制使用點數 - 跳過所有限制（僅供管理員使用）
+ * 強制使用點數 - 跳過所有限制（僅供管理員使用，加強安全檢查）
  * 此函數可以添加到主題的 functions.php 中來強制啟用點數使用
  */
 function wc_points_rewards_force_enable_points_usage() {
+    // 多重安全檢查
     if (!current_user_can('manage_woocommerce')) {
         return false;
+    }
+    
+    // 檢查是否在管理後台或具有適當的 nonce
+    if (!is_admin() && !wp_verify_nonce($_REQUEST['force_points_nonce'] ?? '', 'wc_points_force_enable')) {
+        return false;
+    }
+    
+    // 記錄此操作
+    if (class_exists('WC_Points_Rewards_Security')) {
+        $security = WC_Points_Rewards_Security::instance();
+        $security->log_security_event('admin_force_points', '管理員強制啟用點數使用', get_current_user_id());
     }
     
     // 添加一個 hook 來允許管理員跳過所有限制
@@ -240,12 +252,24 @@ function wc_points_rewards_is_admin_override_enabled() {
 }
 
 /**
- * 為當前用戶強制啟用點數使用（緊急修復功能）
+ * 為當前用戶強制啟用點數使用（緊急修復功能，加強安全性）
  * 可以在主題的 functions.php 中調用此函數來臨時解決點數使用問題
  */
 function wc_points_rewards_emergency_enable_points() {
-    if (!is_admin() && !current_user_can('manage_woocommerce')) {
+    // 嚴格的權限檢查
+    if (!current_user_can('manage_woocommerce')) {
         return;
+    }
+    
+    // 只能在管理後台使用
+    if (!is_admin()) {
+        return;
+    }
+    
+    // 記錄緊急操作
+    if (class_exists('WC_Points_Rewards_Security')) {
+        $security = WC_Points_Rewards_Security::instance();
+        $security->log_security_event('emergency_points_enable', '管理員使用緊急點數啟用功能', get_current_user_id());
     }
     
     // 臨時設置允許管理員覆蓋

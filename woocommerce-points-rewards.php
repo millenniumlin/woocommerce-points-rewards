@@ -37,7 +37,7 @@ add_action('before_woocommerce_init', function() {
 });
 
 // 定義常數 - 修正版本號一致性
-define('WC_POINTS_REWARDS_VERSION', '1.0.7');  // 修正：與標題版本一致
+define('WC_POINTS_REWARDS_VERSION', '1.4.7');  // 修正：與標題版本一致
 define('WC_POINTS_REWARDS_PLUGIN_FILE', __FILE__);
 define('WC_POINTS_REWARDS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WC_POINTS_REWARDS_PLUGIN_URL', plugin_dir_url(__FILE__));

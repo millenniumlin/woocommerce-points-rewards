@@ -65,16 +65,36 @@ class WC_Points_Rewards_Ajax_Handler {
             wp_send_json_error(__('請提供有效的日期範圍', 'wc-points-rewards'));
         }
         
-        // 驗證日期格式
-        if (!strtotime($start_date) || !strtotime($end_date)) {
+        // 驗證日期格式和合理性
+        $start_timestamp = strtotime($start_date);
+        $end_timestamp = strtotime($end_date);
+        
+        if (!$start_timestamp || !$end_timestamp) {
             wp_send_json_error(__('日期格式不正確', 'wc-points-rewards'));
         }
         
-        // 獲取指定日期範圍內的已完成訂單
+        // 檢查日期範圍合理性
+        $current_time = time();
+        $max_past_time = strtotime('-10 years'); // 最多查詢10年前的資料
+        
+        if ($start_timestamp < $max_past_time || $end_timestamp > $current_time) {
+            wp_send_json_error(__('日期範圍不合理', 'wc-points-rewards'));
+        }
+        
+        if ($start_timestamp >= $end_timestamp) {
+            wp_send_json_error(__('開始日期必須早於結束日期', 'wc-points-rewards'));
+        }
+        
+        // 限制查詢範圍不超過2年
+        if (($end_timestamp - $start_timestamp) > (2 * 365 * 24 * 60 * 60)) {
+            wp_send_json_error(__('日期範圍不能超過2年', 'wc-points-rewards'));
+        }
+        
+        // 獲取指定日期範圍內的已完成訂單（添加合理限制防止記憶體問題）
         $orders = wc_get_orders(array(
             'status' => 'completed',
             'date_created' => $start_date . '...' . $end_date,
-            'limit' => -1,
+            'limit' => 1000, // 限制每次處理1000筆，防止記憶體溢出
         ));
         
         $processed_count = 0;

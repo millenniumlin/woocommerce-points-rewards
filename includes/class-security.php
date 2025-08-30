@@ -96,10 +96,14 @@ class WC_Points_Rewards_Security {
                 return esc_url_raw($data);
             
             case 'int':
-                return intval($data);
+                $value = intval($data);
+                // 添加合理的範圍限制
+                return max(0, min($value, 2147483647)); // 32位整數最大值
             
             case 'float':
-                return floatval($data);
+                $value = floatval($data);
+                // 添加合理的範圍限制，防止溢出
+                return max(0, min($value, 999999999.99)); // 合理的點數上限
             
             case 'array':
                 if (!is_array($data)) {
@@ -135,11 +139,11 @@ class WC_Points_Rewards_Security {
         
         $log_data = array(
             'timestamp' => current_time('mysql'),
-            'event_type' => $event_type,
-            'description' => $description,
-            'user_id' => $user_id,
+            'event_type' => sanitize_text_field($event_type),
+            'description' => sanitize_textarea_field($description),
+            'user_id' => intval($user_id),
             'ip_address' => $this->get_user_ip(),
-            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
+            'user_agent' => sanitize_text_field($_SERVER['HTTP_USER_AGENT'] ?? 'Unknown')
         );
         
         // 可以保存到自定義日誌表或使用 WordPress 日誌
@@ -150,16 +154,35 @@ class WC_Points_Rewards_Security {
     }
     
     /**
-     * 獲取用戶 IP 地址
+     * 獲取用戶 IP 地址 - 安全版本
      */
     private function get_user_ip() {
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            return $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            return $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else {
-            return $_SERVER['REMOTE_ADDR'] ?? '';
+        $ip_headers = array(
+            'HTTP_CLIENT_IP',
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_FORWARDED',
+            'HTTP_X_CLUSTER_CLIENT_IP',
+            'HTTP_FORWARDED_FOR',
+            'HTTP_FORWARDED',
+            'REMOTE_ADDR'
+        );
+        
+        foreach ($ip_headers as $header) {
+            if (!empty($_SERVER[$header])) {
+                $ip = sanitize_text_field($_SERVER[$header]);
+                // 處理多個 IP 地址的情況（取第一個）
+                if (strpos($ip, ',') !== false) {
+                    $ip = trim(explode(',', $ip)[0]);
+                }
+                // 驗證 IP 地址格式
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    return $ip;
+                }
+            }
         }
+        
+        // 後備方案：返回本地 IP 或空字符串
+        return $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
     }
     
     /**
