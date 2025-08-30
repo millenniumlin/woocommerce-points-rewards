@@ -410,37 +410,20 @@ class WC_Points_Rewards_Account {
         $current_page = max(1, intval(get_query_var('paged', 1)));
         $offset = ($current_page - 1) * $per_page;
         
-        // 篩選處理
-        $type_filter = sanitize_text_field($_GET['filter_type'] ?? '');
-        
         $history = $database->get_user_points_history($user_id, $per_page, $offset);
-        
-        // 如果有篩選條件，需要重新查詢
-        if ($type_filter) {
-            global $wpdb;
-            $points_table = $wpdb->prefix . 'wc_points_rewards_points';
-            
-            $history = $wpdb->get_results($wpdb->prepare("
-                SELECT * FROM $points_table 
-                WHERE user_id = %d AND type = %s 
-                ORDER BY created_at DESC 
-                LIMIT %d OFFSET %d
-            ", $user_id, $type_filter, $per_page, $offset));
-        }
         
         // 計算總頁數
         global $wpdb;
         $points_table = $wpdb->prefix . 'wc_points_rewards_points';
-        $where_clause = $type_filter ? $wpdb->prepare("AND type = %s", $type_filter) : "";
         
         $total_records = $wpdb->get_var($wpdb->prepare("
             SELECT COUNT(*) FROM $points_table 
-            WHERE user_id = %d $where_clause
+            WHERE user_id = %d
         ", $user_id));
         
         $total_pages = ceil(intval($total_records ?? 0) / $per_page);
         
-        $this->render_points_history($history ?: array(), $current_page, $total_pages, $type_filter);
+        $this->render_points_history($history ?: array(), $current_page, $total_pages);
     }
     
     /**
@@ -868,24 +851,10 @@ class WC_Points_Rewards_Account {
         <?php
     }
     
-    private function render_points_history($history, $current_page, $total_pages, $type_filter) {
+    private function render_points_history($history, $current_page, $total_pages) {
         ?>
         <div class="wc-points-history">
             <h3><?php _e('點數記錄', 'wc-points-rewards'); ?></h3>
-            
-            <!-- 篩選器 -->
-            <div class="history-filters">
-                <form method="get" class="filter-form">
-                    <label for="filter_type"><?php _e('篩選類型:', 'wc-points-rewards'); ?></label>
-                    <select name="filter_type" id="filter_type" onchange="this.form.submit()">
-                        <option value=""><?php _e('全部', 'wc-points-rewards'); ?></option>
-                        <option value="earned" <?php selected($type_filter, 'earned'); ?>><?php _e('獲得', 'wc-points-rewards'); ?></option>
-                        <option value="redeemed" <?php selected($type_filter, 'redeemed'); ?>><?php _e('使用', 'wc-points-rewards'); ?></option>
-                        <option value="expired" <?php selected($type_filter, 'expired'); ?>><?php _e('過期', 'wc-points-rewards'); ?></option>
-                        <option value="admin" <?php selected($type_filter, 'admin'); ?>><?php _e('調整', 'wc-points-rewards'); ?></option>
-                    </select>
-                </form>
-            </div>
             
             <?php if (!empty($history)): ?>
             <table class="wc-points-history-table">
@@ -947,9 +916,6 @@ class WC_Points_Rewards_Account {
             <div class="wc-points-pagination">
                 <?php
                 $base_url = wc_points_rewards_get_account_endpoint_url('points-history');
-                if ($type_filter) {
-                    $base_url = add_query_arg('filter_type', $type_filter, $base_url);
-                }
                 
                 echo paginate_links(array(
                     'base' => add_query_arg('paged', '%#%', $base_url),
@@ -972,17 +938,7 @@ class WC_Points_Rewards_Account {
         </div>
         
         <style>
-        .history-filters {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .filter-form select {
-            margin-left: 10px;
-            padding: 5px 10px;
-        }
+
         
         .wc-points-history-table {
             width: 100%;
