@@ -77,8 +77,8 @@ class WC_Points_Rewards_Reports {
         
         // 目前有效點數總額
         $total_active = $wpdb->get_var("
-            SELECT SUM(points) 
-            FROM $points_table 
+            SELECT COALESCE(SUM(points), 0) 
+            FROM `{$points_table}` 
             WHERE type = 'earned' 
             AND (expiry_date IS NULL OR expiry_date > NOW())
         ");
@@ -105,8 +105,8 @@ class WC_Points_Rewards_Reports {
                 t.name as tier_name,
                 COUNT(s.user_id) as user_count,
                 t.tier_order
-            FROM $tiers_table t
-            LEFT JOIN $stats_table s ON t.id = s.current_tier_id 
+            FROM `{$tiers_table}` t
+            LEFT JOIN `{$stats_table}` s ON t.id = s.current_tier_id 
                 AND s.year = YEAR(NOW())
                 AND (s.tier_expiry_date IS NULL OR s.tier_expiry_date > NOW())
             GROUP BY t.id, t.name, t.tier_order
@@ -248,24 +248,24 @@ class WC_Points_Rewards_Reports {
         
         // 30天內到期的點數
         $expiring_30_days = $wpdb->get_var("
-            SELECT SUM(points) 
-            FROM $points_table 
+            SELECT COALESCE(SUM(points), 0) 
+            FROM `{$points_table}` 
             WHERE type = 'earned' 
             AND expiry_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 DAY)
         ");
         
         // 7天內到期的點數
         $expiring_7_days = $wpdb->get_var("
-            SELECT SUM(points) 
-            FROM $points_table 
+            SELECT COALESCE(SUM(points), 0) 
+            FROM `{$points_table}` 
             WHERE type = 'earned' 
             AND expiry_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 7 DAY)
         ");
         
         // 已過期但未標記的點數
         $expired_unmarked = $wpdb->get_var("
-            SELECT SUM(points) 
-            FROM $points_table 
+            SELECT COALESCE(SUM(points), 0) 
+            FROM `{$points_table}` 
             WHERE type = 'earned' 
             AND expiry_date IS NOT NULL 
             AND expiry_date < NOW()
@@ -315,10 +315,29 @@ class WC_Points_Rewards_Reports {
     }
     
     /**
-     * 匯出報表為 CSV
+     * 匯出報表為 CSV - 加強安全檢查
      */
     public function export_csv($report_type, $data) {
+        // 檢查權限
+        if (!current_user_can('manage_woocommerce')) {
+            wp_die(__('您沒有權限執行此操作', 'wc-points-rewards'));
+        }
+        
+        // 驗證報表類型
+        $allowed_types = array('points_history', 'tier_distribution', 'user_stats');
+        if (!in_array($report_type, $allowed_types, true)) {
+            wp_die(__('無效的報表類型', 'wc-points-rewards'));
+        }
+        
+        // 清理檔案名稱
+        $report_type = sanitize_file_name($report_type);
         $filename = 'points_rewards_' . $report_type . '_' . date('Y-m-d') . '.csv';
+        
+        // 記錄安全事件
+        if (class_exists('WC_Points_Rewards_Security')) {
+            $security = WC_Points_Rewards_Security::instance();
+            $security->log_security_event('csv_export', "管理員匯出 {$report_type} 報表", get_current_user_id());
+        }
         
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
