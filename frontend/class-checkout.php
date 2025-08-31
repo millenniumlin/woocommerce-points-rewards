@@ -149,14 +149,27 @@ class WC_Points_Rewards_Checkout {
             return;
         }
         
-        // 計算最大可使用點數
+        // 計算最大可使用點數 - 修正精度問題
         $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', '100'));
         $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
         
         // 計算最大可用點數（考慮點數價值）
         $point_value = wc_points_rewards_get_points_value();
         $max_points_by_amount = $max_discount_amount / $point_value;
-        $max_points = min($available_points, $max_points_by_amount);
+        
+        // 使用floor確保不會有精度問題，然後驗證是否可用
+        $theoretical_max = floor(min($available_points, $max_points_by_amount) * 100) / 100;
+        
+        // 最後驗證計算出的點數確實可以使用
+        if ($theoretical_max > 0 && $calculator->can_use_points($cart_total, $theoretical_max)) {
+            $max_points = $theoretical_max;
+        } else {
+            // 如果理論最大值不能使用，嘗試減少一點
+            $max_points = max(0, $theoretical_max - 0.01);
+            if ($max_points > 0 && !$calculator->can_use_points($cart_total, $max_points)) {
+                $max_points = 0;
+            }
+        }
         
         $current_discount = WC()->session->get('wc_points_rewards_discount_amount', 0);
         
