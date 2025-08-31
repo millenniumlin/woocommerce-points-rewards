@@ -441,7 +441,9 @@ class WC_Points_Rewards_Points_Calculator {
         $discount_amount = $this->calculate_discount_amount($points_to_use);
         $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
         
-        return $discount_amount <= $max_discount_amount;
+        // 使用小數點精度容忍度來避免浮點數精度問題導致的off-by-1錯誤
+        $epsilon = 0.01; // 1分錢的容忍度
+        return $discount_amount <= ($max_discount_amount + $epsilon);
     }
     
     /**
