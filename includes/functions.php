@@ -41,6 +41,7 @@ function wc_points_rewards_floatval($value) {
 
 /**
  * 安全的數字格式化 - 使用 WooCommerce 小數位數設定
+ * 修正：當小數位數為0時，使用 floor 截斷而非四捨五入，確保顯示的點數可以實際使用
  * 
  * @param mixed $value 輸入值
  * @param int $decimals 小數位數 (可選，預設使用 WooCommerce 設定)
@@ -51,7 +52,16 @@ function wc_points_rewards_number_format($value, $decimals = null) {
     if ($decimals === null) {
         $decimals = wc_get_price_decimals();
     }
-    return number_format(floatval($value ?? 0), $decimals);
+    
+    $value = floatval($value ?? 0);
+    
+    // 當小數位數為0時，使用 floor 截斷而非四捨五入
+    // 這確保顯示的點數金額與實際可用金額一致
+    if ($decimals == 0) {
+        $value = floor($value);
+    }
+    
+    return number_format($value, $decimals);
 }
 
 /**

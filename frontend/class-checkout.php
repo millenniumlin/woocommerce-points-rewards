@@ -168,6 +168,7 @@ class WC_Points_Rewards_Checkout {
     /**
      * 計算指定折抵金額對應的最大可用點數
      * 使用與驗證邏輯相同的計算方法確保一致性
+     * 修正：當小數位數為0時，確保不四捨五入，保證顯示的點數可以實際使用
      */
     private function calculate_max_points_for_amount($max_discount_amount, $calculator) {
         // 獲取點數價值設定
@@ -183,20 +184,35 @@ class WC_Points_Rewards_Checkout {
         // 計算理論最大點數
         $theoretical_max_points = $max_discount_amount / $point_value;
         
-        // 使用向下取整以確保不會超出限制
-        // 並驗證計算出的折抵金額不超過限制
-        $max_points = floor($theoretical_max_points * pow(10, $decimal_places)) / pow(10, $decimal_places);
+        // 當小數位數為0時，直接使用 floor 截斷
+        // 當有小數位數時，使用精確計算以確保不會超出限制
+        if ($decimal_places == 0) {
+            $max_points = floor($theoretical_max_points);
+        } else {
+            // 使用向下取整以確保不會超出限制
+            $max_points = floor($theoretical_max_points * pow(10, $decimal_places)) / pow(10, $decimal_places);
+        }
         
         // 進一步驗證：確保使用 calculator 計算的折抵金額不超過限制
         $actual_discount = $calculator->calculate_discount_amount($max_points);
         
         // 如果超出限制，微調點數
+        $adjustment = $decimal_places == 0 ? 1 : pow(10, -$decimal_places);
         while ($actual_discount > $max_discount_amount && $max_points > 0) {
-            $max_points -= pow(10, -$decimal_places);
+            $max_points -= $adjustment;
+            if ($max_points < 0) {
+                $max_points = 0;
+                break;
+            }
             $actual_discount = $calculator->calculate_discount_amount($max_points);
         }
         
-        return round($max_points, $decimal_places);
+        // 當小數位數為0時，確保返回整數
+        if ($decimal_places == 0) {
+            return floor($max_points);
+        } else {
+            return round($max_points, $decimal_places);
+        }
     }
     
     /**
