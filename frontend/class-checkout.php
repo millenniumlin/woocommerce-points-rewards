@@ -153,9 +153,8 @@ class WC_Points_Rewards_Checkout {
         $max_discount_percent = floatval(get_option('wc_points_rewards_max_discount_percent', '100'));
         $max_discount_amount = ($cart_total * $max_discount_percent) / 100;
         
-        // 計算最大可用點數（考慮點數價值）
-        $point_value = wc_points_rewards_get_points_value();
-        $max_points_by_amount = $max_discount_amount / $point_value;
+        // 計算最大可用點數（使用與驗證相同的計算方法確保一致性）
+        $max_points_by_amount = $this->calculate_max_points_for_amount($max_discount_amount, $calculator);
         $max_points = min($available_points, $max_points_by_amount);
         
         $current_discount = WC()->session->get('wc_points_rewards_discount_amount', 0);
@@ -164,6 +163,40 @@ class WC_Points_Rewards_Checkout {
         $max_usable_points = $max_points;
         
         include WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/views/cart-points-section.php';
+    }
+    
+    /**
+     * 計算指定折抵金額對應的最大可用點數
+     * 使用與驗證邏輯相同的計算方法確保一致性
+     */
+    private function calculate_max_points_for_amount($max_discount_amount, $calculator) {
+        // 獲取點數價值設定
+        $point_value = wc_points_rewards_get_points_value();
+        
+        if ($point_value <= 0) {
+            return 0;
+        }
+        
+        // 使用與 calculate_discount_amount 相同的精度處理
+        $decimal_places = wc_get_price_decimals();
+        
+        // 計算理論最大點數
+        $theoretical_max_points = $max_discount_amount / $point_value;
+        
+        // 使用向下取整以確保不會超出限制
+        // 並驗證計算出的折抵金額不超過限制
+        $max_points = floor($theoretical_max_points * pow(10, $decimal_places)) / pow(10, $decimal_places);
+        
+        // 進一步驗證：確保使用 calculator 計算的折抵金額不超過限制
+        $actual_discount = $calculator->calculate_discount_amount($max_points);
+        
+        // 如果超出限制，微調點數
+        while ($actual_discount > $max_discount_amount && $max_points > 0) {
+            $max_points -= pow(10, -$decimal_places);
+            $actual_discount = $calculator->calculate_discount_amount($max_points);
+        }
+        
+        return round($max_points, $decimal_places);
     }
     
     /**
