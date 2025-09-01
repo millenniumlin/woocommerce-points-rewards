@@ -44,14 +44,29 @@ function wc_points_rewards_floatval($value) {
  * 
  * @param mixed $value 輸入值
  * @param int $decimals 小數位數 (可選，預設使用 WooCommerce 設定)
+ * @param bool $truncate 是否截斷而非四捨五入（點數顯示建議使用）
  * @return string 格式化後的數字
  */
-function wc_points_rewards_number_format($value, $decimals = null) {
+function wc_points_rewards_number_format($value, $decimals = null, $truncate = true) {
     // 如果沒有指定小數位數，使用 WooCommerce 的設定
     if ($decimals === null) {
         $decimals = wc_get_price_decimals();
     }
-    return number_format(floatval($value ?? 0), $decimals);
+    
+    $value = floatval($value ?? 0);
+    
+    // 如果要求截斷而非四捨五入，先進行截斷處理
+    if ($truncate && $decimals >= 0) {
+        if ($decimals > 0) {
+            $scale = pow(10, $decimals);
+            $value = floor($value * $scale) / $scale;
+        } else {
+            // 如果小數位數為0，直接向下取整到整數
+            $value = floor($value);
+        }
+    }
+    
+    return number_format($value, $decimals);
 }
 
 /**

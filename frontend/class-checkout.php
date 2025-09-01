@@ -156,6 +156,19 @@ class WC_Points_Rewards_Checkout {
         // 計算最大可用點數（考慮點數價值）
         $point_value = wc_points_rewards_get_points_value();
         $max_points_by_amount = $max_discount_amount / $point_value;
+        
+        // 修正：使用 WooCommerce 小數位數設定，並向下取整以確保可以實際使用
+        $decimal_places = wc_get_price_decimals();
+        
+        // 先按照小數位數處理，然後向下取整（截去小數，不四捨五入）
+        if ($decimal_places > 0) {
+            $scale = pow(10, $decimal_places);
+            $max_points_by_amount = floor($max_points_by_amount * $scale) / $scale;
+        } else {
+            // 如果小數位數為0，直接向下取整到整數
+            $max_points_by_amount = floor($max_points_by_amount);
+        }
+        
         $max_points = min($available_points, $max_points_by_amount);
         
         $current_discount = WC()->session->get('wc_points_rewards_discount_amount', 0);

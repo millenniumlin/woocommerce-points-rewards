@@ -388,7 +388,7 @@ class WC_Points_Rewards_Points_Calculator {
         }
         
         // 使用設定中的點數價值：1點 = 多少元
-        $point_value = isset($this->settings['points_value']) ? floatval($this->settings['points_value']) : 1;
+        $point_value = wc_points_rewards_get_points_value();
         
         if ($point_value <= 0) {
             return 0;
