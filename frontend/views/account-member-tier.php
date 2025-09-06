@@ -44,36 +44,42 @@ if (!defined('ABSPATH')) {
                         <?php printf(__('享有 %s 額外點數回饋', 'wc-points-rewards'), wc_points_rewards_format_percentage($current_tier->bonus_percentage)); ?>
                     </div>
                 <?php endif; ?>
-                
-                <?php if ($yearly_stats && $yearly_stats->tier_expiry_date): ?>
-                    <div class="tier-expiry">
-                        <span class="expiry-label"><?php _e('等級有效期至：', 'wc-points-rewards'); ?></span>
-                        <span class="expiry-date"><?php echo date('Y-m-d', strtotime($yearly_stats->tier_expiry_date)); ?></span>
+            </div>
+        </div>
+        
+        <!-- 年度消費金額與會員資格到期日區塊 -->
+        <div class="member-key-info-section">
+            <div class="key-info-grid">
+                <div class="key-info-item annual-spending">
+                    <div class="info-icon">💰</div>
+                    <div class="info-content">
+                        <div class="info-label"><?php printf(__('%d年度消費金額', 'wc-points-rewards'), $yearly_stats->year ?? date('Y')); ?></div>
+                        <div class="info-value"><?php echo wc_price($yearly_stats ? $yearly_stats->total_spent : 0); ?></div>
                     </div>
-                <?php endif; ?>
+                </div>
+                
+                <div class="key-info-item membership-expiry">
+                    <div class="info-icon">📅</div>
+                    <div class="info-content">
+                        <div class="info-label"><?php _e('會員資格到期日', 'wc-points-rewards'); ?></div>
+                        <div class="info-value">
+                            <?php if ($yearly_stats && $yearly_stats->tier_expiry_date): ?>
+                                <?php echo date('Y-m-d', strtotime($yearly_stats->tier_expiry_date)); ?>
+                            <?php else: ?>
+                                <span class="no-expiry"><?php _e('無到期日', 'wc-points-rewards'); ?></span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
         <?php if ($yearly_stats): ?>
         <div class="tier-stats">
             <div class="stat-item">
-                <div class="stat-label"><?php printf(__('%d年度消費', 'wc-points-rewards'), $yearly_stats->year ?? date('Y')); ?></div>
-                <div class="stat-value"><?php echo wc_price($yearly_stats->total_spent); ?></div>
-            </div>
-            
-            <div class="stat-item">
                 <div class="stat-label"><?php _e('獲得總點數', 'wc-points-rewards'); ?></div>
                 <div class="stat-value"><?php echo wc_points_rewards_number_format($yearly_stats->total_points_earned); ?> <?php echo wc_points_rewards_get_points_name(); ?></div>
             </div>
-            
-            <?php if ($yearly_stats->tier_expiry_date): ?>
-            <div class="stat-item">
-                <div class="stat-label"><?php _e('等級有效期', 'wc-points-rewards'); ?></div>
-                <div class="stat-value">
-                    <?php echo date('Y-m-d', strtotime($yearly_stats->tier_expiry_date)); ?>
-                </div>
-            </div>
-            <?php endif; ?>
         </div>
         <?php endif; ?>
     </div>
@@ -167,6 +173,59 @@ if (!defined('ABSPATH')) {
 </div>
 
 <style>
+/* 年度消費金額與會員資格到期日區塊 */
+.member-key-info-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.key-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.key-info-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.info-icon {
+    font-size: 2.5em;
+    margin-right: 15px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-label {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.no-expiry {
+    color: rgba(255,255,255,0.8);
+    font-style: italic;
+}
+
 .tier-expiry {
     margin-top: 10px;
     padding: 8px 12px;
