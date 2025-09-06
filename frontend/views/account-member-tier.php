@@ -165,3 +165,24 @@ if (!defined('ABSPATH')) {
         </ul>
     </div>
 </div>
+
+<style>
+.tier-expiry {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #f0f8ff;
+    border-left: 3px solid #007cba;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.expiry-label {
+    color: #6c757d;
+    margin-right: 5px;
+}
+
+.expiry-date {
+    font-weight: bold;
+    color: #007cba;
+}
+</style>
