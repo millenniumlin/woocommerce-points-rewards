@@ -44,6 +44,13 @@ if (!defined('ABSPATH')) {
                         <?php printf(__('享有 %s 額外點數回饋', 'wc-points-rewards'), wc_points_rewards_format_percentage($current_tier->bonus_percentage)); ?>
                     </div>
                 <?php endif; ?>
+                
+                <?php if ($yearly_stats && $yearly_stats->tier_expiry_date): ?>
+                    <div class="tier-expiry">
+                        <span class="expiry-label"><?php _e('等級有效期至：', 'wc-points-rewards'); ?></span>
+                        <span class="expiry-date"><?php echo date('Y-m-d', strtotime($yearly_stats->tier_expiry_date)); ?></span>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
         

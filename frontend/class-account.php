@@ -1029,22 +1029,6 @@ class WC_Points_Rewards_Account {
             </div>
             <?php endif; ?>
             
-            <?php if ($yearly_stats): ?>
-            <div class="yearly-stats">
-                <h4><?php printf(__('%d年消費統計', 'wc-points-rewards'), date('Y')); ?></h4>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-label"><?php _e('年度消費金額', 'wc-points-rewards'); ?></div>
-                        <div class="stat-value"><?php echo wc_price(floatval($yearly_stats->total_spent ?? 0)); ?></div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label"><?php _e('獲得總點數', 'wc-points-rewards'); ?></div>
-                        <div class="stat-value"><?php echo wc_points_rewards_number_format(floatval($yearly_stats->total_points_earned ?? 0)); ?> <?php echo wc_points_rewards_get_points_name(); ?></div>
-                    </div>
-                </div>
-            </div>
-            <?php endif; ?>
-            
             <?php if (!empty($all_tiers)): ?>
             <div class="all-tiers">
                 <h4><?php _e('會員等級說明', 'wc-points-rewards'); ?></h4>
@@ -1119,36 +1103,6 @@ class WC_Points_Rewards_Account {
             justify-content: space-between;
             font-size: 14px;
             color: #6c757d;
-        }
-        
-        .yearly-stats {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin-top: 15px;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
-        
-        .stat-value {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #495057;
         }
         
         .tiers-grid {

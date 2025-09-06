@@ -334,7 +334,15 @@ class WC_Points_Rewards_Database {
             
             $total_spent = floatval($total_spent);
             
-            // 獲取符合的最高等級
+            // 獲取用戶當前等級和最高等級
+            $current_user_tier = $this->get_user_current_tier($user_id);
+            $highest_tier = $wpdb->get_row("
+                SELECT * FROM `{$tiers_table}` 
+                ORDER BY min_amount DESC 
+                LIMIT 1
+            ");
+            
+            // 獲取符合消費金額的最高等級
             $new_tier = $wpdb->get_row($wpdb->prepare("
                 SELECT * FROM `{$tiers_table}` 
                 WHERE min_amount <= %f 
@@ -343,14 +351,34 @@ class WC_Points_Rewards_Database {
             ", $total_spent));
             
             if ($new_tier) {
+                $update_data = array(
+                    'current_tier_id' => intval($new_tier->id),
+                    'tier_start_date' => current_time('mysql'),
+                    'tier_expiry_date' => date('Y-m-d H:i:s', strtotime('+1 year'))
+                );
+                
+                // 檢查是否為最高等級續約情況
+                if ($current_user_tier && $highest_tier && 
+                    $current_user_tier->id == $highest_tier->id && 
+                    $new_tier->id == $highest_tier->id &&
+                    $total_spent >= $highest_tier->min_amount) {
+                    
+                    // 最高等級會員達到最低消費金額，延長一年會員資格
+                    $current_expiry = $wpdb->get_var($wpdb->prepare("
+                        SELECT tier_expiry_date FROM `{$stats_table}` 
+                        WHERE user_id = %d AND year = %d
+                    ", $user_id, $year));
+                    
+                    if ($current_expiry && strtotime($current_expiry) > time()) {
+                        // 如果當前還沒過期，從現有過期日延長一年
+                        $update_data['tier_expiry_date'] = date('Y-m-d H:i:s', strtotime($current_expiry . ' +1 year'));
+                    }
+                }
+                
                 // 更新用戶等級
                 $wpdb->update(
                     $stats_table,
-                    array(
-                        'current_tier_id' => intval($new_tier->id),
-                        'tier_start_date' => current_time('mysql'),
-                        'tier_expiry_date' => date('Y-m-d H:i:s', strtotime('+1 year'))
-                    ),
+                    $update_data,
                     array('user_id' => $user_id, 'year' => $year),
                     array('%d', '%s', '%s'),
                     array('%d', '%d')

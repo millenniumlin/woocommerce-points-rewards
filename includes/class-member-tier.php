@@ -176,6 +176,67 @@ class WC_Points_Rewards_Member_Tier {
     }
     
     /**
+     * 獲取最高等級
+     */
+    public function get_highest_tier() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'wc_points_rewards_tiers';
+        
+        $highest_tier = $wpdb->get_row("
+            SELECT * FROM $table_name 
+            ORDER BY min_amount DESC 
+            LIMIT 1
+        ");
+        
+        return $highest_tier;
+    }
+    
+    /**
+     * 獲取指定等級的前一個等級
+     */
+    public function get_previous_tier($current_tier_id) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'wc_points_rewards_tiers';
+        
+        // 先獲取當前等級的min_amount
+        $current_tier = $wpdb->get_row($wpdb->prepare("
+            SELECT * FROM $table_name 
+            WHERE id = %d
+        ", $current_tier_id));
+        
+        if (!$current_tier) {
+            return null;
+        }
+        
+        // 獲取比當前等級min_amount小的最大等級
+        $previous_tier = $wpdb->get_row($wpdb->prepare("
+            SELECT * FROM $table_name 
+            WHERE min_amount < %f 
+            ORDER BY min_amount DESC 
+            LIMIT 1
+        ", $current_tier->min_amount));
+        
+        return $previous_tier;
+    }
+    
+    /**
+     * 檢查用戶是否在最高等級
+     */
+    public function is_user_at_highest_tier($user_id) {
+        $database = WC_Points_Rewards_Database::instance();
+        $current_tier = $database->get_user_current_tier($user_id);
+        $highest_tier = $this->get_highest_tier();
+        
+        if (!$current_tier || !$highest_tier) {
+            return false;
+        }
+        
+        return $current_tier->id === $highest_tier->id;
+    }
+    
+    /**
      * 獲取用戶距離下一等級還需的消費金額
      */
     public function get_amount_to_next_tier($user_id) {
@@ -217,7 +278,6 @@ class WC_Points_Rewards_Member_Tier {
         ");
         
         foreach ($expired_members as $member) {
-            // 重新計算等級（基於當前年度消費）
             $current_year = date('Y');
             $current_spent = $wpdb->get_var($wpdb->prepare("
                 SELECT total_spent FROM $stats_table 
@@ -226,13 +286,78 @@ class WC_Points_Rewards_Member_Tier {
             
             $current_spent = $current_spent ? floatval($current_spent) : 0;
             
-            // 獲取符合的等級
-            $new_tier = $wpdb->get_row($wpdb->prepare("
+            // 獲取最高等級
+            $highest_tier = $wpdb->get_row("
                 SELECT * FROM $tiers_table 
-                WHERE min_amount <= %f 
                 ORDER BY min_amount DESC 
                 LIMIT 1
-            ", $current_spent));
+            ");
+            
+            // 獲取當前會員等級
+            $current_member_tier = $wpdb->get_row($wpdb->prepare("
+                SELECT * FROM $tiers_table 
+                WHERE id = %d
+            ", $member->current_tier_id));
+            
+            $new_tier = null;
+            
+            // 檢查是否為最高等級會員
+            if ($highest_tier && $current_member_tier && $current_member_tier->id == $highest_tier->id) {
+                // 最高等級會員：只有當消費達到最低要求時才能維持等級
+                if ($current_spent >= $highest_tier->min_amount) {
+                    $new_tier = $highest_tier;
+                } else {
+                    // 降至符合消費的等級
+                    $new_tier = $wpdb->get_row($wpdb->prepare("
+                        SELECT * FROM $tiers_table 
+                        WHERE min_amount <= %f 
+                        ORDER BY min_amount DESC 
+                        LIMIT 1
+                    ", $current_spent));
+                }
+            } else {
+                // 非最高等級會員：檢查是否有消費但未升級
+                if ($current_spent > 0) {
+                    // 獲取下一等級
+                    $next_tier = $wpdb->get_row($wpdb->prepare("
+                        SELECT * FROM $tiers_table 
+                        WHERE min_amount > %f 
+                        ORDER BY min_amount ASC 
+                        LIMIT 1
+                    ", $current_member_tier->min_amount));
+                    
+                    // 如果有消費但未達到下一等級，自動降一級
+                    if ($next_tier && $current_spent < $next_tier->min_amount) {
+                        $previous_tier = $this->get_previous_tier($member->current_tier_id);
+                        if ($previous_tier) {
+                            $new_tier = $previous_tier;
+                        } else {
+                            // 沒有更低等級，重新計算符合的等級
+                            $new_tier = $wpdb->get_row($wpdb->prepare("
+                                SELECT * FROM $tiers_table 
+                                WHERE min_amount <= %f 
+                                ORDER BY min_amount DESC 
+                                LIMIT 1
+                            ", $current_spent));
+                        }
+                    } else {
+                        // 重新計算符合的等級
+                        $new_tier = $wpdb->get_row($wpdb->prepare("
+                            SELECT * FROM $tiers_table 
+                            WHERE min_amount <= %f 
+                            ORDER BY min_amount DESC 
+                            LIMIT 1
+                        ", $current_spent));
+                    }
+                } else {
+                    // 沒有消費，降至最低等級
+                    $new_tier = $wpdb->get_row("
+                        SELECT * FROM $tiers_table 
+                        ORDER BY min_amount ASC 
+                        LIMIT 1
+                    ");
+                }
+            }
             
             if ($new_tier) {
                 // 更新會員等級
