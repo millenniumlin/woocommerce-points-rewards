@@ -470,16 +470,33 @@ class WC_Points_Rewards_Account {
         $orders_table = $wpdb->prefix . 'posts';
         $order_meta_table = $wpdb->prefix . 'postmeta';
         
+        // 首先嘗試原始查詢，但修正數據類型
         $actual_spent = $wpdb->get_var($wpdb->prepare("
-            SELECT SUM(ot.meta_value) 
+            SELECT SUM(CAST(ot.meta_value AS DECIMAL(10,2))) 
             FROM $orders_table p
             INNER JOIN $order_meta_table ot ON p.ID = ot.post_id AND ot.meta_key = '_order_total'
             INNER JOIN $order_meta_table cu ON p.ID = cu.post_id AND cu.meta_key = '_customer_user'
             WHERE p.post_type = 'shop_order'
             AND p.post_status IN ('wc-completed', 'wc-processing')
-            AND cu.meta_value = %d
+            AND cu.meta_value = %s
             AND YEAR(p.post_date) = %d
         ", $user_id, $selected_year));
+        
+        // 如果沒有結果，嘗試更寬鬆的查詢
+        if (!$actual_spent) {
+            $actual_spent = $wpdb->get_var($wpdb->prepare("
+                SELECT SUM(CAST(ot.meta_value AS DECIMAL(10,2))) 
+                FROM $orders_table p
+                LEFT JOIN $order_meta_table ot ON p.ID = ot.post_id AND ot.meta_key = '_order_total'
+                LEFT JOIN $order_meta_table cu ON p.ID = cu.post_id AND cu.meta_key = '_customer_user'
+                WHERE p.post_type = 'shop_order'
+                AND p.post_status IN ('wc-completed', 'wc-processing')
+                AND cu.meta_value = %s
+                AND YEAR(p.post_date) = %d
+                AND ot.meta_value IS NOT NULL
+                AND ot.meta_value > 0
+            ", $user_id, $selected_year));
+        }
         
         // 獲取總點數
         $points_table = $wpdb->prefix . 'wc_points_rewards_points';
@@ -508,7 +525,8 @@ class WC_Points_Rewards_Account {
             $yearly_stats->total_points_earned = floatval($total_points_earned ?? 0);
         }
         
-        $this->render_member_tier($current_tier, $all_tiers, $tier_progress, $yearly_stats);
+        // Load the template file with the variables available
+        include WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/views/account-member-tier.php';
     }
     
     /**
