@@ -466,18 +466,18 @@ class WC_Points_Rewards_Account {
             WHERE user_id = %d AND year = %d
         ", $user_id, $selected_year));
         
-        // 同時從訂單表中獲取真實的消費金額
+        // 修正：從訂單表中獲取真實的消費金額，使用正確的客戶ID關聯
         $orders_table = $wpdb->prefix . 'posts';
         $order_meta_table = $wpdb->prefix . 'postmeta';
         
         $actual_spent = $wpdb->get_var($wpdb->prepare("
-            SELECT SUM(pm.meta_value) 
+            SELECT SUM(ot.meta_value) 
             FROM $orders_table p
-            INNER JOIN $order_meta_table pm ON p.ID = pm.post_id
+            INNER JOIN $order_meta_table ot ON p.ID = ot.post_id AND ot.meta_key = '_order_total'
+            INNER JOIN $order_meta_table cu ON p.ID = cu.post_id AND cu.meta_key = '_customer_user'
             WHERE p.post_type = 'shop_order'
             AND p.post_status IN ('wc-completed', 'wc-processing')
-            AND pm.meta_key = '_order_total'
-            AND p.post_author = %d
+            AND cu.meta_value = %d
             AND YEAR(p.post_date) = %d
         ", $user_id, $selected_year));
         
@@ -1001,6 +1001,14 @@ class WC_Points_Rewards_Account {
                                 <span class="benefit-item">+<?php echo esc_html(wc_points_rewards_format_percentage($current_tier->bonus_percentage)); ?> <?php _e('點數回饋', 'wc-points-rewards'); ?></span>
                             <?php endif; ?>
                         </div>
+                        
+                        <!-- 會員到期日 -->
+                        <?php if ($yearly_stats && $yearly_stats->tier_expiry_date): ?>
+                        <div class="tier-expiry-info">
+                            <span class="expiry-label"><?php _e('會員到期日', 'wc-points-rewards'); ?>：</span>
+                            <span class="expiry-date"><?php echo date('Y/m/d', strtotime($yearly_stats->tier_expiry_date)); ?></span>
+                        </div>
+                        <?php endif; ?>
                     <?php else: ?>
                         <div class="tier-name-badge"><?php _e('一般會員', 'wc-points-rewards'); ?>
                             <span class="current-badge"><?php _e('目前等級', 'wc-points-rewards'); ?></span>
@@ -1009,6 +1017,14 @@ class WC_Points_Rewards_Account {
                         <div class="tier-benefits-info">
                             <span class="benefit-item"><?php _e('標準回饋', 'wc-points-rewards'); ?></span>
                         </div>
+                        
+                        <!-- 會員到期日 -->
+                        <?php if ($yearly_stats && $yearly_stats->tier_expiry_date): ?>
+                        <div class="tier-expiry-info">
+                            <span class="expiry-label"><?php _e('會員到期日', 'wc-points-rewards'); ?>：</span>
+                            <span class="expiry-date"><?php echo date('Y/m/d', strtotime($yearly_stats->tier_expiry_date)); ?></span>
+                        </div>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -1185,6 +1201,25 @@ class WC_Points_Rewards_Account {
         .tier-bonus {
             color: #28a745;
             font-weight: bold;
+        }
+        
+        .tier-expiry-info {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .tier-expiry-info .expiry-label {
+            color: #856404;
+            font-weight: bold;
+        }
+        
+        .tier-expiry-info .expiry-date {
+            color: #856404;
+            font-weight: normal;
         }
         </style>
         <?php
