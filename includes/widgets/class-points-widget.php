@@ -72,7 +72,7 @@ class WC_Points_Rewards_Widget extends WP_Widget {
             echo '<div class="progress-fill" style="width: ' . $tier_progress['progress_percentage'] . '%"></div>';
             echo '</div>';
             echo '<div class="progress-amount">';
-            printf(__('還需 %s', 'wc-points-rewards'), wc_price($tier_progress['amount_to_next']));
+            printf(__('還需 %s', 'wc-points-rewards'), wc_price(floatval($tier_progress['amount_to_next'] ?? 0)));
             echo '</div>';
             echo '</div>';
         }

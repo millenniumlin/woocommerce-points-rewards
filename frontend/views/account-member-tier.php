@@ -93,7 +93,7 @@ if (!defined('ABSPATH')) {
             </div>
             
             <div class="remaining-amount">
-                <?php printf(__('還需消費 %s', 'wc-points-rewards'), '<strong>' . wc_price($tier_progress['amount_to_next']) . '</strong>'); ?>
+                <?php printf(__('還需消費 %s', 'wc-points-rewards'), '<strong>' . wc_price(floatval($tier_progress['amount_to_next'] ?? 0)) . '</strong>'); ?>
             </div>
         </div>
         
