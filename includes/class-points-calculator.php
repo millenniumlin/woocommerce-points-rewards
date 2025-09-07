@@ -142,8 +142,9 @@ class WC_Points_Rewards_Points_Calculator {
             // 標記已發放點數
             update_post_meta($order_id, '_points_awarded', $total_points);
             
-            // 更新年度消費統計
-            $database->update_user_yearly_stats($user_id, $order_total);
+            // 更新年度消費統計 - 使用實際付款金額（扣除點數折抵）
+            $actual_paid_amount = $order_total - floatval($used_points_amount);
+            $database->update_user_yearly_stats($user_id, $actual_paid_amount);
             
             // 發送通知
             $this->send_points_notification($user_id, $total_points, $order);

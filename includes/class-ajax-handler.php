@@ -166,9 +166,12 @@ class WC_Points_Rewards_Ajax_Handler {
                         // 標記訂單已處理
                         update_post_meta($order->get_id(), '_points_awarded', $points);
                         
-                        // 更新年度消費統計
+                        // 更新年度消費統計 - 使用實際付款金額（扣除點數折抵）
                         if (method_exists($database, 'update_user_yearly_stats')) {
-                            $database->update_user_yearly_stats($user_id, $order->get_total());
+                            $order_total = $order->get_total();
+                            $points_discount = get_post_meta($order->get_id(), '_points_discount_amount', true);
+                            $actual_paid_amount = $order_total - floatval($points_discount);
+                            $database->update_user_yearly_stats($user_id, $actual_paid_amount);
                         }
                         
                         $processed_count++;

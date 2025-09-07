@@ -466,17 +466,21 @@ class WC_Points_Rewards_Account {
             WHERE user_id = %d AND year = %d
         ", $user_id, $selected_year));
         
-        // 修正：從訂單表中獲取真實的消費金額，使用正確的客戶ID關聯
+        // 修正：從訂單表中獲取真實的消費金額，使用正確的客戶ID關聯，並扣除點數折抵部分
         $orders_table = $wpdb->prefix . 'posts';
         $order_meta_table = $wpdb->prefix . 'postmeta';
         
         $actual_spent = $wpdb->get_var($wpdb->prepare("
-            SELECT SUM(ot.meta_value) 
+            SELECT SUM(
+                CAST(ot.meta_value AS DECIMAL(10,2)) - 
+                COALESCE(CAST(pd.meta_value AS DECIMAL(10,2)), 0)
+            ) 
             FROM $orders_table p
             INNER JOIN $order_meta_table ot ON p.ID = ot.post_id AND ot.meta_key = '_order_total'
             INNER JOIN $order_meta_table cu ON p.ID = cu.post_id AND cu.meta_key = '_customer_user'
+            LEFT JOIN $order_meta_table pd ON p.ID = pd.post_id AND pd.meta_key = '_points_discount_amount'
             WHERE p.post_type = 'shop_order'
-            AND p.post_status IN ('wc-completed', 'wc-processing')
+            AND p.post_status = 'wc-completed'
             AND cu.meta_value = %d
             AND YEAR(p.post_date) = %d
         ", $user_id, $selected_year));
