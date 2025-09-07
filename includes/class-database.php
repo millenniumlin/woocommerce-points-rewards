@@ -262,6 +262,15 @@ class WC_Points_Rewards_Database {
     
     /**
      * 更新用戶年度消費統計
+     * 
+     * 此方法是會員等級升級的主要觸發點：
+     * 1. 更新或創建用戶年度消費記錄
+     * 2. 自動觸發等級升級檢查
+     * 3. 支援多年度統計追蹤
+     * 
+     * @param int $user_id 用戶ID
+     * @param float $amount 消費金額
+     * @param int|null $year 統計年份（null時使用當前年份）
      */
     public function update_user_yearly_stats($user_id, $amount, $year = null) {
         global $wpdb;
@@ -272,21 +281,21 @@ class WC_Points_Rewards_Database {
         
         $table_name = $wpdb->prefix . 'wc_points_rewards_user_stats';
         
-        // 檢查是否已存在記錄
+        // 檢查是否已存在該用戶該年度的記錄
         $existing = $wpdb->get_row($wpdb->prepare("
             SELECT * FROM $table_name 
             WHERE user_id = %d AND year = %d
         ", $user_id, $year));
         
         if ($existing) {
-            // 更新現有記錄
+            // 更新現有記錄 - 累加消費金額
             $wpdb->update(
                 $table_name,
                 array('total_spent' => $existing->total_spent + $amount),
                 array('user_id' => $user_id, 'year' => $year)
             );
         } else {
-            // 插入新記錄
+            // 插入新記錄 - 創建該用戶該年度的首筆記錄
             $wpdb->insert(
                 $table_name,
                 array(
@@ -297,16 +306,28 @@ class WC_Points_Rewards_Database {
             );
         }
         
-        // 檢查會員等級升級
+        // 重要：每次更新消費統計後，自動檢查是否符合等級升級條件
         $this->check_tier_upgrade($user_id, $year);
     }
     
     /**
-     * 檢查會員等級升級 - 添加鎖定機制防止競態條件
+     * 檢查會員等級升級
+     * 
+     * 升級邏輯說明：
+     * 1. 根據用戶年度累積消費金額判斷是否符合更高等級條件
+     * 2. 使用資料庫鎖定機制防止併發處理導致的數據不一致
+     * 3. 自動升級至符合條件的最高等級
+     * 4. 設定等級有效期為1年（從升級時間開始計算）
+     * 5. 觸發升級通知機制
+     * 
+     * @param int $user_id 用戶ID
+     * @param int $year 統計年份
+     * @return bool 是否成功升級
      */
     private function check_tier_upgrade($user_id, $year) {
         global $wpdb;
         
+        // 參數驗證
         $user_id = intval($user_id);
         $year = intval($year);
         
@@ -317,7 +338,8 @@ class WC_Points_Rewards_Database {
         $stats_table = $wpdb->prefix . 'wc_points_rewards_user_stats';
         $tiers_table = $wpdb->prefix . 'wc_points_rewards_tiers';
         
-        // 使用資料庫鎖定防止競態條件
+        // 步驟1: 使用資料庫鎖定防止競爭條件
+        // 確保同一用戶同一年份的等級檢查不會同時進行
         $lock_name = "wc_points_tier_upgrade_{$user_id}_{$year}";
         $lock_acquired = $wpdb->get_var($wpdb->prepare("SELECT GET_LOCK(%s, 10)", $lock_name));
         
@@ -326,7 +348,7 @@ class WC_Points_Rewards_Database {
         }
         
         try {
-            // 獲取用戶年度消費總額
+            // 步驟2: 獲取用戶當年累積消費總額
             $total_spent = $wpdb->get_var($wpdb->prepare("
                 SELECT COALESCE(total_spent, 0) FROM `{$stats_table}` 
                 WHERE user_id = %d AND year = %d
@@ -334,7 +356,9 @@ class WC_Points_Rewards_Database {
             
             $total_spent = floatval($total_spent);
             
-            // 獲取符合的最高等級
+            // 步驟3: 尋找符合條件的最高等級
+            // 查詢最低消費要求 <= 用戶實際消費的等級
+            // 按最低消費要求降序排列，取第一個（即最高等級）
             $new_tier = $wpdb->get_row($wpdb->prepare("
                 SELECT * FROM `{$tiers_table}` 
                 WHERE min_amount <= %f 
@@ -343,26 +367,26 @@ class WC_Points_Rewards_Database {
             ", $total_spent));
             
             if ($new_tier) {
-                // 更新用戶等級
+                // 步驟4: 執行等級升級
                 $wpdb->update(
                     $stats_table,
                     array(
-                        'current_tier_id' => intval($new_tier->id),
-                        'tier_start_date' => current_time('mysql'),
-                        'tier_expiry_date' => date('Y-m-d H:i:s', strtotime('+1 year'))
+                        'current_tier_id' => intval($new_tier->id),     // 新等級ID
+                        'tier_start_date' => current_time('mysql'),     // 等級開始時間
+                        'tier_expiry_date' => date('Y-m-d H:i:s', strtotime('+1 year')) // 過期時間（1年後）
                     ),
                     array('user_id' => $user_id, 'year' => $year),
                     array('%d', '%s', '%s'),
                     array('%d', '%d')
                 );
                 
-                // 觸發等級升級動作
+                // 步驟5: 觸發升級通知和相關處理
                 do_action('wc_points_rewards_tier_upgraded', $user_id, $new_tier);
                 return true;
             }
             
         } finally {
-            // 釋放鎖定
+            // 步驟6: 釋放資料庫鎖定
             $wpdb->query($wpdb->prepare("SELECT RELEASE_LOCK(%s)", $lock_name));
         }
         
