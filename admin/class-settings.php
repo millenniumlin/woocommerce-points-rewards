@@ -89,6 +89,7 @@ class WC_Points_Rewards_Settings {
         // 通知設定
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_enable_notifications');
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_expiry_notification_days');
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_enable_birthday_notification');
     }
     
     /**
@@ -284,6 +285,17 @@ class WC_Points_Rewards_Settings {
                                 <p class="description"><?php _e('在點數到期前幾天發送提醒', 'wc-points-rewards'); ?></p>
                             </td>
                         </tr>
+                        
+                        <tr>
+                            <th scope="row">
+                                <label for="enable_birthday_notification"><?php _e('生日點數通知', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="checkbox" id="enable_birthday_notification" name="wc_points_rewards_enable_birthday_notification" value="yes" 
+                                       <?php checked($settings['enable_birthday_notification'], 'yes'); ?>>
+                                <p class="description"><?php _e('發放生日點數時自動發送通知郵件', 'wc-points-rewards'); ?></p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 
@@ -315,6 +327,7 @@ class WC_Points_Rewards_Settings {
             'tier_period' => get_option('wc_points_rewards_tier_period', 'yearly'),
             'enable_notifications' => get_option('wc_points_rewards_enable_notifications', 'yes'),
             'expiry_notification_days' => get_option('wc_points_rewards_expiry_notification_days', '30'),
+            'enable_birthday_notification' => get_option('wc_points_rewards_enable_birthday_notification', 'yes'),
         );
     }
     
@@ -347,7 +360,8 @@ class WC_Points_Rewards_Settings {
             'enable_tiers' => array('type' => 'checkbox', 'default' => 'yes'),
             'tier_period' => array('type' => 'text', 'default' => 'yearly'),
             'enable_notifications' => array('type' => 'checkbox', 'default' => 'yes'),
-            'expiry_notification_days' => array('type' => 'integer', 'min' => 1, 'max' => 365, 'default' => 30)
+            'expiry_notification_days' => array('type' => 'integer', 'min' => 1, 'max' => 365, 'default' => 30),
+            'enable_birthday_notification' => array('type' => 'checkbox', 'default' => 'yes')
         );
         
         $errors = array();

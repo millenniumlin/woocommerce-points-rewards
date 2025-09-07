@@ -267,6 +267,47 @@ class WC_Points_Rewards_Notifications {
     }
     
     /**
+     * 發送生日點數通知
+     */
+    public function send_birthday_points_notification($user_id, $points) {
+        // 檢查是否啟用生日通知
+        $enable_birthday_notification = get_option('wc_points_rewards_enable_birthday_notification', 'yes');
+        if ($enable_birthday_notification !== 'yes') {
+            return;
+        }
+        
+        $user = get_user_by('id', $user_id);
+        if (!$user) {
+            return;
+        }
+        
+        $subject = __('生日快樂！您獲得了生日贈送點數', 'wc-points-rewards');
+        
+        // 取得點數有效期限
+        $expiry_months = get_option('wc_points_rewards_points_expiry_months', 12);
+        $expiry_text = '';
+        if ($expiry_months > 0) {
+            $expiry_date = date('Y-m-d', strtotime("+{$expiry_months} months"));
+            $expiry_text = sprintf(__('<br>點數將於 %s 到期，請記得使用。', 'wc-points-rewards'), $expiry_date);
+        }
+        
+        $message = sprintf(
+            __('親愛的 %s，<br><br>🎉 生日快樂！🎂<br><br>在這個特別的日子裡，我們為您準備了 %s 點作為生日禮物！%s<br><br>立即使用點數購物：%s<br>查看我的帳戶：%s', 'wc-points-rewards'),
+            $user->display_name,
+            wc_points_rewards_number_format($points),
+            $expiry_text,
+            wc_get_page_permalink('shop'),
+            wc_get_page_permalink('myaccount')
+        );
+        
+        // 發送郵件
+        $this->send_email($user->user_email, $subject, $message);
+        
+        // 觸發自定義動作
+        do_action('wc_points_rewards_birthday_points_notification_sent', $user_id, $points);
+    }
+    
+    /**
      * 手動發送通知（管理員功能）
      */
     public function send_custom_notification($user_ids, $subject, $message) {

@@ -266,6 +266,13 @@ class WC_Points_Rewards_Points_Calculator {
                     null,
                     $expiry_date
                 );
+                
+                // 發送生日點數通知
+                $notifications = WC_Points_Rewards_Notifications::instance();
+                $notifications->send_birthday_points_notification($user_id, $points);
+                
+                // 觸發自定義動作
+                do_action('wc_points_rewards_birthday_points_awarded', $user_id, $points);
             }
         }
     }
