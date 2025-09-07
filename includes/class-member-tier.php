@@ -176,6 +176,38 @@ class WC_Points_Rewards_Member_Tier {
     }
     
     /**
+     * 獲取最高等級
+     */
+    public function get_highest_tier() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'wc_points_rewards_tiers';
+        
+        $highest_tier = $wpdb->get_row("
+            SELECT * FROM $table_name 
+            ORDER BY min_amount DESC 
+            LIMIT 1
+        ");
+        
+        return $highest_tier;
+    }
+    
+    /**
+     * 檢查用戶是否為最高等級
+     */
+    public function is_user_at_highest_tier($user_id) {
+        $database = WC_Points_Rewards_Database::instance();
+        $current_tier = $database->get_user_current_tier($user_id);
+        $highest_tier = $this->get_highest_tier();
+        
+        if (!$current_tier || !$highest_tier) {
+            return false;
+        }
+        
+        return $current_tier->id === $highest_tier->id;
+    }
+    
+    /**
      * 獲取用戶距離下一等級還需的消費金額
      */
     public function get_amount_to_next_tier($user_id) {

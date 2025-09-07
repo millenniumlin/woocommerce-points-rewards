@@ -471,13 +471,15 @@ class WC_Points_Rewards_Account {
         $order_meta_table = $wpdb->prefix . 'postmeta';
         
         $actual_spent = $wpdb->get_var($wpdb->prepare("
-            SELECT SUM(pm.meta_value) 
+            SELECT SUM(total_meta.meta_value) 
             FROM $orders_table p
-            INNER JOIN $order_meta_table pm ON p.ID = pm.post_id
+            INNER JOIN $order_meta_table customer_meta ON p.ID = customer_meta.post_id
+            INNER JOIN $order_meta_table total_meta ON p.ID = total_meta.post_id
             WHERE p.post_type = 'shop_order'
             AND p.post_status IN ('wc-completed', 'wc-processing')
-            AND pm.meta_key = '_order_total'
-            AND p.post_author = %d
+            AND customer_meta.meta_key = '_customer_user'
+            AND customer_meta.meta_value = %d
+            AND total_meta.meta_key = '_order_total'
             AND YEAR(p.post_date) = %d
         ", $user_id, $selected_year));
         

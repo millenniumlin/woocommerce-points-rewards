@@ -302,7 +302,7 @@ class WC_Points_Rewards_Database {
     }
     
     /**
-     * 檢查會員等級升級 - 添加鎖定機制防止競態條件
+     * 檢查會員等級升級 - 添加鎖定機制防止競態條件，支援最高等級延期
      */
     private function check_tier_upgrade($user_id, $year) {
         global $wpdb;
@@ -334,6 +334,19 @@ class WC_Points_Rewards_Database {
             
             $total_spent = floatval($total_spent);
             
+            // 獲取用戶當前等級
+            $current_stats = $wpdb->get_row($wpdb->prepare("
+                SELECT * FROM `{$stats_table}` 
+                WHERE user_id = %d AND year = %d
+            ", $user_id, $year));
+            
+            // 獲取最高等級
+            $highest_tier = $wpdb->get_row("
+                SELECT * FROM `{$tiers_table}` 
+                ORDER BY min_amount DESC 
+                LIMIT 1
+            ");
+            
             // 獲取符合的最高等級
             $new_tier = $wpdb->get_row($wpdb->prepare("
                 SELECT * FROM `{$tiers_table}` 
@@ -343,14 +356,35 @@ class WC_Points_Rewards_Database {
             ", $total_spent));
             
             if ($new_tier) {
+                $update_data = array(
+                    'current_tier_id' => intval($new_tier->id),
+                    'tier_start_date' => current_time('mysql'),
+                );
+                
+                // 檢查是否為最高等級的延期邏輯
+                if ($current_stats && $current_stats->current_tier_id && $highest_tier && 
+                    $current_stats->current_tier_id == $highest_tier->id && 
+                    $new_tier->id == $highest_tier->id && 
+                    $total_spent >= $highest_tier->min_amount) {
+                    
+                    // 如果用戶已經是最高等級且再次達到最高等級消費門檻，延長一年
+                    $current_expiry = $current_stats->tier_expiry_date;
+                    if ($current_expiry && strtotime($current_expiry) > time()) {
+                        // 如果現有到期日還未過，從現有到期日延長一年
+                        $update_data['tier_expiry_date'] = date('Y-m-d H:i:s', strtotime($current_expiry . ' +1 year'));
+                    } else {
+                        // 如果已過期或沒有到期日，從現在開始計算一年
+                        $update_data['tier_expiry_date'] = date('Y-m-d H:i:s', strtotime('+1 year'));
+                    }
+                } else {
+                    // 正常等級升級邏輯
+                    $update_data['tier_expiry_date'] = date('Y-m-d H:i:s', strtotime('+1 year'));
+                }
+                
                 // 更新用戶等級
                 $wpdb->update(
                     $stats_table,
-                    array(
-                        'current_tier_id' => intval($new_tier->id),
-                        'tier_start_date' => current_time('mysql'),
-                        'tier_expiry_date' => date('Y-m-d H:i:s', strtotime('+1 year'))
-                    ),
+                    $update_data,
                     array('user_id' => $user_id, 'year' => $year),
                     array('%d', '%s', '%s'),
                     array('%d', '%d')

@@ -141,6 +141,13 @@ if (!defined('ABSPATH')) {
                     <?php else: ?>
                         <span class="benefit-item"><?php _e('基礎回饋', 'wc-points-rewards'); ?></span>
                     <?php endif; ?>
+                    
+                    <?php if ($tier->id === $current_tier->id && $yearly_stats && $yearly_stats->tier_expiry_date): ?>
+                        <div class="member-expiry-date">
+                            <span class="expiry-label"><?php _e('會員到期日:', 'wc-points-rewards'); ?></span>
+                            <span class="expiry-date"><?php echo date('Y/m/d', strtotime($yearly_stats->tier_expiry_date)); ?></span>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -153,8 +160,31 @@ if (!defined('ABSPATH')) {
         <ul class="tier-rules-list">
             <li><?php _e('會員等級根據年度累積消費金額自動升級', 'wc-points-rewards'); ?></li>
             <li><?php _e('會員資格有效期為一年，到期後將重新計算等級', 'wc-points-rewards'); ?></li>
+            <li><?php _e('最高等級會員：當消費金額再次達到最高等級門檻時，可延長會員資格一年', 'wc-points-rewards'); ?></li>
             <li><?php _e('等級加成適用於購物獲得的點數回饋', 'wc-points-rewards'); ?></li>
             <li><?php _e('消費金額以實際付款金額為準（不包含點數折抵部分）', 'wc-points-rewards'); ?></li>
         </ul>
     </div>
+</div>
+
+<style>
+.member-expiry-date {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #007cba;
+}
+
+.member-expiry-date .expiry-label {
+    font-weight: bold;
+    color: #333;
+    margin-right: 8px;
+}
+
+.member-expiry-date .expiry-date {
+    color: #007cba;
+    font-weight: bold;
+}
+</style>
 </div>
