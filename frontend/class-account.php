@@ -481,6 +481,9 @@ class WC_Points_Rewards_Account {
             AND YEAR(p.post_date) = %d
         ", $user_id, $selected_year));
         
+        // 確保 actual_spent 是有效的數字
+        $actual_spent = floatval($actual_spent ?? 0);
+        
         // 獲取總點數
         $points_table = $wpdb->prefix . 'wc_points_rewards_points';
         $total_points_earned = $wpdb->get_var($wpdb->prepare("
@@ -491,21 +494,24 @@ class WC_Points_Rewards_Account {
             AND YEAR(created_at) = %d
         ", $user_id, $selected_year));
         
+        // 確保 total_points_earned 是有效的數字
+        $total_points_earned = floatval($total_points_earned ?? 0);
+        
         // 如果沒有統計數據，創建一個基本對象
         if (!$yearly_stats) {
             $yearly_stats = (object) array(
                 'user_id' => $user_id,
                 'year' => $selected_year,
-                'total_spent' => floatval($actual_spent ?? 0),
-                'total_points_earned' => floatval($total_points_earned ?? 0),
+                'total_spent' => $actual_spent,
+                'total_points_earned' => $total_points_earned,
                 'current_tier_id' => $current_tier ? $current_tier->id : null,
                 'tier_start_date' => null,
                 'tier_expiry_date' => null
             );
         } else {
             // 更新真實消費金額和點數
-            $yearly_stats->total_spent = floatval($actual_spent ?? 0);
-            $yearly_stats->total_points_earned = floatval($total_points_earned ?? 0);
+            $yearly_stats->total_spent = $actual_spent;
+            $yearly_stats->total_points_earned = $total_points_earned;
         }
         
         $this->render_member_tier($current_tier, $all_tiers, $tier_progress, $yearly_stats);
