@@ -39,6 +39,15 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
     update_option('wc_points_rewards_settings', $new_settings);
     $settings = $new_settings;
     
+    // 儲存郵件通知設定
+    update_option('wc_points_rewards_enable_emails', sanitize_text_field($_POST['enable_emails'] ?? 'yes'));
+    update_option('wc_points_rewards_enable_points_earned_notification', sanitize_text_field($_POST['enable_points_earned_notification'] ?? 'yes'));
+    update_option('wc_points_rewards_enable_welcome_notification', sanitize_text_field($_POST['enable_welcome_notification'] ?? 'yes'));
+    update_option('wc_points_rewards_enable_birthday_notification', sanitize_text_field($_POST['enable_birthday_notification'] ?? 'yes'));
+    update_option('wc_points_rewards_enable_expiry_notification', sanitize_text_field($_POST['enable_expiry_notification'] ?? 'yes'));
+    update_option('wc_points_rewards_enable_tier_expiry_notification', sanitize_text_field($_POST['enable_tier_expiry_notification'] ?? 'yes'));
+    update_option('wc_points_rewards_enable_tier_upgrade_notification', sanitize_text_field($_POST['enable_tier_upgrade_notification'] ?? 'yes'));
+    
     echo '<div class="notice notice-success"><p>' . __('設定已儲存', 'wc-points-rewards') . '</p></div>';
 }
 ?>
@@ -182,6 +191,84 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                         <input type="number" name="min_cart_total" value="<?php echo esc_attr($settings['min_cart_total'] ?? 0); ?>" min="0" step="0.01" class="regular-text">
                         <?php echo get_woocommerce_currency_symbol(); ?>
                         <p class="description"><?php _e('購物車金額需達到此數額才能使用點數折抵（設定為0表示無限制）', 'wc-points-rewards'); ?></p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- 郵件通知設定 -->
+        <div class="settings-section">
+            <h2><?php _e('郵件通知設定', 'wc-points-rewards'); ?></h2>
+            
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><?php _e('啟用郵件通知', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="enable_emails" value="yes" <?php checked(get_option('wc_points_rewards_enable_emails', 'yes'), 'yes'); ?>>
+                            <strong><?php _e('啟用所有郵件通知功能', 'wc-points-rewards'); ?></strong>
+                        </label>
+                        <p class="description"><?php _e('關閉此選項將停止發送所有點數相關的郵件通知', 'wc-points-rewards'); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('點數獲得通知', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="enable_points_earned_notification" value="yes" <?php checked(get_option('wc_points_rewards_enable_points_earned_notification', 'yes'), 'yes'); ?>>
+                            <?php _e('當用戶獲得點數時發送通知', 'wc-points-rewards'); ?>
+                        </label>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('註冊歡迎通知', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="enable_welcome_notification" value="yes" <?php checked(get_option('wc_points_rewards_enable_welcome_notification', 'yes'), 'yes'); ?>>
+                            <?php _e('當用戶註冊並獲得歡迎點數時發送通知', 'wc-points-rewards'); ?>
+                        </label>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('生日點數通知', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="enable_birthday_notification" value="yes" <?php checked(get_option('wc_points_rewards_enable_birthday_notification', 'yes'), 'yes'); ?>>
+                            <?php _e('當用戶生日獲得點數時發送通知', 'wc-points-rewards'); ?>
+                        </label>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('點數到期提醒', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="enable_expiry_notification" value="yes" <?php checked(get_option('wc_points_rewards_enable_expiry_notification', 'yes'), 'yes'); ?>>
+                            <?php _e('當用戶的點數即將到期時發送提醒', 'wc-points-rewards'); ?>
+                        </label>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('等級到期提醒', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="enable_tier_expiry_notification" value="yes" <?php checked(get_option('wc_points_rewards_enable_tier_expiry_notification', 'yes'), 'yes'); ?>>
+                            <?php _e('當會員等級即將到期時發送提醒', 'wc-points-rewards'); ?>
+                        </label>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('等級升級通知', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="enable_tier_upgrade_notification" value="yes" <?php checked(get_option('wc_points_rewards_enable_tier_upgrade_notification', 'yes'), 'yes'); ?>>
+                            <?php _e('當會員升級等級時發送通知', 'wc-points-rewards'); ?>
+                        </label>
                     </td>
                 </tr>
             </table>

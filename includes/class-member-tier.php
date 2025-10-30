@@ -268,6 +268,18 @@ class WC_Points_Rewards_Member_Tier {
      * 發送等級升級通知
      */
     public function send_tier_upgrade_notification($user_id, $new_tier) {
+        // 檢查全域郵件開關
+        $enable_emails = get_option('wc_points_rewards_enable_emails', 'yes');
+        if ($enable_emails !== 'yes') {
+            return;
+        }
+        
+        // 檢查等級升級通知開關
+        $enable_tier_upgrade = get_option('wc_points_rewards_enable_tier_upgrade_notification', 'yes');
+        if ($enable_tier_upgrade !== 'yes') {
+            return;
+        }
+        
         $user = get_user_by('id', $user_id);
         if (!$user) {
             return;

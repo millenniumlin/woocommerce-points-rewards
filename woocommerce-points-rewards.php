@@ -126,6 +126,9 @@ class WC_Points_Rewards {
         if (file_exists(WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/class-reports.php')) {
             require_once WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/class-reports.php';
         }
+        if (file_exists(WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/class-data-manager.php')) {
+            require_once WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/class-data-manager.php';
+        }
         
         // 前端功能
         if (file_exists(WC_POINTS_REWARDS_PLUGIN_DIR . 'frontend/class-frontend.php')) {
@@ -173,6 +176,9 @@ class WC_Points_Rewards {
             }
             if (class_exists('WC_Points_Rewards_Reports')) {
                 WC_Points_Rewards_Reports::instance();
+            }
+            if (class_exists('WC_Points_Rewards_Data_Manager')) {
+                WC_Points_Rewards_Data_Manager::instance();
             }
         }
         

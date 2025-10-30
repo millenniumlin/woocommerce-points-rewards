@@ -97,6 +97,15 @@ class WC_Points_Rewards_Admin {
         
         add_submenu_page(
             'wc-points-rewards',
+            __('資料管理', 'wc-points-rewards'),
+            __('資料管理', 'wc-points-rewards'),
+            'manage_woocommerce',
+            'wc-points-rewards-data',
+            array($this, 'admin_data_management_page')
+        );
+        
+        add_submenu_page(
+            'wc-points-rewards',
             __('會員等級', 'wc-points-rewards'),
             __('會員等級', 'wc-points-rewards'),
             'manage_woocommerce',
@@ -336,6 +345,18 @@ class WC_Points_Rewards_Admin {
         }
         
         include WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/views/historical-orders.php';
+    }
+    
+    /**
+     * 資料管理頁面
+     */
+    public function admin_data_management_page() {
+        // 安全檢查
+        if (!current_user_can('manage_woocommerce')) {
+            wp_die(__('您沒有權限訪問此頁面', 'wc-points-rewards'));
+        }
+        
+        include WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/views/data-management.php';
     }
     
     /**
