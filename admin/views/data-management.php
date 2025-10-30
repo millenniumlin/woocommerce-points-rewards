@@ -11,13 +11,26 @@ if (!defined('ABSPATH')) {
 
 // 處理匯入結果訊息
 if (isset($_GET['import'])) {
-    if ($_GET['import'] === 'success') {
+    $import_status = sanitize_text_field($_GET['import']);
+    
+    if ($import_status === 'success') {
         $imported = isset($_GET['imported']) ? intval($_GET['imported']) : 0;
         echo '<div class="notice notice-success is-dismissible"><p>' . 
-             sprintf(__('成功匯入 %d 筆資料', 'wc-points-rewards'), $imported) . 
+             sprintf(esc_html__('成功匯入 %d 筆資料', 'wc-points-rewards'), $imported) . 
              '</p></div>';
-    } elseif ($_GET['import'] === 'error') {
-        $message = isset($_GET['message']) ? sanitize_text_field($_GET['message']) : __('匯入失敗', 'wc-points-rewards');
+    } elseif ($import_status === 'error') {
+        // 使用預定義的錯誤訊息，避免顯示任意用戶輸入
+        $allowed_messages = array(
+            'file_upload_failed' => __('檔案上傳失敗', 'wc-points-rewards'),
+            'file_too_large' => __('檔案大小超過限制（最大 10MB）', 'wc-points-rewards'),
+            'invalid_json' => __('無效的 JSON 格式', 'wc-points-rewards'),
+            'invalid_format' => __('無效的匯入檔案格式', 'wc-points-rewards'),
+            'import_failed' => __('匯入失敗', 'wc-points-rewards')
+        );
+        
+        $message_key = isset($_GET['message']) ? sanitize_key($_GET['message']) : 'import_failed';
+        $message = isset($allowed_messages[$message_key]) ? $allowed_messages[$message_key] : $allowed_messages['import_failed'];
+        
         echo '<div class="notice notice-error is-dismissible"><p>' . 
              esc_html($message) . 
              '</p></div>';

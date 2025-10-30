@@ -39,14 +39,21 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
     update_option('wc_points_rewards_settings', $new_settings);
     $settings = $new_settings;
     
-    // 儲存郵件通知設定
-    update_option('wc_points_rewards_enable_emails', sanitize_text_field($_POST['enable_emails'] ?? 'yes'));
-    update_option('wc_points_rewards_enable_points_earned_notification', sanitize_text_field($_POST['enable_points_earned_notification'] ?? 'yes'));
-    update_option('wc_points_rewards_enable_welcome_notification', sanitize_text_field($_POST['enable_welcome_notification'] ?? 'yes'));
-    update_option('wc_points_rewards_enable_birthday_notification', sanitize_text_field($_POST['enable_birthday_notification'] ?? 'yes'));
-    update_option('wc_points_rewards_enable_expiry_notification', sanitize_text_field($_POST['enable_expiry_notification'] ?? 'yes'));
-    update_option('wc_points_rewards_enable_tier_expiry_notification', sanitize_text_field($_POST['enable_tier_expiry_notification'] ?? 'yes'));
-    update_option('wc_points_rewards_enable_tier_upgrade_notification', sanitize_text_field($_POST['enable_tier_upgrade_notification'] ?? 'yes'));
+    // 儲存郵件通知設定 - 使用嚴格的布林值驗證
+    $email_settings = array(
+        'enable_emails',
+        'enable_points_earned_notification',
+        'enable_welcome_notification',
+        'enable_birthday_notification',
+        'enable_expiry_notification',
+        'enable_tier_expiry_notification',
+        'enable_tier_upgrade_notification'
+    );
+    
+    foreach ($email_settings as $setting) {
+        $value = (isset($_POST[$setting]) && $_POST[$setting] === 'yes') ? 'yes' : 'no';
+        update_option('wc_points_rewards_' . $setting, $value);
+    }
     
     echo '<div class="notice notice-success"><p>' . __('設定已儲存', 'wc-points-rewards') . '</p></div>';
 }

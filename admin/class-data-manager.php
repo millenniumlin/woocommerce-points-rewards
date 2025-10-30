@@ -172,8 +172,12 @@ class WC_Points_Rewards_Data_Manager {
             wp_die(__('安全驗證失敗', 'wc-points-rewards'));
         }
         
-        // 獲取匯出類型
+        // 獲取並驗證匯出類型
         $export_type = isset($_POST['export_type']) ? sanitize_text_field($_POST['export_type']) : 'all';
+        $allowed_types = array('all', 'points', 'tiers', 'user_stats', 'settings');
+        if (!in_array($export_type, $allowed_types, true)) {
+            $export_type = 'all';
+        }
         
         // 記錄安全事件
         if (class_exists('WC_Points_Rewards_Security')) {
@@ -260,7 +264,18 @@ class WC_Points_Rewards_Data_Manager {
             wp_redirect(add_query_arg(array(
                 'page' => 'wc-points-rewards-data',
                 'import' => 'error',
-                'message' => urlencode(__('檔案上傳失敗', 'wc-points-rewards'))
+                'message' => 'file_upload_failed'
+            ), admin_url('admin.php')));
+            exit;
+        }
+        
+        // 驗證檔案大小 (限制 10MB)
+        $max_file_size = 10 * 1024 * 1024; // 10MB
+        if ($_FILES['import_file']['size'] > $max_file_size) {
+            wp_redirect(add_query_arg(array(
+                'page' => 'wc-points-rewards-data',
+                'import' => 'error',
+                'message' => 'file_too_large'
             ), admin_url('admin.php')));
             exit;
         }
@@ -274,7 +289,7 @@ class WC_Points_Rewards_Data_Manager {
             wp_redirect(add_query_arg(array(
                 'page' => 'wc-points-rewards-data',
                 'import' => 'error',
-                'message' => urlencode(__('無效的 JSON 格式', 'wc-points-rewards'))
+                'message' => 'invalid_json'
             ), admin_url('admin.php')));
             exit;
         }
@@ -284,7 +299,7 @@ class WC_Points_Rewards_Data_Manager {
             wp_redirect(add_query_arg(array(
                 'page' => 'wc-points-rewards-data',
                 'import' => 'error',
-                'message' => urlencode(__('無效的匯入檔案格式', 'wc-points-rewards'))
+                'message' => 'invalid_format'
             ), admin_url('admin.php')));
             exit;
         }
@@ -311,7 +326,7 @@ class WC_Points_Rewards_Data_Manager {
             wp_redirect(add_query_arg(array(
                 'page' => 'wc-points-rewards-data',
                 'import' => 'error',
-                'message' => urlencode($result['message'])
+                'message' => 'import_failed'
             ), admin_url('admin.php')));
         }
         exit;
@@ -372,8 +387,10 @@ class WC_Points_Rewards_Data_Manager {
                     }
                     
                     if (!$user) {
+                        // 安全地記錄錯誤，避免暴露敏感資訊
+                        $user_identifier = 'ID:' . intval($record['user_id'] ?? 0);
                         $errors[] = sprintf(__('找不到用戶: %s', 'wc-points-rewards'), 
-                            $record['user_login'] ?? $record['user_email'] ?? 'unknown');
+                            esc_html($user_identifier));
                         continue;
                     }
                     
@@ -447,10 +464,40 @@ class WC_Points_Rewards_Data_Manager {
                 }
             }
             
-            // 匯入設定
+            // 匯入設定 - 使用白名單驗證
             if (isset($data['settings']) && is_array($data['settings'])) {
+                $allowed_settings = array(
+                    'main_settings',
+                    'enable_notifications',
+                    'expiry_notification_days',
+                    'enable_birthday_notification',
+                    'db_version',
+                    'enable_emails',
+                    'enable_points_earned_notification',
+                    'enable_welcome_notification',
+                    'enable_expiry_notification',
+                    'enable_tier_expiry_notification',
+                    'enable_tier_upgrade_notification'
+                );
+                
                 foreach ($data['settings'] as $key => $value) {
-                    update_option('wc_points_rewards_' . $key, $value);
+                    // 只允許白名單中的設定
+                    if (in_array($key, $allowed_settings, true)) {
+                        // 根據設定類型進行適當的清理
+                        if ($key === 'main_settings' && is_array($value)) {
+                            update_option('wc_points_rewards_' . $key, $value);
+                        } elseif (in_array($key, array('enable_notifications', 'enable_birthday_notification', 'enable_emails', 'enable_points_earned_notification', 'enable_welcome_notification', 'enable_expiry_notification', 'enable_tier_expiry_notification', 'enable_tier_upgrade_notification'), true)) {
+                            // 布林值設定
+                            $sanitized = ($value === 'yes') ? 'yes' : 'no';
+                            update_option('wc_points_rewards_' . $key, $sanitized);
+                        } elseif ($key === 'expiry_notification_days') {
+                            // 整數設定
+                            update_option('wc_points_rewards_' . $key, intval($value));
+                        } elseif ($key === 'db_version') {
+                            // 版本號設定
+                            update_option('wc_points_rewards_' . $key, sanitize_text_field($value));
+                        }
+                    }
                 }
                 $imported_count++;
             }

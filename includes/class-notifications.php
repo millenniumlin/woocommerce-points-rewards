@@ -141,6 +141,12 @@ class WC_Points_Rewards_Notifications {
      * 發送點數到期通知
      */
     public function send_points_expiry_notification($user_id, $points_data) {
+        // 檢查全域郵件開關
+        $enable_emails = get_option('wc_points_rewards_enable_emails', 'yes');
+        if ($enable_emails !== 'yes') {
+            return;
+        }
+        
         // 檢查點數到期通知開關
         $enable_expiry = get_option('wc_points_rewards_enable_expiry_notification', 'yes');
         if ($enable_expiry !== 'yes') {
@@ -175,6 +181,12 @@ class WC_Points_Rewards_Notifications {
      * 發送會員等級到期通知
      */
     public function send_tier_expiry_notification($user_id, $tier_data) {
+        // 檢查全域郵件開關
+        $enable_emails = get_option('wc_points_rewards_enable_emails', 'yes');
+        if ($enable_emails !== 'yes') {
+            return;
+        }
+        
         // 檢查等級到期通知開關
         $enable_tier_expiry = get_option('wc_points_rewards_enable_tier_expiry_notification', 'yes');
         if ($enable_tier_expiry !== 'yes') {
@@ -234,6 +246,12 @@ class WC_Points_Rewards_Notifications {
      * 發送點數獲得通知
      */
     public function send_points_earned_notification($user_id, $points, $order = null) {
+        // 檢查全域郵件開關
+        $enable_emails = get_option('wc_points_rewards_enable_emails', 'yes');
+        if ($enable_emails !== 'yes') {
+            return;
+        }
+        
         // 檢查點數獲得通知開關
         $enable_points_earned = get_option('wc_points_rewards_enable_points_earned_notification', 'yes');
         if ($enable_points_earned !== 'yes') {
@@ -272,6 +290,12 @@ class WC_Points_Rewards_Notifications {
      * 發送歡迎郵件（註冊贈送點數）
      */
     public function send_welcome_points_notification($user_id, $points) {
+        // 檢查全域郵件開關
+        $enable_emails = get_option('wc_points_rewards_enable_emails', 'yes');
+        if ($enable_emails !== 'yes') {
+            return;
+        }
+        
         // 檢查註冊通知開關
         $enable_welcome = get_option('wc_points_rewards_enable_welcome_notification', 'yes');
         if ($enable_welcome !== 'yes') {
