@@ -107,11 +107,16 @@ if (!defined('ABSPATH')) {
                             <?php echo esc_html(date_i18n(get_option('date_format'), strtotime($license->created_at))); ?>
                         </td>
                         <td>
-                            <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=ml-license-keys&action=delete&id=' . $license->id), 'delete-license-' . $license->id)); ?>" 
-                               class="button button-small"
-                               onclick="return confirm('<?php echo esc_js(__('確定要刪除此授權碼嗎？', 'ml-license-manager')); ?>')">
-                                <?php echo esc_html__('刪除', 'ml-license-manager'); ?>
-                            </a>
+                            <form method="post" style="display: inline;">
+                                <?php wp_nonce_field('ml_delete_license_' . $license->id); ?>
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="license_id" value="<?php echo esc_attr($license->id); ?>">
+                                <button type="submit" 
+                                        class="button button-small"
+                                        onclick="return confirm('<?php echo esc_js(__('確定要刪除此授權碼嗎？', 'ml-license-manager')); ?>')">
+                                    <?php echo esc_html__('刪除', 'ml-license-manager'); ?>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>

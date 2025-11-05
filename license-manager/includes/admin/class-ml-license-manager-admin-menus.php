@@ -168,10 +168,10 @@ class ML_License_Manager_Admin_Menus {
         global $wpdb;
         $licenses_table = $wpdb->prefix . 'ml_license_keys';
         
-        // 處理刪除操作
-        if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
-            check_admin_referer('delete-license-' . $_GET['id']);
-            $wpdb->delete($licenses_table, array('id' => intval($_GET['id'])), array('%d'));
+        // 處理刪除操作（使用 POST 請求）
+        if (isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['license_id'])) {
+            check_admin_referer('ml_delete_license_' . $_POST['license_id']);
+            $wpdb->delete($licenses_table, array('id' => intval($_POST['license_id'])), array('%d'));
             wp_redirect(admin_url('admin.php?page=ml-license-keys&message=deleted'));
             exit;
         }

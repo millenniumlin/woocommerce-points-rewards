@@ -121,7 +121,9 @@ class ML_License_Key {
             // 生成隨機字符串
             switch ($format) {
                 case 'hex':
-                    $key = bin2hex(random_bytes($length / 2));
+                    // 確保長度為偶數
+                    $bytes_needed = (int) ceil($length / 2);
+                    $key = substr(bin2hex(random_bytes($bytes_needed)), 0, $length);
                     break;
                 case 'alphanumeric':
                 default:
@@ -265,14 +267,27 @@ class ML_License_Key {
     private function log_action($license_id, $action, $description = '') {
         global $wpdb;
         
+        $ip_address = '';
+        if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ip = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR']));
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                $ip_address = $ip;
+            }
+        }
+        
+        $user_agent = '';
+        if (isset($_SERVER['HTTP_USER_AGENT'])) {
+            $user_agent = sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT']));
+        }
+        
         $wpdb->insert(
             $this->logs_table,
             array(
                 'license_key_id' => $license_id,
                 'action' => $action,
                 'description' => $description,
-                'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
-                'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null,
+                'ip_address' => $ip_address ?: null,
+                'user_agent' => $user_agent ?: null,
             ),
             array('%d', '%s', '%s', '%s', '%s')
         );

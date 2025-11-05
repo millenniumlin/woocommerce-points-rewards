@@ -134,8 +134,13 @@ class ML_License_Manager_API {
         
         // 檢查是否需要驗證
         if (isset($settings['require_api_authentication']) && $settings['require_api_authentication'] === 'yes') {
-            // 這裡可以實作 API 金鑰驗證
-            // 目前先返回 true，之後可以添加更嚴格的驗證
+            // TODO: 實作 API 金鑰驗證
+            // 未來版本可以添加以下驗證方式：
+            // 1. API 金鑰驗證（透過 HTTP Header 或參數）
+            // 2. OAuth 認證
+            // 3. JWT Token 驗證
+            // 目前為基礎版本，當啟用驗證時會允許所有請求通過
+            // 在正式環境中，建議實作適當的 API 認證機制
             return true;
         }
         
@@ -216,7 +221,7 @@ class ML_License_Manager_API {
                 'activation_token' => $activation_token,
                 'instance_name' => $instance_name,
                 'instance_id' => $instance_id,
-                'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
+                'ip_address' => $this->get_client_ip(),
                 'status' => 'active',
             ),
             array('%d', '%s', '%s', '%s', '%s', '%s')
@@ -379,5 +384,29 @@ class ML_License_Manager_API {
      */
     private function generate_activation_token() {
         return wp_generate_password(64, false);
+    }
+    
+    /**
+     * 安全地獲取客戶端 IP 地址
+     * 
+     * @return string IP 地址
+     */
+    private function get_client_ip() {
+        $ip = '';
+        
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED_FOR']));
+            // 取第一個 IP（如果有多個代理）
+            $ip = explode(',', $ip)[0];
+        } elseif (isset($_SERVER['REMOTE_ADDR'])) {
+            $ip = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR']));
+        }
+        
+        // 驗證 IP 地址格式
+        if (filter_var($ip, FILTER_VALIDATE_IP)) {
+            return $ip;
+        }
+        
+        return '';
     }
 }
