@@ -1,0 +1,44 @@
+# Millennium License Manager - Git Ignore
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor Files
+*.sublime-project
+*.sublime-workspace
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Composer
+vendor/
+composer.lock
+
+# Build Files
+*.log
+*.cache
+dist/
+build/
+
+# Language Files (keep .po, ignore .mo and backups)
+*.mo
+*.pot~
+*.po~
+
+# Temporary Files
+*.tmp
+*.temp
+.sass-cache/
+
+# Test Files
+tests.php
