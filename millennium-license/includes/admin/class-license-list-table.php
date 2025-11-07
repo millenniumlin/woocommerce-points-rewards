@@ -100,8 +100,8 @@ class Millennium_License_List_Table extends WP_List_Table {
             case 'product':
                 if ($item->product_id) {
                     $product = wc_get_product($item->product_id);
-                    if ($product) {
-                        return '<a href="' . get_edit_post_link($item->product_id) . '">' . esc_html($product->get_name()) . '</a>';
+                    if ($product && is_object($product)) {
+                        return '<a href="' . esc_url(get_edit_post_link($item->product_id)) . '">' . esc_html($product->get_name()) . '</a>';
                     }
                 }
                 return '—';
@@ -109,8 +109,8 @@ class Millennium_License_List_Table extends WP_List_Table {
             case 'user':
                 if ($item->user_id) {
                     $user = get_userdata($item->user_id);
-                    if ($user) {
-                        return '<a href="' . get_edit_user_link($item->user_id) . '">' . esc_html($user->display_name) . '</a>';
+                    if ($user && is_object($user)) {
+                        return '<a href="' . esc_url(get_edit_user_link($item->user_id)) . '">' . esc_html($user->display_name) . '</a>';
                     }
                 }
                 return '—';

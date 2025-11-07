@@ -310,7 +310,12 @@ class Millennium_License_Order {
         include MILLENNIUM_LICENSE_PLUGIN_DIR . 'templates/emails/license-key-email.php';
         $message = ob_get_clean();
         
-        wp_mail($user->user_email, $subject, $message, array('Content-Type: text/html; charset=UTF-8'));
+        $result = wp_mail($user->user_email, $subject, $message, array('Content-Type: text/html; charset=UTF-8'));
+        
+        // 記錄郵件發送失敗
+        if (!$result) {
+            error_log(sprintf('Millennium License: Failed to send license email for order #%s to %s', $order->get_order_number(), $user->user_email));
+        }
     }
     
     /**

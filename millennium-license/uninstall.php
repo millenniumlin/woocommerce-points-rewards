@@ -20,7 +20,9 @@ $tables = array(
 );
 
 foreach ($tables as $table) {
-    $wpdb->query("DROP TABLE IF EXISTS $table");
+    // 驗證表格名稱以防止 SQL 注入
+    $table_name = esc_sql($table);
+    $wpdb->query($wpdb->prepare("DROP TABLE IF EXISTS %i", $table_name));
 }
 
 // 刪除選項設定

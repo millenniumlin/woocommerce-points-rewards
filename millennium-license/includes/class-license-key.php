@@ -14,6 +14,7 @@ class Millennium_License_Key {
      */
     public static function generate($format = 'XXXX-XXXX-XXXX-XXXX') {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $char_count = strlen($characters) - 1;
         $license_key = '';
         
         // 將格式分解為段落
@@ -25,7 +26,7 @@ class Millennium_License_Key {
             $generated_segment = '';
             
             for ($i = 0; $i < $length; $i++) {
-                $generated_segment .= $characters[random_int(0, strlen($characters) - 1)];
+                $generated_segment .= $characters[random_int(0, $char_count)];
             }
             
             $generated_segments[] = $generated_segment;

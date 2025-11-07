@@ -10,7 +10,7 @@
             <?php _e('您的授權碼', 'millennium-license'); ?>
         </h2>
         
-        <?php if (isset($license->order)) : ?>
+        <?php if (isset($license->order) && is_a($license->order, 'WC_Order')) : ?>
             <p><?php printf(__('感謝您的購買！以下是訂單 #%s 的授權碼：', 'millennium-license'), $license->order->get_order_number()); ?></p>
             
             <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">

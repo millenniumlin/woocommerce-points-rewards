@@ -199,6 +199,18 @@ class Millennium_License_Manager_Core {
         
         $args = wp_parse_args($args, $defaults);
         
+        // 驗證 orderby 和 order 參數以防止 SQL 注入
+        $allowed_orderby = array('id', 'license_key', 'status', 'created_at', 'updated_at', 'expires_at');
+        $allowed_order = array('ASC', 'DESC');
+        
+        if (!in_array($args['orderby'], $allowed_orderby)) {
+            $args['orderby'] = 'created_at';
+        }
+        
+        if (!in_array(strtoupper($args['order']), $allowed_order)) {
+            $args['order'] = 'DESC';
+        }
+        
         $where = array('1=1');
         
         if ($args['status']) {
@@ -218,7 +230,7 @@ class Millennium_License_Manager_Core {
         }
         
         $where_clause = implode(' AND ', $where);
-        $orderby = sanitize_sql_orderby($args['orderby'] . ' ' . $args['order']);
+        $orderby = sprintf('%s %s', esc_sql($args['orderby']), esc_sql($args['order']));
         
         $query = "SELECT * FROM $table WHERE $where_clause ORDER BY $orderby LIMIT %d OFFSET %d";
         

@@ -33,7 +33,7 @@ if (!defined('ABSPATH')) {
                             <?php 
                             if ($license->product_id) {
                                 $product = wc_get_product($license->product_id);
-                                if ($product) {
+                                if ($product && is_object($product) && method_exists($product, 'get_name')) {
                                     echo '<a href="' . esc_url(get_permalink($license->product_id)) . '">' . esc_html($product->get_name()) . '</a>';
                                 } else {
                                     echo '—';

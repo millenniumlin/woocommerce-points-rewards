@@ -262,7 +262,7 @@ class Millennium_License_API {
     }
     
     /**
-     * 發送啟用郵件通知
+     * 發送授權碼郵件
      */
     private function send_activation_email($license) {
         $settings = get_option('millennium_license_settings', array());
@@ -286,7 +286,12 @@ class Millennium_License_API {
         include MILLENNIUM_LICENSE_PLUGIN_DIR . 'templates/emails/license-key-email.php';
         $message = ob_get_clean();
         
-        wp_mail($user->user_email, $subject, $message, array('Content-Type: text/html; charset=UTF-8'));
+        $result = wp_mail($user->user_email, $subject, $message, array('Content-Type: text/html; charset=UTF-8'));
+        
+        // 記錄郵件發送失敗
+        if (!$result) {
+            error_log('Millennium License: Failed to send activation email to ' . $user->user_email);
+        }
     }
     
     /**
