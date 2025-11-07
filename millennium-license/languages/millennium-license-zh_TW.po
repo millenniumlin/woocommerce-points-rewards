@@ -1,0 +1,161 @@
+# Millennium License Manager - Traditional Chinese (Taiwan) Translation
+# Copyright (C) 2024 millenniumlim
+# This file is distributed under the same license as the Millennium License Manager plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Millennium License Manager 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/millenniumlin/millennium-license/issues\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: millenniumlim\n"
+"Language-Team: Traditional Chinese (Taiwan)\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+# Main Plugin
+msgid "Millennium License Manager 需要 WooCommerce 外掛才能運作。"
+msgstr ""
+
+# Admin
+msgid "授權管理"
+msgstr ""
+
+msgid "所有授權碼"
+msgstr ""
+
+msgid "新增授權碼"
+msgstr ""
+
+msgid "設定"
+msgstr ""
+
+msgid "授權碼"
+msgstr ""
+
+msgid "產品"
+msgstr ""
+
+msgid "用戶"
+msgstr ""
+
+msgid "狀態"
+msgstr ""
+
+msgid "啟用次數"
+msgstr ""
+
+msgid "到期時間"
+msgstr ""
+
+msgid "創建時間"
+msgstr ""
+
+msgid "啟用"
+msgstr ""
+
+msgid "停用"
+msgstr ""
+
+msgid "已過期"
+msgstr ""
+
+msgid "刪除"
+msgstr ""
+
+# License Key
+msgid "授權碼不存在"
+msgstr ""
+
+msgid "授權碼已停用"
+msgstr ""
+
+msgid "授權碼已過期"
+msgstr ""
+
+msgid "已達最大啟用次數"
+msgstr ""
+
+msgid "授權碼有效"
+msgstr ""
+
+msgid "授權碼已啟用"
+msgstr ""
+
+# API
+msgid "API 已停用"
+msgstr ""
+
+msgid "無效的認證資訊"
+msgstr ""
+
+msgid "無效的 API 密鑰"
+msgstr ""
+
+msgid "需要認證"
+msgstr ""
+
+msgid "缺少授權碼參數"
+msgstr ""
+
+msgid "缺少必要參數"
+msgstr ""
+
+# Product
+msgid "授權設定"
+msgstr ""
+
+msgid "啟用授權功能"
+msgstr ""
+
+msgid "為此產品啟用授權碼生成"
+msgstr ""
+
+msgid "最大啟用次數"
+msgstr ""
+
+msgid "每個授權碼可啟用的次數"
+msgstr ""
+
+msgid "有效期限（天）"
+msgstr ""
+
+msgid "授權碼的有效天數，留空表示永久"
+msgstr ""
+
+msgid "授權碼數量"
+msgstr ""
+
+msgid "每次購買生成的授權碼數量"
+msgstr ""
+
+# Email
+msgid "您的授權碼"
+msgstr ""
+
+msgid "如何使用授權碼"
+msgstr ""
+
+msgid "將授權碼複製到您的應用程式中"
+msgstr ""
+
+msgid "按照應用程式的啟用指示操作"
+msgstr ""
+
+msgid "完成啟用後即可開始使用"
+msgstr ""
+
+# My Account
+msgid "我的授權碼"
+msgstr ""
+
+msgid "您目前沒有任何授權碼。"
+msgstr ""
+
+msgid "查看訂單"
+msgstr ""
+
+msgid "永久"
+msgstr ""

@@ -1,0 +1,194 @@
+/**
+ * Millennium License Manager - Admin Styles
+ */
+
+/* General Admin Styles */
+.millennium-license-admin {
+    max-width: 1200px;
+}
+
+/* Status Badges */
+.status-active {
+    display: inline-block;
+    padding: 4px 12px;
+    background-color: #d4edda;
+    color: #155724;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-inactive {
+    display: inline-block;
+    padding: 4px 12px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-expired {
+    display: inline-block;
+    padding: 4px 12px;
+    background-color: #e2e3e5;
+    color: #383d41;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* License Key Display */
+code.license-key {
+    background-color: #f8f9fa;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #2c3e50;
+    border: 1px solid #dee2e6;
+}
+
+/* API Key Display */
+code.api-key {
+    background-color: #fff3cd;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #856404;
+    border: 1px solid #ffc107;
+    display: inline-block;
+}
+
+/* License Table */
+.millennium-licenses-table {
+    margin-top: 20px;
+}
+
+.millennium-licenses-table th {
+    font-weight: 600;
+}
+
+.millennium-licenses-table code {
+    font-size: 13px;
+}
+
+/* Delete Link */
+.millennium-licenses-table .delete {
+    color: #dc3545;
+}
+
+.millennium-licenses-table .delete:hover {
+    color: #bd2130;
+}
+
+/* Product Data Panel */
+#millennium_license_data .options_group {
+    padding: 15px;
+}
+
+#millennium_license_data .form-field {
+    margin-bottom: 15px;
+}
+
+/* License Info Display on Product Page */
+.millennium-license-info {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.millennium-license-info h3 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 18px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.millennium-license-info ul {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0 0;
+}
+
+.millennium-license-info ul li {
+    padding: 8px 0;
+    padding-left: 25px;
+    position: relative;
+}
+
+.millennium-license-info ul li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* Settings Page */
+.millennium-license-settings .form-table th {
+    width: 250px;
+}
+
+.millennium-license-settings code {
+    background-color: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 3px;
+}
+
+/* Notices */
+.millennium-license-notice {
+    padding: 12px;
+    margin: 20px 0;
+    border-left: 4px solid #3498db;
+    background-color: #e8f4f8;
+}
+
+.millennium-license-notice.error {
+    border-left-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.millennium-license-notice.success {
+    border-left-color: #28a745;
+    background-color: #d4edda;
+}
+
+/* Loading Spinner */
+.millennium-license-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+    .millennium-license-info {
+        padding: 15px;
+    }
+    
+    .millennium-license-info h3 {
+        font-size: 16px;
+    }
+    
+    code.license-key {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+}
