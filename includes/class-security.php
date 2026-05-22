@@ -276,7 +276,7 @@ class WC_Points_Rewards_Security {
      * AJAX: 管理員手動添加點數
      */
     public function ajax_admin_add_points() {
-        if (!current_user_can('manage_woocommerce')) {
+        if (!current_user_can('manage_options')) {
             wp_send_json_error(__('權限不足', 'wc-points-rewards'));
         }
         
@@ -321,7 +321,7 @@ class WC_Points_Rewards_Security {
      * AJAX: 管理員手動扣除點數
      */
     public function ajax_admin_deduct_points() {
-        if (!current_user_can('manage_woocommerce')) {
+        if (!current_user_can('manage_options')) {
             wp_send_json_error(__('權限不足', 'wc-points-rewards'));
         }
         

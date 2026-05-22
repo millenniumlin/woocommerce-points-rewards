@@ -8,12 +8,61 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
+$can_grant_points = current_user_can('manage_options');
 ?>
 
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php _e('點數記錄管理', 'wc-points-rewards'); ?></h1>
     
     <hr class="wp-header-end">
+
+    <?php if ($can_grant_points): ?>
+    <div class="wcpr-manual-points-card">
+        <h2><?php _e('手動發放點數', 'wc-points-rewards'); ?></h2>
+        <div id="wcpr-manual-points-message" style="display:none;"></div>
+        <form id="wcpr-manual-points-form" onsubmit="return false;">
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <label for="wcpr-user-keyword"><?php _e('搜尋用戶', 'wc-points-rewards'); ?></label>
+                    </th>
+                    <td>
+                        <input
+                            type="text"
+                            id="wcpr-user-keyword"
+                            class="regular-text"
+                            autocomplete="off"
+                            placeholder="<?php _e('輸入關鍵字即時下拉搜尋', 'wc-points-rewards'); ?>"
+                        />
+                        <input type="hidden" id="wcpr-user-id" value="">
+                        <div id="wcpr-user-dropdown" class="wcpr-user-dropdown" style="display:none;"></div>
+                        <p class="description"><?php _e('可搜尋姓名、帳號或 Email。', 'wc-points-rewards'); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="wcpr-points"><?php _e('發放點數', 'wc-points-rewards'); ?></label>
+                    </th>
+                    <td>
+                        <input type="number" id="wcpr-points" class="small-text" min="0.01" step="0.01" value="0">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="wcpr-reason"><?php _e('原因', 'wc-points-rewards'); ?></label>
+                    </th>
+                    <td>
+                        <input type="text" id="wcpr-reason" class="regular-text" placeholder="<?php _e('選填', 'wc-points-rewards'); ?>">
+                    </td>
+                </tr>
+            </table>
+            <p>
+                <button type="button" id="wcpr-grant-points-btn" class="button button-primary"><?php _e('發放點數', 'wc-points-rewards'); ?></button>
+            </p>
+        </form>
+    </div>
+    <?php endif; ?>
     
     <!-- 篩選選項 -->
     <div class="tablenav top">
@@ -147,4 +196,159 @@ if (!defined('ABSPATH')) {
     border: 1px solid #c3c4c7;
     margin-top: 20px;
 }
+
+.wcpr-manual-points-card {
+    margin: 16px 0;
+    padding: 16px;
+    border: 1px solid #c3c4c7;
+    background: #fff;
+}
+
+.wcpr-manual-points-card h2 {
+    margin-top: 0;
+}
+
+.wcpr-user-dropdown {
+    margin-top: 4px;
+    border: 1px solid #c3c4c7;
+    background: #fff;
+    max-width: 420px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.wcpr-user-option {
+    padding: 8px 10px;
+    border-bottom: 1px solid #f0f0f1;
+    cursor: pointer;
+}
+
+.wcpr-user-option:last-child {
+    border-bottom: none;
+}
+
+.wcpr-user-option:hover {
+    background: #f6f7f7;
+}
+
+.wcpr-user-option small {
+    display: block;
+    color: #646970;
+}
 </style>
+
+<?php if ($can_grant_points): ?>
+<script type="text/javascript">
+jQuery(function($) {
+    var adminNonce = (window.wcPointsRewardsAdmin && wcPointsRewardsAdmin.nonce) ? wcPointsRewardsAdmin.nonce : '';
+    var $keyword = $('#wcpr-user-keyword');
+    var $userId = $('#wcpr-user-id');
+    var $dropdown = $('#wcpr-user-dropdown');
+    var $message = $('#wcpr-manual-points-message');
+    var timer = null;
+
+    function hideDropdown() {
+        $dropdown.hide().empty();
+    }
+
+    function showMessage(type, text) {
+        var cls = type === 'error' ? 'notice notice-error' : 'notice notice-success';
+        $message.removeClass().addClass(cls).empty().append($('<p>').text(text)).show();
+    }
+
+    $keyword.on('input', function() {
+        var keyword = $.trim($keyword.val());
+        $userId.val('');
+
+        if (timer) {
+            clearTimeout(timer);
+        }
+
+        if (keyword.length < 1) {
+            hideDropdown();
+            return;
+        }
+
+        timer = setTimeout(function() {
+            $.post(ajaxurl, {
+                action: 'wc_points_rewards_search_users',
+                nonce: adminNonce,
+                keyword: keyword
+            }).done(function(response) {
+                if (!response || !response.success || !response.data || !response.data.length) {
+                    hideDropdown();
+                    return;
+                }
+
+                var html = '';
+                $.each(response.data, function(_, user) {
+                    var label = $('<div>').text(user.display_name).html();
+                    var sub = $('<div>').text(user.user_email + ' (' + user.user_login + ')').html();
+                    html += '<div class="wcpr-user-option" data-id="' + user.id + '" data-label="' + label + '">' +
+                        '<strong>' + label + '</strong><small>' + sub + '</small></div>';
+                });
+
+                $dropdown.html(html).show();
+            }).fail(function() {
+                hideDropdown();
+            });
+        }, 250);
+    });
+
+    $(document).on('click', '.wcpr-user-option', function() {
+        $userId.val($(this).data('id'));
+        $keyword.val($(this).data('label'));
+        hideDropdown();
+    });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#wcpr-user-keyword, #wcpr-user-dropdown').length) {
+            hideDropdown();
+        }
+    });
+
+    $('#wcpr-grant-points-btn').on('click', function() {
+        var userId = parseInt($userId.val(), 10) || 0;
+        var points = parseFloat($('#wcpr-points').val() || 0);
+        var reason = $.trim($('#wcpr-reason').val());
+
+        $message.hide();
+
+        if (!userId) {
+            showMessage('error', '<?php echo esc_js(__('請先從下拉選單選擇用戶', 'wc-points-rewards')); ?>');
+            return;
+        }
+        if (!(points > 0)) {
+            showMessage('error', '<?php echo esc_js(__('請輸入大於 0 的點數', 'wc-points-rewards')); ?>');
+            return;
+        }
+
+        var $btn = $(this);
+        $btn.prop('disabled', true);
+
+        $.post(ajaxurl, {
+            action: 'wc_points_rewards_admin_add_points',
+            nonce: adminNonce,
+            user_id: userId,
+            points: points,
+            reason: reason
+        }).done(function(response) {
+            if (response && response.success) {
+                showMessage('success', response.data.message || '<?php echo esc_js(__('發放成功', 'wc-points-rewards')); ?>');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 900);
+                return;
+            }
+
+            var errorMessage = (response && response.data && response.data.message) ? response.data.message : (response && response.data ? response.data : '<?php echo esc_js(__('發放失敗', 'wc-points-rewards')); ?>');
+            showMessage('error', errorMessage);
+        }).fail(function() {
+            showMessage('error', '<?php echo esc_js(__('發放失敗，請稍後再試', 'wc-points-rewards')); ?>');
+        }).always(function() {
+            $btn.prop('disabled', false);
+        });
+    });
+});
+</script>
+<?php endif; ?>

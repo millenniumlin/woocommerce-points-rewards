@@ -41,6 +41,7 @@ class WC_Points_Rewards_Ajax_Handler {
      */
     private function init_hooks() {
         add_action('wp_ajax_wc_points_rewards_process_historical_orders', array($this, 'process_historical_orders'));
+        add_action('wp_ajax_wc_points_rewards_search_users', array($this, 'search_users'));
     }
     
     /**
@@ -48,7 +49,7 @@ class WC_Points_Rewards_Ajax_Handler {
      */
     public function process_historical_orders() {
         // 檢查權限
-        if (!current_user_can('manage_woocommerce')) {
+        if (!current_user_can('manage_options')) {
             wp_send_json_error(__('權限不足', 'wc-points-rewards'));
         }
         
@@ -229,5 +230,44 @@ class WC_Points_Rewards_Ajax_Handler {
             'total_points' => $total_points_awarded,
             'eligible_orders' => $eligible_orders
         ));
+    }
+
+    /**
+     * AJAX: 即時搜尋用戶（管理員專用）
+     */
+    public function search_users() {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(__('權限不足', 'wc-points-rewards'));
+        }
+
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'wc_points_rewards_admin_nonce')) {
+            wp_send_json_error(__('安全驗證失敗', 'wc-points-rewards'));
+        }
+
+        $keyword = sanitize_text_field($_POST['keyword'] ?? '');
+        if (strlen($keyword) < 1) {
+            wp_send_json_success(array());
+        }
+
+        $query = new WP_User_Query(array(
+            'search' => '*' . $keyword . '*',
+            'search_columns' => array('user_login', 'user_email', 'display_name'),
+            'number' => 10,
+            'orderby' => 'display_name',
+            'order' => 'ASC',
+            'fields' => array('ID', 'display_name', 'user_email', 'user_login')
+        ));
+
+        $users = array();
+        foreach ($query->get_results() as $user) {
+            $users[] = array(
+                'id' => intval($user->ID),
+                'display_name' => $user->display_name ?: $user->user_login,
+                'user_email' => $user->user_email,
+                'user_login' => $user->user_login
+            );
+        }
+
+        wp_send_json_success($users);
     }
 }
