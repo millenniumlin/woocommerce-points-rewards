@@ -249,6 +249,7 @@ class WC_Points_Rewards_Checkout {
                     update_post_meta($order_id, '_points_discount_amount', $discount_value);
                     update_post_meta($order_id, '_points_used', $discount_amount);
                 } else {
+                    WC()->session->__unset('wc_points_rewards_discount_amount');
                     $order->add_order_note(
                         sprintf(
                             __('點數折抵未完成：%s', 'wc-points-rewards'),
@@ -263,6 +264,9 @@ class WC_Points_Rewards_Checkout {
                             $user_id
                         );
                     }
+
+                    wc_add_notice($result->get_error_message(), 'error');
+                    throw new Exception($result->get_error_message());
                 }
 
                 // 清除 session

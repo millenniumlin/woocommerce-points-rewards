@@ -296,7 +296,7 @@ function wc_points_rewards_get_site_day_window_mysql() {
  * @return string|null
  */
 function wc_points_rewards_calculate_points_expiry_date() {
-    $expiry_months = intval(get_option('wc_points_rewards_points_expiry_months', '12'));
+    $expiry_months = intval(wc_points_rewards_get_option('points_expiry_months', 12));
 
     if ($expiry_months <= 0) {
         return null;
