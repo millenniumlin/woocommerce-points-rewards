@@ -56,17 +56,22 @@ class WC_Points_Rewards_Admin_Points_Manager {
         $admin_used = 0.0;
 
         if ($operator_id > 0) {
+            $legacy_operator_marker = '%admin_user_id=' . $operator_id . ';%';
             $admin_used = (float) $wpdb->get_var($wpdb->prepare(
                 "SELECT COALESCE(SUM(points), 0)
                 FROM {$points_table}
                 WHERE type = %s
                 AND points > 0
                 AND description LIKE %s
-                AND admin_user_id = %d
+                AND (
+                    admin_user_id = %d
+                    OR (admin_user_id IS NULL AND description LIKE %s)
+                )
                 AND created_at BETWEEN %s AND %s",
                 'admin',
                 '%' . self::MANUAL_GRANT_MARKER . '%',
                 $operator_id,
+                $legacy_operator_marker,
                 $day_window['start'],
                 $day_window['end']
             ));

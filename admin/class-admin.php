@@ -497,6 +497,8 @@ class WC_Points_Rewards_Admin {
                 wc_points_rewards_number_format($result['balance'])
             ),
             'grant_user_id'        => $result['target_user']->ID,
+            'grant_points'         => $points,
+            'grant_reason'         => $reason,
         ));
     }
 
