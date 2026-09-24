@@ -367,14 +367,16 @@ class WC_Points_Rewards_Account {
         // 獲取即將到期的點數
         global $wpdb;
         $points_table = $wpdb->prefix . 'wc_points_rewards_points';
+        $window_start = wc_points_rewards_get_site_mysql_datetime();
+        $window_end = wc_points_rewards_get_site_datetime('+30 days')->format('Y-m-d H:i:s');
         $expiring_points = $wpdb->get_var($wpdb->prepare("
             SELECT SUM(points) 
             FROM $points_table 
             WHERE user_id = %d 
-            AND type = 'earned' 
+            AND (type = 'earned' OR (type = 'admin' AND points > 0))
             AND expiry_date IS NOT NULL 
-            AND expiry_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 DAY)
-        ", $user_id));
+            AND expiry_date BETWEEN %s AND %s
+        ", $user_id, $window_start, $window_end));
         
         $expiring_points = floatval($expiring_points ?? 0);
         

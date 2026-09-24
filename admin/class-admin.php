@@ -70,6 +70,7 @@ class WC_Points_Rewards_Admin {
         
         // 處理表單提交
         add_action('admin_post_wc_points_rewards_save_tier', array($this, 'handle_save_tier'));
+        add_action('admin_post_wc_points_rewards_manual_grant_points', array($this, 'handle_manual_grant_points'));
     }
     
     /**
@@ -173,7 +174,7 @@ class WC_Points_Rewards_Admin {
     $total_users = intval($total_users ?? 0);
     
     $points_table = $wpdb->prefix . 'wc_points_rewards_points';
-    $total_points_issued = $wpdb->get_var("SELECT SUM(points) FROM $points_table WHERE type = 'earned'");
+    $total_points_issued = $wpdb->get_var("SELECT SUM(points) FROM $points_table WHERE type = 'earned' OR (type = 'admin' AND points > 0)");
     $total_points_issued = floatval($total_points_issued ?? 0);
     
     // 修正第 185 行 - 先處理 null 值再使用 abs()
@@ -318,6 +319,26 @@ class WC_Points_Rewards_Admin {
         }
         
         $total_pages = ceil($total_items / $per_page);
+
+        $manual_grant_is_authorized = wc_points_rewards_is_site_administrator();
+        $manual_grant_settings      = wc_points_rewards_get_manual_grant_settings();
+        $manual_grant_usage         = WC_Points_Rewards_Admin_Points_Manager::instance()->get_manual_grant_usage(get_current_user_id());
+        $manual_grant_notice        = sanitize_key($_GET['manual_grant_notice'] ?? '');
+        $manual_grant_message       = sanitize_text_field(wp_unslash($_GET['manual_grant_message'] ?? ''));
+        $manual_grant_form_values   = array(
+            'user_id' => intval($_GET['grant_user_id'] ?? 0),
+            'points'  => isset($_GET['grant_points']) ? floatval(wp_unslash($_GET['grant_points'])) : '',
+            'reason'  => sanitize_textarea_field(wp_unslash($_GET['grant_reason'] ?? '')),
+        );
+        $manual_grant_target_user   = null;
+        $manual_grant_target_points = 0.0;
+
+        if ($manual_grant_form_values['user_id'] > 0) {
+            $manual_grant_target_user = get_user_by('id', $manual_grant_form_values['user_id']);
+            if ($manual_grant_target_user) {
+                $manual_grant_target_points = WC_Points_Rewards_Database::instance()->get_user_points($manual_grant_target_user->ID);
+            }
+        }
         
         if (file_exists(WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/views/points-list.php')) {
             include WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/views/points-list.php';
@@ -331,7 +352,7 @@ class WC_Points_Rewards_Admin {
      */
     public function admin_historical_page() {
         // 安全檢查
-        if (!current_user_can('manage_woocommerce')) {
+        if (!wc_points_rewards_is_site_administrator()) {
             wp_die(__('您沒有權限訪問此頁面', 'wc-points-rewards'));
         }
         
@@ -359,7 +380,7 @@ class WC_Points_Rewards_Admin {
     public function admin_settings_page() {
         if (class_exists('WC_Points_Rewards_Settings')) {
             $settings = WC_Points_Rewards_Settings::instance();
-            $settings->output();
+            $settings->render_settings_page();
         } else {
             if (file_exists(WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/views/settings.php')) {
                 include WC_POINTS_REWARDS_PLUGIN_DIR . 'admin/views/settings.php';
@@ -408,10 +429,10 @@ class WC_Points_Rewards_Admin {
             ), admin_url('admin.php')));
             exit;
         }
-        
+
         $tier_manager = WC_Points_Rewards_Member_Tier::instance();
         $result = $tier_manager->save_tier($tier_data);
-        
+
         if ($result) {
             wp_redirect(add_query_arg(array(
                 'page' => 'wc-points-rewards-tiers',
@@ -423,6 +444,55 @@ class WC_Points_Rewards_Admin {
                 'error' => 'save_failed'
             ), admin_url('admin.php')));
         }
+        exit;
+    }
+
+    /**
+     * 處理管理員手動補發點數表單。
+     */
+    public function handle_manual_grant_points() {
+        if (!wc_points_rewards_is_site_administrator()) {
+            wp_die(__('只有網站管理員可以手動補發點數。', 'wc-points-rewards'));
+        }
+
+        check_admin_referer('wc_points_rewards_manual_grant_points');
+
+        $user_id = intval($_POST['grant_user_id'] ?? 0);
+        $points  = floatval($_POST['grant_points'] ?? 0);
+        $reason  = sanitize_textarea_field(wp_unslash($_POST['grant_reason'] ?? ''));
+        $manager = WC_Points_Rewards_Admin_Points_Manager::instance();
+        $result  = $manager->create_manual_grant($user_id, $points, $reason, get_current_user_id());
+
+        if (is_wp_error($result)) {
+            $this->redirect_manual_grant(array(
+                'manual_grant_notice'  => 'error',
+                'manual_grant_message' => $result->get_error_message(),
+                'grant_user_id'        => $user_id,
+                'grant_points'         => $points,
+                'grant_reason'         => $reason,
+            ));
+        }
+
+        $this->redirect_manual_grant(array(
+            'manual_grant_notice'  => 'success',
+            'manual_grant_message' => sprintf(
+                __('已成功為 %1$s 補發 %2$s，目前餘額為 %3$s。', 'wc-points-rewards'),
+                $result['target_user']->display_name,
+                wc_points_rewards_number_format($result['points']),
+                wc_points_rewards_number_format($result['balance'])
+            ),
+            'grant_user_id'        => $result['target_user']->ID,
+        ));
+    }
+
+    /**
+     * 重導回點數記錄頁並附帶訊息。
+     *
+     * @param array<string,mixed> $args 查詢參數。
+     * @return void
+     */
+    private function redirect_manual_grant($args) {
+        wp_safe_redirect(add_query_arg($args, admin_url('admin.php?page=wc-points-rewards-points')));
         exit;
     }
     

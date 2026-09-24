@@ -36,7 +36,12 @@ function wc_points_rewards_cleanup_database() {
         'wc_points_rewards_settings',
         'wc_points_rewards_version',
         'wc_points_rewards_db_version',
-        'wc_points_rewards_installed_time'
+        'wc_points_rewards_installed_time',
+        'wc_points_rewards_enable_manual_admin_points',
+        'wc_points_rewards_manual_admin_points_per_grant_max',
+        'wc_points_rewards_manual_admin_points_per_admin_daily_max',
+        'wc_points_rewards_manual_admin_points_site_daily_max',
+        'wc_points_rewards_historical_backfill_log'
     );
     
     foreach ($options_to_delete as $option) {

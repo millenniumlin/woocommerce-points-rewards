@@ -73,6 +73,7 @@ class WC_Points_Rewards_Database {
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             user_id bigint(20) unsigned NOT NULL COMMENT '用戶ID',
             order_id bigint(20) unsigned DEFAULT NULL COMMENT '訂單ID',
+            admin_user_id bigint(20) unsigned DEFAULT NULL COMMENT '操作管理員ID（人工補發/扣除/匯入）',
             points decimal(10,2) NOT NULL COMMENT '點數變化量',
             type varchar(50) NOT NULL COMMENT '點數類型：earned, redeemed, expired, admin',
             description text COMMENT '描述',
@@ -81,6 +82,7 @@ class WC_Points_Rewards_Database {
             PRIMARY KEY (id),
             KEY idx_user_id (user_id),
             KEY idx_order_id (order_id),
+            KEY idx_admin_user_id (admin_user_id),
             KEY idx_type (type),
             KEY idx_expiry_date (expiry_date),
             KEY idx_created_at (created_at)
@@ -168,8 +170,8 @@ class WC_Points_Rewards_Database {
             SELECT COALESCE(SUM(points), 0) 
             FROM `{$table_name}` 
             WHERE user_id = %d 
-            AND (expiry_date IS NULL OR expiry_date > NOW())
-        ", $user_id));
+            AND (expiry_date IS NULL OR expiry_date > %s)
+        ", $user_id, wc_points_rewards_get_site_mysql_datetime()));
         
         // 確保返回有效的浮點數
         $result = floatval($total_points);
@@ -179,7 +181,7 @@ class WC_Points_Rewards_Database {
     /**
      * 添加點數記錄 - 使用事務確保一致性
      */
-    public function add_points($user_id, $points, $type, $description = '', $order_id = null, $expiry_date = null) {
+    public function add_points($user_id, $points, $type, $description = '', $order_id = null, $expiry_date = null, $admin_user_id = null) {
         global $wpdb;
         
         $table_name = $wpdb->prefix . 'wc_points_rewards_points';
@@ -213,6 +215,10 @@ class WC_Points_Rewards_Database {
             
             if ($order_id) {
                 $data['order_id'] = intval($order_id);
+            }
+
+            if (!is_null($admin_user_id) && intval($admin_user_id) > 0) {
+                $data['admin_user_id'] = intval($admin_user_id);
             }
             
             if ($expiry_date) {
@@ -430,19 +436,110 @@ class WC_Points_Rewards_Database {
         global $wpdb;
         
         $table_name = $wpdb->prefix . 'wc_points_rewards_points';
+        $current_time = wc_points_rewards_get_site_mysql_datetime();
         
         // 標記過期點數 - 使用準備好的語句
         $expired_query = "
             UPDATE `{$table_name}` 
             SET type = %s 
             WHERE expiry_date IS NOT NULL 
-            AND expiry_date <= NOW() 
-            AND type = %s
+            AND expiry_date <= %s 
+            AND (
+                type = %s
+                OR (type = %s AND points > 0)
+            )
         ";
         
-        $wpdb->query($wpdb->prepare($expired_query, 'expired', 'earned'));
+        $wpdb->query($wpdb->prepare($expired_query, 'expired', $current_time, 'earned', 'admin'));
         
         // 觸發清理動作
         do_action('wc_points_rewards_points_expired');
+    }
+
+    /**
+     * 使用每位會員獨立鎖來扣除點數，避免併發超扣。
+     *
+     * @param int         $user_id       用戶 ID。
+     * @param float       $points        要扣除的點數（正數）。
+     * @param string      $type          點數類型。
+     * @param string      $description   描述。
+     * @param int|null    $order_id      訂單 ID。
+     * @param int|null    $admin_user_id 操作管理員 ID。
+     * @return int|WP_Error
+     */
+    public function deduct_points_with_lock($user_id, $points, $type, $description = '', $order_id = null, $admin_user_id = null) {
+        global $wpdb;
+
+        $user_id = intval($user_id);
+        $points  = floatval($points);
+
+        if ($user_id <= 0 || $points <= 0) {
+            return new WP_Error('invalid_points_debit', __('扣點參數不正確。', 'wc-points-rewards'));
+        }
+
+        $lock_name = $this->get_user_points_lock_name($user_id);
+        $lock_acquired = $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lock_name));
+
+        if ('1' !== (string) $lock_acquired) {
+            return new WP_Error('points_lock_timeout', __('系統正忙碌中，暫時無法扣除點數，請稍後再試。', 'wc-points-rewards'));
+        }
+
+        try {
+            $available_points = $this->get_user_points_total_at_time($user_id, wc_points_rewards_get_site_mysql_datetime());
+
+            if ($points > $available_points) {
+                return new WP_Error('insufficient_points', __('點數不足，無法完成此次扣點。', 'wc-points-rewards'));
+            }
+
+            $result = $this->add_points(
+                $user_id,
+                -$points,
+                $type,
+                $description,
+                $order_id,
+                null,
+                $admin_user_id
+            );
+
+            if (!$result) {
+                return new WP_Error('points_deduct_failed', __('扣除點數失敗。', 'wc-points-rewards'));
+            }
+
+            return $result;
+        } finally {
+            $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock_name));
+        }
+    }
+
+    /**
+     * 取得指定時間點仍可用的點數總額。
+     *
+     * @param int    $user_id       用戶 ID。
+     * @param string $current_time  目前時間（MySQL datetime）。
+     * @return float
+     */
+    private function get_user_points_total_at_time($user_id, $current_time) {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'wc_points_rewards_points';
+
+        return (float) $wpdb->get_var($wpdb->prepare(
+            "SELECT COALESCE(SUM(points), 0)
+            FROM `{$table_name}`
+            WHERE user_id = %d
+            AND (expiry_date IS NULL OR expiry_date > %s)",
+            $user_id,
+            $current_time
+        ));
+    }
+
+    /**
+     * 取得會員點數鎖名稱。
+     *
+     * @param int $user_id 用戶 ID。
+     * @return string
+     */
+    private function get_user_points_lock_name($user_id) {
+        return substr('wcpr_points_user_' . get_current_blog_id() . '_' . intval($user_id), 0, 64);
     }
 }

@@ -90,6 +90,12 @@ class WC_Points_Rewards_Settings {
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_enable_notifications');
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_expiry_notification_days');
         register_setting('wc_points_rewards_settings', 'wc_points_rewards_enable_birthday_notification');
+
+        // 管理員手動補發設定
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_enable_manual_admin_points');
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_manual_admin_points_per_grant_max');
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_manual_admin_points_per_admin_daily_max');
+        register_setting('wc_points_rewards_settings', 'wc_points_rewards_manual_admin_points_site_daily_max');
     }
     
     /**
@@ -98,10 +104,17 @@ class WC_Points_Rewards_Settings {
     public function render_settings_page() {
         // 獲取當前設定
         $settings = $this->get_current_settings();
+        $manual_grant_settings = wc_points_rewards_get_manual_grant_settings();
         
         ?>
         <div class="wrap">
             <h1><?php _e('點數獎勵系統設定', 'wc-points-rewards'); ?></h1>
+
+            <?php if (!empty($_GET['errors'])) : ?>
+                <div class="notice notice-warning is-dismissible">
+                    <p><?php echo esc_html(str_replace('|', ' / ', sanitize_text_field(wp_unslash($_GET['errors'])))); ?></p>
+                </div>
+            <?php endif; ?>
             
             <form method="post" action="admin-post.php">
                 <?php wp_nonce_field('save_points_rewards_settings', 'points_rewards_nonce'); ?>
@@ -298,6 +311,56 @@ class WC_Points_Rewards_Settings {
                         </tr>
                     </tbody>
                 </table>
+
+                <h2><?php _e('管理員手動補發限制', 'wc-points-rewards'); ?></h2>
+
+                <table class="form-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">
+                                <label for="enable_manual_admin_points"><?php _e('啟用管理員手動補發', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="checkbox" id="enable_manual_admin_points" name="wc_points_rewards_enable_manual_admin_points" value="yes"
+                                       <?php checked($manual_grant_settings['enabled'], 'yes'); ?>>
+                                <p class="description"><?php _e('停用後，所有手動補發請求都會在伺服器端被拒絕。', 'wc-points-rewards'); ?></p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="manual_admin_points_per_grant_max"><?php _e('單筆補發上限', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="number" id="manual_admin_points_per_grant_max" name="wc_points_rewards_manual_admin_points_per_grant_max"
+                                       value="<?php echo esc_attr($manual_grant_settings['per_grant_max']); ?>" min="1" max="100000" step="1">
+                                <p class="description"><?php echo esc_html(wc_points_rewards_format_points_with_value($manual_grant_settings['per_grant_max'])); ?></p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="manual_admin_points_per_admin_daily_max"><?php _e('每位管理員每日上限', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="number" id="manual_admin_points_per_admin_daily_max" name="wc_points_rewards_manual_admin_points_per_admin_daily_max"
+                                       value="<?php echo esc_attr($manual_grant_settings['per_admin_daily_max']); ?>" min="1" max="100000" step="1">
+                                <p class="description"><?php echo esc_html(wc_points_rewards_format_points_with_value($manual_grant_settings['per_admin_daily_max'])); ?></p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">
+                                <label for="manual_admin_points_site_daily_max"><?php _e('全站每日補發上限', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="number" id="manual_admin_points_site_daily_max" name="wc_points_rewards_manual_admin_points_site_daily_max"
+                                       value="<?php echo esc_attr($manual_grant_settings['site_daily_max']); ?>" min="1" max="500000" step="1">
+                                <p class="description"><?php echo esc_html(wc_points_rewards_format_points_with_value($manual_grant_settings['site_daily_max'])); ?></p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
                 
                 <?php submit_button(__('儲存設定', 'wc-points-rewards')); ?>
             </form>
@@ -328,6 +391,10 @@ class WC_Points_Rewards_Settings {
             'enable_notifications' => get_option('wc_points_rewards_enable_notifications', 'yes'),
             'expiry_notification_days' => get_option('wc_points_rewards_expiry_notification_days', '30'),
             'enable_birthday_notification' => get_option('wc_points_rewards_enable_birthday_notification', 'yes'),
+            'enable_manual_admin_points' => get_option('wc_points_rewards_enable_manual_admin_points', 'yes'),
+            'manual_admin_points_per_grant_max' => get_option('wc_points_rewards_manual_admin_points_per_grant_max', '1000'),
+            'manual_admin_points_per_admin_daily_max' => get_option('wc_points_rewards_manual_admin_points_per_admin_daily_max', '1000'),
+            'manual_admin_points_site_daily_max' => get_option('wc_points_rewards_manual_admin_points_site_daily_max', '3000'),
         );
     }
     
@@ -361,7 +428,11 @@ class WC_Points_Rewards_Settings {
             'tier_period' => array('type' => 'text', 'default' => 'yearly'),
             'enable_notifications' => array('type' => 'checkbox', 'default' => 'yes'),
             'expiry_notification_days' => array('type' => 'integer', 'min' => 1, 'max' => 365, 'default' => 30),
-            'enable_birthday_notification' => array('type' => 'checkbox', 'default' => 'yes')
+            'enable_birthday_notification' => array('type' => 'checkbox', 'default' => 'yes'),
+            'enable_manual_admin_points' => array('type' => 'checkbox', 'default' => 'yes'),
+            'manual_admin_points_per_grant_max' => array('type' => 'integer', 'min' => 1, 'max' => 100000, 'default' => 1000),
+            'manual_admin_points_per_admin_daily_max' => array('type' => 'integer', 'min' => 1, 'max' => 100000, 'default' => 1000),
+            'manual_admin_points_site_daily_max' => array('type' => 'integer', 'min' => 1, 'max' => 500000, 'default' => 3000),
         );
         
         $errors = array();

@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Points & Rewards 會員系統
  * Plugin URI: https://github.com/millenniumlin/woocommerce-points-rewards
  * Description: 完整的 WooCommerce 累積消費點數獎勵系統，支援會員等級、點數回饋、折抵功能等。
- * Version: 1.6.9
+ * Version: 1.7.0
  * Author: Github Copilot x millenniumlim
  * License: GPL v2 or later
  * Text Domain: wc-points-rewards
@@ -37,7 +37,7 @@ add_action('before_woocommerce_init', function() {
 });
 
 // 定義常數 - 修正版本號一致性
-define('WC_POINTS_REWARDS_VERSION', '1.4.7');  // 修正：與標題版本一致
+define('WC_POINTS_REWARDS_VERSION', '1.7.0');  // 修正：與標題版本一致
 define('WC_POINTS_REWARDS_PLUGIN_FILE', __FILE__);
 define('WC_POINTS_REWARDS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WC_POINTS_REWARDS_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -114,6 +114,9 @@ class WC_Points_Rewards {
         }
         if (file_exists(WC_POINTS_REWARDS_PLUGIN_DIR . 'includes/class-ajax-handler.php')) {
             require_once WC_POINTS_REWARDS_PLUGIN_DIR . 'includes/class-ajax-handler.php';
+        }
+        if (file_exists(WC_POINTS_REWARDS_PLUGIN_DIR . 'includes/class-admin-points-manager.php')) {
+            require_once WC_POINTS_REWARDS_PLUGIN_DIR . 'includes/class-admin-points-manager.php';
         }
         
         // 管理介面
@@ -281,37 +284,40 @@ class WC_Points_Rewards {
      */
     private function set_default_settings() {
         // 檢查是否已經有設定
-        if (get_option('wc_points_rewards_settings')) {
-            return; // 已經有設定，不要覆蓋
+        if (!get_option('wc_points_rewards_settings')) {
+            $default_settings = array(
+                // 點數系統啟用設定
+                'enable_points_system' => 'yes',
+                
+                // 前台顯示控制設定
+                'show_in_menu' => 'no',  // 預設不在選單顯示
+                
+                // 原有設定
+                'points_per_amount' => 1, // 每1元回饋1點
+                'points_amount' => 1,
+                'registration_points' => 100,
+                'birthday_points' => 200,
+                'points_expiry_months' => 12,
+                'min_cart_total' => 0,
+                'max_discount_percent' => 50,
+                'enable_cart_redemption' => 'yes',
+                'notification_days' => 30,
+                'enable_notifications' => 'yes',
+                'enable_birthday_points' => 'yes',
+                'enable_registration_points' => 'yes',
+                
+                // 點數名稱設定
+                'points_name' => '點',
+                'points_value' => 1  // 1點 = 1元
+            );
+            
+            add_option('wc_points_rewards_settings', $default_settings);
         }
-        
-        $default_settings = array(
-            // 點數系統啟用設定
-            'enable_points_system' => 'yes',
-            
-            // 前台顯示控制設定
-            'show_in_menu' => 'no',  // 預設不在選單顯示
-            
-            // 原有設定
-            'points_per_amount' => 1, // 每1元回饋1點
-            'points_amount' => 1,
-            'registration_points' => 100,
-            'birthday_points' => 200,
-            'points_expiry_months' => 12,
-            'min_cart_total' => 0,
-            'max_discount_percent' => 50,
-            'enable_cart_redemption' => 'yes',
-            'notification_days' => 30,
-            'enable_notifications' => 'yes',
-            'enable_birthday_points' => 'yes',
-            'enable_registration_points' => 'yes',
-            
-            // 點數名稱設定
-            'points_name' => '點',
-            'points_value' => 1  // 1點 = 1元
-        );
-        
-        add_option('wc_points_rewards_settings', $default_settings);
+
+        add_option('wc_points_rewards_enable_manual_admin_points', 'yes');
+        add_option('wc_points_rewards_manual_admin_points_per_grant_max', 1000);
+        add_option('wc_points_rewards_manual_admin_points_per_admin_daily_max', 1000);
+        add_option('wc_points_rewards_manual_admin_points_site_daily_max', 3000);
         add_option('wc_points_rewards_version', WC_POINTS_REWARDS_VERSION);
     }
     

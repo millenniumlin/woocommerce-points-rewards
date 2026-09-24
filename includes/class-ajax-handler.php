@@ -48,7 +48,7 @@ class WC_Points_Rewards_Ajax_Handler {
      */
     public function process_historical_orders() {
         // 檢查權限
-        if (!current_user_can('manage_woocommerce')) {
+        if (!wc_points_rewards_is_site_administrator()) {
             wp_send_json_error(__('權限不足', 'wc-points-rewards'));
         }
         
@@ -60,6 +60,7 @@ class WC_Points_Rewards_Ajax_Handler {
         $start_date = sanitize_text_field($_POST['start_date'] ?? '');
         $end_date = sanitize_text_field($_POST['end_date'] ?? '');
         $dry_run = isset($_POST['dry_run']) && $_POST['dry_run'] === '1';
+        $confirmation = sanitize_text_field($_POST['confirmation'] ?? '');
         
         if (!$start_date || !$end_date) {
             wp_send_json_error(__('請提供有效的日期範圍', 'wc-points-rewards'));
@@ -89,6 +90,10 @@ class WC_Points_Rewards_Ajax_Handler {
         if (($end_timestamp - $start_timestamp) > (2 * 365 * 24 * 60 * 60)) {
             wp_send_json_error(__('日期範圍不能超過2年', 'wc-points-rewards'));
         }
+
+        if (!$dry_run && 'CONFIRM' !== strtoupper($confirmation)) {
+            wp_send_json_error(__('請輸入 CONFIRM 以確認執行正式補發。', 'wc-points-rewards'));
+        }
         
         // 獲取指定日期範圍內的已完成訂單（添加合理限制防止記憶體問題）
         $orders = wc_get_orders(array(
@@ -107,6 +112,9 @@ class WC_Points_Rewards_Ajax_Handler {
             wp_send_json_error(__('點數系統類別未正確載入', 'wc-points-rewards'));
         }
         
+        $operator_id = get_current_user_id();
+        $operator = get_user_by('id', $operator_id);
+
         foreach ($orders as $order) {
             // 檢查是否已經處理過
             if (get_post_meta($order->get_id(), '_points_awarded', true)) {
@@ -147,11 +155,7 @@ class WC_Points_Rewards_Ajax_Handler {
                     $database = WC_Points_Rewards_Database::instance();
                     
                     // 計算過期時間
-                    $expiry_months = intval(get_option('wc_points_rewards_points_expiry_months', '12'));
-                    $expiry_date = null;
-                    if ($expiry_months > 0) {
-                        $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
-                    }
+                    $expiry_date = wc_points_rewards_calculate_points_expiry_date();
                     
                     $success = $database->add_points(
                         $user_id,
@@ -159,7 +163,8 @@ class WC_Points_Rewards_Ajax_Handler {
                         'earned',
                         sprintf(__('訂單 #%s 補發點數', 'wc-points-rewards'), $order->get_order_number()),
                         $order->get_id(),
-                        $expiry_date
+                        $expiry_date,
+                        $operator_id
                     );
                     
                     if ($success) {
@@ -220,6 +225,36 @@ class WC_Points_Rewards_Ajax_Handler {
                 $skipped_count,
                 wc_points_rewards_number_format($total_points_awarded)
             );
+
+            $summary = array(
+                'run_at'          => wc_points_rewards_get_site_mysql_datetime(),
+                'operator_id'     => $operator_id,
+                'operator_login'  => $operator ? $operator->user_login : '',
+                'operator_name'   => $operator ? $operator->display_name : '',
+                'start_date'      => $start_date,
+                'end_date'        => $end_date,
+                'processed_count' => $processed_count,
+                'skipped_count'   => $skipped_count,
+                'total_points'    => $total_points_awarded,
+            );
+
+            $this->log_historical_backfill_summary($summary);
+
+            if (class_exists('WC_Points_Rewards_Security')) {
+                WC_Points_Rewards_Security::instance()->log_security_event(
+                    'historical_points_backfill',
+                    sprintf(
+                        '管理員 %1$s（ID:%2$d）執行歷史訂單補發，日期 %3$s 至 %4$s，共 %5$d 筆，發放 %6$s 點',
+                        $summary['operator_login'],
+                        $operator_id,
+                        $start_date,
+                        $end_date,
+                        $processed_count,
+                        wc_points_rewards_number_format($total_points_awarded)
+                    ),
+                    $operator_id
+                );
+            }
         }
         
         wp_send_json_success(array(
@@ -229,5 +264,24 @@ class WC_Points_Rewards_Ajax_Handler {
             'total_points' => $total_points_awarded,
             'eligible_orders' => $eligible_orders
         ));
+    }
+
+    /**
+     * 記錄歷史訂單補發摘要。
+     *
+     * @param array<string,mixed> $summary 執行摘要。
+     * @return void
+     */
+    private function log_historical_backfill_summary($summary) {
+        $logs = get_option('wc_points_rewards_historical_backfill_log', array());
+
+        if (!is_array($logs)) {
+            $logs = array();
+        }
+
+        array_unshift($logs, $summary);
+        $logs = array_slice($logs, 0, 20);
+
+        update_option('wc_points_rewards_historical_backfill_log', $logs, false);
     }
 }

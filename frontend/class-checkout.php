@@ -235,19 +235,36 @@ class WC_Points_Rewards_Checkout {
                 
                 // 記錄點數使用
                 $description = sprintf(__('訂單 #%s 使用點數折抵', 'wc-points-rewards'), $order->get_order_number());
-                $database->add_points(
+                $result = $database->deduct_points_with_lock(
                     $user_id,
-                    -$discount_amount, // 負數表示扣除
+                    $discount_amount,
                     'redeemed',
                     $description,
                     $order_id
                 );
-                
-                // 記錄到訂單 meta
-                $discount_value = $calculator->calculate_discount_amount($discount_amount);
-                update_post_meta($order_id, '_points_discount_amount', $discount_value);
-                update_post_meta($order_id, '_points_used', $discount_amount);
-                
+
+                if (!is_wp_error($result)) {
+                    // 記錄到訂單 meta
+                    $discount_value = $calculator->calculate_discount_amount($discount_amount);
+                    update_post_meta($order_id, '_points_discount_amount', $discount_value);
+                    update_post_meta($order_id, '_points_used', $discount_amount);
+                } else {
+                    $order->add_order_note(
+                        sprintf(
+                            __('點數折抵未完成：%s', 'wc-points-rewards'),
+                            $result->get_error_message()
+                        )
+                    );
+
+                    if (class_exists('WC_Points_Rewards_Security')) {
+                        WC_Points_Rewards_Security::instance()->log_security_event(
+                            'checkout_points_deduction_failed',
+                            sprintf('訂單 %1$d 點數扣除失敗：%2$s', $order_id, $result->get_error_message()),
+                            $user_id
+                        );
+                    }
+                }
+
                 // 清除 session
                 WC()->session->__unset('wc_points_rewards_discount_amount');
             }

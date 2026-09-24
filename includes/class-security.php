@@ -276,8 +276,11 @@ class WC_Points_Rewards_Security {
      * AJAX: 管理員手動添加點數
      */
     public function ajax_admin_add_points() {
-        if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error(__('權限不足', 'wc-points-rewards'));
+        if (!wc_points_rewards_is_site_administrator()) {
+            wp_send_json_error(array(
+                'code' => 'forbidden',
+                'message' => __('權限不足', 'wc-points-rewards'),
+            ));
         }
         
         $this->verify_nonce('wc_points_rewards_admin_nonce');
@@ -285,44 +288,38 @@ class WC_Points_Rewards_Security {
         $user_id = $this->sanitize_input($_POST['user_id'], 'int');
         $points = $this->sanitize_input($_POST['points'], 'float');
         $reason = $this->sanitize_input($_POST['reason'], 'textarea');
-        
-        if (!$user_id || $points <= 0) {
-            wp_send_json_error(__('參數錯誤', 'wc-points-rewards'));
-        }
-        
-        $database = WC_Points_Rewards_Database::instance();
-        
-        // 計算過期時間
-        $expiry_months = intval(get_option('wc_points_rewards_points_expiry_months', '12'));
-        $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
-        
-        $result = $database->add_points(
-            $user_id,
-            $points,
-            'admin',
-            $reason ?: __('管理員手動添加', 'wc-points-rewards'),
-            null,
-            $expiry_date
-        );
-        
-        if ($result) {
-            $admin_user = wp_get_current_user();
-            $this->log_security_event('admin_points_added', "管理員 {$admin_user->user_login} 為用戶 {$user_id} 添加 {$points} 點數", get_current_user_id());
-            
-            wp_send_json_success(array(
-                'message' => sprintf(__('成功為用戶添加 %s 點數', 'wc-points-rewards'), wc_points_rewards_number_format($points))
+
+        $manager = WC_Points_Rewards_Admin_Points_Manager::instance();
+        $result  = $manager->create_manual_grant($user_id, $points, $reason, get_current_user_id());
+
+        if (is_wp_error($result)) {
+            wp_send_json_error(array(
+                'code' => $result->get_error_code(),
+                'message' => $result->get_error_message(),
             ));
-        } else {
-            wp_send_json_error(__('添加點數失敗', 'wc-points-rewards'));
         }
+
+        wp_send_json_success(array(
+            'message' => sprintf(
+                __('成功為 %1$s 補發 %2$s，目前餘額為 %3$s。', 'wc-points-rewards'),
+                $result['target_user']->display_name,
+                wc_points_rewards_number_format($result['points']),
+                wc_points_rewards_number_format($result['balance'])
+            ),
+            'balance' => $result['balance'],
+            'usage'   => $result['usage'],
+        ));
     }
     
     /**
      * AJAX: 管理員手動扣除點數
      */
     public function ajax_admin_deduct_points() {
-        if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error(__('權限不足', 'wc-points-rewards'));
+        if (!wc_points_rewards_is_site_administrator()) {
+            wp_send_json_error(array(
+                'code' => 'forbidden',
+                'message' => __('權限不足', 'wc-points-rewards'),
+            ));
         }
         
         $this->verify_nonce('wc_points_rewards_admin_nonce');
@@ -330,35 +327,25 @@ class WC_Points_Rewards_Security {
         $user_id = $this->sanitize_input($_POST['user_id'], 'int');
         $points = $this->sanitize_input($_POST['points'], 'float');
         $reason = $this->sanitize_input($_POST['reason'], 'textarea');
-        
-        if (!$user_id || $points <= 0) {
-            wp_send_json_error(__('參數錯誤', 'wc-points-rewards'));
-        }
-        
-        $database = WC_Points_Rewards_Database::instance();
-        
-        // 檢查用戶是否有足夠點數
-        $available_points = $database->get_user_points($user_id);
-        if ($points > $available_points) {
-            wp_send_json_error(__('用戶點數不足', 'wc-points-rewards'));
-        }
-        
-        $result = $database->add_points(
-            $user_id,
-            -$points, // 負數表示扣除
-            'admin',
-            $reason ?: __('管理員手動扣除', 'wc-points-rewards')
-        );
-        
-        if ($result) {
-            $admin_user = wp_get_current_user();
-            $this->log_security_event('admin_points_deducted', "管理員 {$admin_user->user_login} 為用戶 {$user_id} 扣除 {$points} 點數", get_current_user_id());
-            
-            wp_send_json_success(array(
-                'message' => sprintf(__('成功扣除用戶 %s 點數', 'wc-points-rewards'), wc_points_rewards_number_format($points))
+
+        $manager = WC_Points_Rewards_Admin_Points_Manager::instance();
+        $result  = $manager->deduct_points($user_id, $points, $reason, get_current_user_id());
+
+        if (is_wp_error($result)) {
+            wp_send_json_error(array(
+                'code' => $result->get_error_code(),
+                'message' => $result->get_error_message(),
             ));
-        } else {
-            wp_send_json_error(__('扣除點數失敗', 'wc-points-rewards'));
         }
+
+        wp_send_json_success(array(
+            'message' => sprintf(
+                __('成功扣除 %1$s 的 %2$s，目前餘額為 %3$s。', 'wc-points-rewards'),
+                $result['target_user']->display_name,
+                wc_points_rewards_number_format($result['points']),
+                wc_points_rewards_number_format($result['balance'])
+            ),
+            'balance' => $result['balance'],
+        ));
     }
 }

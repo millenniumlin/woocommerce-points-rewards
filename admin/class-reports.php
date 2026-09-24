@@ -50,12 +50,13 @@ class WC_Points_Rewards_Reports {
         }
         
         $points_table = $wpdb->prefix . 'wc_points_rewards_points';
+        $current_time = wc_points_rewards_get_site_mysql_datetime();
         
         // 總發放點數
         $total_earned = $wpdb->get_var($wpdb->prepare("
             SELECT SUM(points) 
             FROM $points_table 
-            WHERE type = 'earned' 
+            WHERE (type = 'earned' OR (type = 'admin' AND points > 0))
             AND created_at BETWEEN %s AND %s
         ", $start_date, $end_date . ' 23:59:59'));
         
@@ -76,12 +77,13 @@ class WC_Points_Rewards_Reports {
         ", $start_date, $end_date . ' 23:59:59')));
         
         // 目前有效點數總額
-        $total_active = $wpdb->get_var("
-            SELECT COALESCE(SUM(points), 0) 
+        $total_active = $wpdb->get_var($wpdb->prepare(
+            "SELECT COALESCE(SUM(points), 0) 
             FROM `{$points_table}` 
-            WHERE type = 'earned' 
-            AND (expiry_date IS NULL OR expiry_date > NOW())
-        ");
+            WHERE (type = 'earned' OR (type = 'admin' AND points > 0))
+            AND (expiry_date IS NULL OR expiry_date > %s)",
+            $current_time
+        ));
         
         return array(
             'total_earned' => floatval($total_earned),
@@ -128,7 +130,7 @@ class WC_Points_Rewards_Reports {
         $trend_data = $wpdb->get_results($wpdb->prepare("
             SELECT 
                 DATE(created_at) as date,
-                SUM(CASE WHEN type = 'earned' THEN points ELSE 0 END) as earned,
+                SUM(CASE WHEN type = 'earned' OR (type = 'admin' AND points > 0) THEN points ELSE 0 END) as earned,
                 ABS(SUM(CASE WHEN type = 'redeemed' THEN points ELSE 0 END)) as redeemed
             FROM $points_table 
             WHERE created_at >= %s
@@ -164,7 +166,7 @@ class WC_Points_Rewards_Reports {
                 p.user_id,
                 u.display_name,
                 u.user_email,
-                SUM(CASE WHEN p.type = 'earned' THEN p.points ELSE 0 END) as total_earned,
+                SUM(CASE WHEN p.type = 'earned' OR (p.type = 'admin' AND p.points > 0) THEN p.points ELSE 0 END) as total_earned,
                 ABS(SUM(CASE WHEN p.type = 'redeemed' THEN p.points ELSE 0 END)) as total_redeemed
             FROM $points_table p
             LEFT JOIN {$wpdb->users} u ON p.user_id = u.ID
@@ -247,29 +249,33 @@ class WC_Points_Rewards_Reports {
         $points_table = $wpdb->prefix . 'wc_points_rewards_points';
         
         // 30天內到期的點數
-        $expiring_30_days = $wpdb->get_var("
+        $current_time = wc_points_rewards_get_site_mysql_datetime();
+        $window_30_end = wc_points_rewards_get_site_datetime('+30 days')->format('Y-m-d H:i:s');
+        $window_7_end = wc_points_rewards_get_site_datetime('+7 days')->format('Y-m-d H:i:s');
+
+        $expiring_30_days = $wpdb->get_var($wpdb->prepare("
             SELECT COALESCE(SUM(points), 0) 
             FROM `{$points_table}` 
-            WHERE type = 'earned' 
-            AND expiry_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 DAY)
-        ");
+            WHERE (type = 'earned' OR (type = 'admin' AND points > 0))
+            AND expiry_date BETWEEN %s AND %s
+        ", $current_time, $window_30_end));
         
         // 7天內到期的點數
-        $expiring_7_days = $wpdb->get_var("
+        $expiring_7_days = $wpdb->get_var($wpdb->prepare("
             SELECT COALESCE(SUM(points), 0) 
             FROM `{$points_table}` 
-            WHERE type = 'earned' 
-            AND expiry_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 7 DAY)
-        ");
+            WHERE (type = 'earned' OR (type = 'admin' AND points > 0))
+            AND expiry_date BETWEEN %s AND %s
+        ", $current_time, $window_7_end));
         
         // 已過期但未標記的點數
-        $expired_unmarked = $wpdb->get_var("
+        $expired_unmarked = $wpdb->get_var($wpdb->prepare("
             SELECT COALESCE(SUM(points), 0) 
             FROM `{$points_table}` 
-            WHERE type = 'earned' 
+            WHERE (type = 'earned' OR (type = 'admin' AND points > 0))
             AND expiry_date IS NOT NULL 
-            AND expiry_date < NOW()
-        ");
+            AND expiry_date < %s
+        ", $current_time));
         
         return array(
             'expiring_30_days' => floatval($expiring_30_days),
