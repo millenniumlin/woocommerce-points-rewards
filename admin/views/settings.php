@@ -17,11 +17,15 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
         // 基本設定
         'enable_points_system' => sanitize_text_field($_POST['enable_points_system'] ?? 'no'),
         'points_name' => sanitize_text_field($_POST['points_name'] ?? '點'),
+        'points_value' => floatval($_POST['points_value'] ?? 1),
         
         // 點數獲得
-        'points_per_amount' => floatval($_POST['points_per_amount'] ?? 100),
+        'points_per_amount' => floatval($_POST['points_per_amount'] ?? 1),
         'points_amount' => floatval($_POST['points_amount'] ?? 1),
         'points_expiry_months' => intval($_POST['points_expiry_months'] ?? 12),
+        'registration_points' => floatval($_POST['registration_points'] ?? 100),
+        'enable_birthday_points' => sanitize_text_field($_POST['enable_birthday_points'] ?? 'yes'),
+        'birthday_points' => floatval($_POST['birthday_points'] ?? 200),
         
         // 購物車點數使用設定
         'enable_cart_redemption' => sanitize_text_field($_POST['enable_cart_redemption'] ?? 'yes'),
@@ -30,8 +34,6 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
         
         // 顯示設定
         'show_in_menu' => sanitize_text_field($_POST['show_in_menu'] ?? 'yes'),
-        'show_in_shop_loop' => sanitize_text_field($_POST['show_in_shop_loop'] ?? 'yes'),
-        'show_in_single_product' => sanitize_text_field($_POST['show_in_single_product'] ?? 'yes'),
     );
     
     update_option('wc_points_rewards_settings', $new_settings);
@@ -72,6 +74,15 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                     </td>
                 </tr>
                 
+                <tr>
+                    <th scope="row"><?php _e('點數價值', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <input type="number" name="points_value" value="<?php echo esc_attr($settings['points_value'] ?? 1); ?>" min="0.001" step="0.001" class="small-text">
+                        <?php echo get_woocommerce_currency_symbol(); ?>
+                        <p class="description"><?php _e('1點等於多少錢（例如：1表示1點=1元）', 'wc-points-rewards'); ?></p>
+                    </td>
+                </tr>
+                
                 <!-- 小數位數設定說明 -->
                 <tr>
                     <th scope="row"><?php _e('小數位數顯示', 'wc-points-rewards'); ?></th>
@@ -93,12 +104,12 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                     <td>
                         <label>
                             <?php _e('每', 'wc-points-rewards'); ?>
-                            <input type="number" name="points_per_amount" value="<?php echo esc_attr($settings['points_per_amount'] ?? 100); ?>" min="1" step="0.01" class="small-text">
+                            <input type="number" name="points_per_amount" value="<?php echo esc_attr($settings['points_per_amount'] ?? 1); ?>" min="1" step="0.01" class="small-text">
                             <?php _e('元回饋', 'wc-points-rewards'); ?>
                             <input type="number" name="points_amount" value="<?php echo esc_attr($settings['points_amount'] ?? 1); ?>" min="0.01" step="0.01" class="small-text">
                             <?php echo wc_points_rewards_get_points_name(); ?>
                         </label>
-                        <p class="description"><?php _e('例如：每100元回饋1點', 'wc-points-rewards'); ?></p>
+                        <p class="description"><?php _e('例如：每1元回饋1點', 'wc-points-rewards'); ?></p>
                     </td>
                 </tr>
                 
@@ -108,6 +119,34 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                         <input type="number" name="points_expiry_months" value="<?php echo esc_attr($settings['points_expiry_months'] ?? 12); ?>" min="1" class="small-text">
                         <?php _e('個月', 'wc-points-rewards'); ?>
                         <p class="description"><?php _e('點數的有效期限，超過此期限點數將自動過期', 'wc-points-rewards'); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('註冊贈送點數', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <input type="number" name="registration_points" value="<?php echo esc_attr($settings['registration_points'] ?? 100); ?>" min="0" class="small-text">
+                        <?php echo wc_points_rewards_get_points_name(); ?>
+                        <p class="description"><?php _e('新用戶註冊時贈送的點數', 'wc-points-rewards'); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('啟用生日點數', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="enable_birthday_points" value="yes" <?php checked($settings['enable_birthday_points'] ?? 'yes', 'yes'); ?>>
+                            <?php _e('在用戶生日月份贈送點數', 'wc-points-rewards'); ?>
+                        </label>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('生日贈送點數', 'wc-points-rewards'); ?></th>
+                    <td>
+                        <input type="number" name="birthday_points" value="<?php echo esc_attr($settings['birthday_points'] ?? 200); ?>" min="0" class="small-text">
+                        <?php echo wc_points_rewards_get_points_name(); ?>
+                        <p class="description"><?php _e('用戶生日月份贈送的點數', 'wc-points-rewards'); ?></p>
                     </td>
                 </tr>
             </table>
@@ -123,7 +162,7 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                     <td>
                         <label>
                             <input type="checkbox" name="enable_cart_redemption" value="yes" <?php checked($settings['enable_cart_redemption'] ?? 'yes', 'yes'); ?>>
-                            <?php _e('允許客戶在購物車頁面使用點數折抵', 'wc-points-rewards'); ?>
+                            <?php _e('允許客戶在購物車使用點數折抵', 'wc-points-rewards'); ?>
                         </label>
                     </td>
                 </tr>
@@ -143,43 +182,6 @@ if (isset($_POST['save_settings']) && wp_verify_nonce($_POST['_wpnonce'], 'wc_po
                         <input type="number" name="min_cart_total" value="<?php echo esc_attr($settings['min_cart_total'] ?? 0); ?>" min="0" step="0.01" class="regular-text">
                         <?php echo get_woocommerce_currency_symbol(); ?>
                         <p class="description"><?php _e('購物車金額需達到此數額才能使用點數折抵（設定為0表示無限制）', 'wc-points-rewards'); ?></p>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        
-        <!-- 顯示設定 -->
-        <div class="settings-section">
-            <h2><?php _e('顯示設定', 'wc-points-rewards'); ?></h2>
-            
-            <table class="form-table">
-                <tr>
-                    <th scope="row"><?php _e('選單位置顯示', 'wc-points-rewards'); ?></th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="show_in_menu" value="yes" <?php checked($settings['show_in_menu'] ?? 'yes', 'yes'); ?>>
-                            <?php _e('在網站選單顯示點數資訊', 'wc-points-rewards'); ?>
-                        </label>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <th scope="row"><?php _e('商品列表頁顯示', 'wc-points-rewards'); ?></th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="show_in_shop_loop" value="yes" <?php checked($settings['show_in_shop_loop'] ?? 'yes', 'yes'); ?>>
-                            <?php _e('在商品列表頁顯示可獲得點數', 'wc-points-rewards'); ?>
-                        </label>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <th scope="row"><?php _e('單一商品頁顯示', 'wc-points-rewards'); ?></th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="show_in_single_product" value="yes" <?php checked($settings['show_in_single_product'] ?? 'yes', 'yes'); ?>>
-                            <?php _e('在單一商品頁顯示可獲得點數', 'wc-points-rewards'); ?>
-                        </label>
                     </td>
                 </tr>
             </table>

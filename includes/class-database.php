@@ -151,56 +151,94 @@ class WC_Points_Rewards_Database {
     }
     
     /**
-     * 獲取用戶總點數
+     * 獲取用戶總點數 - 改進空值處理和資料型別安全
      */
     public function get_user_points($user_id) {
         global $wpdb;
         
+        // 驗證用戶ID
+        $user_id = intval($user_id);
+        if ($user_id <= 0) {
+            return 0.0;
+        }
+        
         $table_name = $wpdb->prefix . 'wc_points_rewards_points';
         
         $total_points = $wpdb->get_var($wpdb->prepare("
-            SELECT SUM(points) 
-            FROM $table_name 
+            SELECT COALESCE(SUM(points), 0) 
+            FROM `{$table_name}` 
             WHERE user_id = %d 
             AND (expiry_date IS NULL OR expiry_date > NOW())
         ", $user_id));
         
-        return $total_points ? floatval($total_points) : 0;
+        // 確保返回有效的浮點數
+        $result = floatval($total_points);
+        return max(0, $result); // 確保不會返回負數
     }
     
     /**
-     * 添加點數記錄
+     * 添加點數記錄 - 使用事務確保一致性
      */
     public function add_points($user_id, $points, $type, $description = '', $order_id = null, $expiry_date = null) {
         global $wpdb;
         
         $table_name = $wpdb->prefix . 'wc_points_rewards_points';
         
-        $data = array(
-            'user_id' => $user_id,
-            'points' => $points,
-            'type' => $type,
-            'description' => $description,
-            'created_at' => current_time('mysql')
-        );
+        // 驗證輸入參數
+        $user_id = intval($user_id);
+        $points = floatval($points);
+        $type = sanitize_text_field($type);
+        $description = sanitize_textarea_field($description);
         
-        if ($order_id) {
-            $data['order_id'] = $order_id;
+        if ($user_id <= 0) {
+            return false;
         }
         
-        if ($expiry_date) {
-            $data['expiry_date'] = $expiry_date;
+        // 檢查點數範圍（防止極大的值導致問題）
+        if (abs($points) > 999999999.99) {
+            return false;
         }
         
-        $result = $wpdb->insert($table_name, $data);
+        // 開始事務
+        $wpdb->query('START TRANSACTION');
         
-        if ($result) {
+        try {
+            $data = array(
+                'user_id' => $user_id,
+                'points' => $points,
+                'type' => $type,
+                'description' => $description,
+                'created_at' => current_time('mysql')
+            );
+            
+            if ($order_id) {
+                $data['order_id'] = intval($order_id);
+            }
+            
+            if ($expiry_date) {
+                $data['expiry_date'] = sanitize_text_field($expiry_date);
+            }
+            
+            $result = $wpdb->insert($table_name, $data);
+            
+            if ($result === false) {
+                $wpdb->query('ROLLBACK');
+                return false;
+            }
+            
+            // 提交事務
+            $wpdb->query('COMMIT');
+            
             // 觸發動作鉤子
             do_action('wc_points_rewards_points_added', $user_id, $points, $type, $description, $order_id);
             return $wpdb->insert_id;
+            
+        } catch (Exception $e) {
+            // 回滾事務
+            $wpdb->query('ROLLBACK');
+            error_log('WC Points Rewards: Error adding points - ' . $e->getMessage());
+            return false;
         }
-        
-        return false;
     }
     
     /**
@@ -224,6 +262,15 @@ class WC_Points_Rewards_Database {
     
     /**
      * 更新用戶年度消費統計
+     * 
+     * 此方法是會員等級升級的主要觸發點：
+     * 1. 更新或創建用戶年度消費記錄
+     * 2. 自動觸發等級升級檢查
+     * 3. 支援多年度統計追蹤
+     * 
+     * @param int $user_id 用戶ID
+     * @param float $amount 消費金額
+     * @param int|null $year 統計年份（null時使用當前年份）
      */
     public function update_user_yearly_stats($user_id, $amount, $year = null) {
         global $wpdb;
@@ -234,21 +281,21 @@ class WC_Points_Rewards_Database {
         
         $table_name = $wpdb->prefix . 'wc_points_rewards_user_stats';
         
-        // 檢查是否已存在記錄
+        // 檢查是否已存在該用戶該年度的記錄
         $existing = $wpdb->get_row($wpdb->prepare("
             SELECT * FROM $table_name 
             WHERE user_id = %d AND year = %d
         ", $user_id, $year));
         
         if ($existing) {
-            // 更新現有記錄
+            // 更新現有記錄 - 累加消費金額
             $wpdb->update(
                 $table_name,
                 array('total_spent' => $existing->total_spent + $amount),
                 array('user_id' => $user_id, 'year' => $year)
             );
         } else {
-            // 插入新記錄
+            // 插入新記錄 - 創建該用戶該年度的首筆記錄
             $wpdb->insert(
                 $table_name,
                 array(
@@ -259,48 +306,91 @@ class WC_Points_Rewards_Database {
             );
         }
         
-        // 檢查會員等級升級
+        // 重要：每次更新消費統計後，自動檢查是否符合等級升級條件
         $this->check_tier_upgrade($user_id, $year);
     }
     
     /**
      * 檢查會員等級升級
+     * 
+     * 升級邏輯說明：
+     * 1. 根據用戶年度累積消費金額判斷是否符合更高等級條件
+     * 2. 使用資料庫鎖定機制防止併發處理導致的數據不一致
+     * 3. 自動升級至符合條件的最高等級
+     * 4. 設定等級有效期為1年（從升級時間開始計算）
+     * 5. 觸發升級通知機制
+     * 
+     * @param int $user_id 用戶ID
+     * @param int $year 統計年份
+     * @return bool 是否成功升級
      */
     private function check_tier_upgrade($user_id, $year) {
         global $wpdb;
         
+        // 參數驗證
+        $user_id = intval($user_id);
+        $year = intval($year);
+        
+        if ($user_id <= 0 || $year < 2000 || $year > 2100) {
+            return false;
+        }
+        
         $stats_table = $wpdb->prefix . 'wc_points_rewards_user_stats';
         $tiers_table = $wpdb->prefix . 'wc_points_rewards_tiers';
         
-        // 獲取用戶年度消費總額
-        $total_spent = $wpdb->get_var($wpdb->prepare("
-            SELECT total_spent FROM $stats_table 
-            WHERE user_id = %d AND year = %d
-        ", $user_id, $year));
+        // 步驟1: 使用資料庫鎖定防止競爭條件
+        // 確保同一用戶同一年份的等級檢查不會同時進行
+        $lock_name = "wc_points_tier_upgrade_{$user_id}_{$year}";
+        $lock_acquired = $wpdb->get_var($wpdb->prepare("SELECT GET_LOCK(%s, 10)", $lock_name));
         
-        // 獲取符合的最高等級
-        $new_tier = $wpdb->get_row($wpdb->prepare("
-            SELECT * FROM $tiers_table 
-            WHERE min_amount <= %f 
-            ORDER BY min_amount DESC 
-            LIMIT 1
-        ", $total_spent));
-        
-        if ($new_tier) {
-            // 更新用戶等級
-            $wpdb->update(
-                $stats_table,
-                array(
-                    'current_tier_id' => $new_tier->id,
-                    'tier_start_date' => current_time('mysql'),
-                    'tier_expiry_date' => date('Y-m-d H:i:s', strtotime('+1 year'))
-                ),
-                array('user_id' => $user_id, 'year' => $year)
-            );
-            
-            // 觸發等級升級動作
-            do_action('wc_points_rewards_tier_upgraded', $user_id, $new_tier);
+        if (!$lock_acquired) {
+            return false; // 無法獲得鎖定，可能有其他進程正在處理
         }
+        
+        try {
+            // 步驟2: 獲取用戶當年累積消費總額
+            $total_spent = $wpdb->get_var($wpdb->prepare("
+                SELECT COALESCE(total_spent, 0) FROM `{$stats_table}` 
+                WHERE user_id = %d AND year = %d
+            ", $user_id, $year));
+            
+            $total_spent = floatval($total_spent);
+            
+            // 步驟3: 尋找符合條件的最高等級
+            // 查詢最低消費要求 <= 用戶實際消費的等級
+            // 按最低消費要求降序排列，取第一個（即最高等級）
+            $new_tier = $wpdb->get_row($wpdb->prepare("
+                SELECT * FROM `{$tiers_table}` 
+                WHERE min_amount <= %f 
+                ORDER BY min_amount DESC 
+                LIMIT 1
+            ", $total_spent));
+            
+            if ($new_tier) {
+                // 步驟4: 執行等級升級
+                $wpdb->update(
+                    $stats_table,
+                    array(
+                        'current_tier_id' => intval($new_tier->id),     // 新等級ID
+                        'tier_start_date' => current_time('mysql'),     // 等級開始時間
+                        'tier_expiry_date' => date('Y-m-d H:i:s', strtotime('+1 year')) // 過期時間（1年後）
+                    ),
+                    array('user_id' => $user_id, 'year' => $year),
+                    array('%d', '%s', '%s'),
+                    array('%d', '%d')
+                );
+                
+                // 步驟5: 觸發升級通知和相關處理
+                do_action('wc_points_rewards_tier_upgraded', $user_id, $new_tier);
+                return true;
+            }
+            
+        } finally {
+            // 步驟6: 釋放資料庫鎖定
+            $wpdb->query($wpdb->prepare("SELECT RELEASE_LOCK(%s)", $lock_name));
+        }
+        
+        return false;
     }
     
     /**
@@ -325,7 +415,9 @@ class WC_Points_Rewards_Database {
         
         // 如果沒有等級或等級已過期，返回預設等級
         if (!$tier) {
-            $tier = $wpdb->get_row("SELECT * FROM $tiers_table WHERE tier_order = 1 LIMIT 1");
+            // 使用安全的表名和參數
+            $safe_query = "SELECT * FROM `{$tiers_table}` WHERE tier_order = %d LIMIT 1";
+            $tier = $wpdb->get_row($wpdb->prepare($safe_query, 1));
         }
         
         return $tier;
@@ -339,14 +431,16 @@ class WC_Points_Rewards_Database {
         
         $table_name = $wpdb->prefix . 'wc_points_rewards_points';
         
-        // 標記過期點數
-        $wpdb->query("
-            UPDATE $table_name 
-            SET type = 'expired' 
+        // 標記過期點數 - 使用準備好的語句
+        $expired_query = "
+            UPDATE `{$table_name}` 
+            SET type = %s 
             WHERE expiry_date IS NOT NULL 
             AND expiry_date <= NOW() 
-            AND type = 'earned'
-        ");
+            AND type = %s
+        ";
+        
+        $wpdb->query($wpdb->prepare($expired_query, 'expired', 'earned'));
         
         // 觸發清理動作
         do_action('wc_points_rewards_points_expired');

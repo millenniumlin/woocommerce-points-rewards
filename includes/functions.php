@@ -44,43 +44,57 @@ function wc_points_rewards_floatval($value) {
  * 
  * @param mixed $value 輸入值
  * @param int $decimals 小數位數 (可選，預設使用 WooCommerce 設定)
+ * @param bool $truncate 是否截斷而非四捨五入（點數顯示建議使用）
  * @return string 格式化後的數字
  */
-function wc_points_rewards_number_format($value, $decimals = null) {
+function wc_points_rewards_number_format($value, $decimals = null, $truncate = true) {
     // 如果沒有指定小數位數，使用 WooCommerce 的設定
     if ($decimals === null) {
         $decimals = wc_get_price_decimals();
     }
-    return number_format(floatval($value ?? 0), $decimals);
+    
+    $value = floatval($value ?? 0);
+    
+    // 如果要求截斷而非四捨五入，先進行截斷處理
+    if ($truncate && $decimals >= 0) {
+        if ($decimals > 0) {
+            $scale = pow(10, $decimals);
+            $value = floor($value * $scale) / $scale;
+        } else {
+            // 如果小數位數為0，直接向下取整到整數
+            $value = floor($value);
+        }
+    }
+    
+    return number_format($value, $decimals);
 }
 
 /**
  * 檢查功能是否啟用
  */
 function wc_points_rewards_is_enabled() {
-    $settings = get_option('wc_points_rewards_settings', array());
-    return isset($settings['enable_points_system']) && $settings['enable_points_system'] === 'yes';
+    // 修正：直接從個別選項讀取，而非從組合設定陣列
+    return get_option('wc_points_rewards_enable_points_system', 'yes') === 'yes';
 }
 
 /**
- * 格式化百分比顯示 - 根據需求只顯示到百位數，不顯示小數點
+ * 格式化百分比顯示 - 與 WooCommerce 貨幣小數位數同步
  * 
  * @param float $percentage 百分比值
  * @return string 格式化後的百分比
  */
 function wc_points_rewards_format_percentage($percentage) {
-    // 根據需求，點數回饋百分比只顯示到百位數，不顯示小數點
     $percentage = floatval($percentage ?? 0);
 
-    // 如果是小數，顯示一位小數；如果是整數，不顯示小數點
-    if ($percentage == floor($percentage)) {
-        // 整數，不顯示小數點
+    // 獲取 WooCommerce 貨幣小數位數設定
+    $decimal_places = wc_get_price_decimals();
+    
+    // 使用 WooCommerce 的小數位數格式化百分比
+    $formatted = number_format($percentage, $decimal_places);
+    
+    // 如果小數位數為0或所有小數都是0，則移除不必要的小數點和0
+    if ($decimal_places == 0 || rtrim(substr($formatted, strpos($formatted, '.') + 1), '0') === '') {
         $formatted = number_format($percentage, 0);
-    } else {
-        // 小數，最多顯示一位小數
-        $formatted = number_format($percentage, 1);
-        // 移除不必要的 .0
-        $formatted = rtrim(rtrim($formatted, '0'), '.');
     }
 
     return $formatted . '%';
@@ -90,6 +104,7 @@ function wc_points_rewards_format_percentage($percentage) {
  * 獲取點數名稱
  */
 function wc_points_rewards_get_points_name() {
+    // 修正：直接從個別選項讀取
     return get_option('wc_points_rewards_points_name', __('點', 'wc-points-rewards'));
 }
 
@@ -97,7 +112,8 @@ function wc_points_rewards_get_points_name() {
  * 獲取點數價值（1點等於多少錢）
  */
 function wc_points_rewards_get_points_value() {
-    return floatval(get_option('wc_points_rewards_points_value', '0.01'));
+    // 修正：直接從個別選項讀取
+    return floatval(get_option('wc_points_rewards_points_value', '1'));
 }
 
 /**
@@ -115,17 +131,16 @@ function wc_points_rewards_format_points_value($points = 1) {
  * 獲取外掛設定
  */
 function wc_points_rewards_get_option($key, $default = null) {
-    $settings = get_option('wc_points_rewards_settings', array());
-    return isset($settings[$key]) ? $settings[$key] : $default;
+    // 修正：直接從個別選項讀取
+    return get_option('wc_points_rewards_' . $key, $default);
 }
 
 /**
  * 更新外掛設定
  */
 function wc_points_rewards_update_option($key, $value) {
-    $settings = get_option('wc_points_rewards_settings', array());
-    $settings[$key] = $value;
-    return update_option('wc_points_rewards_settings', $settings);
+    // 修正：直接更新個別選項
+    return update_option('wc_points_rewards_' . $key, $value);
 }
 
 /**
@@ -213,4 +228,155 @@ function wc_points_rewards_get_redemption_rate() {
 function wc_points_rewards_calculate_points_value($points) {
     $rate = wc_points_rewards_get_redemption_rate();
     return floatval($points) * $rate;
+}
+
+/**
+ * 強制使用點數 - 跳過所有限制（僅供管理員使用，加強安全檢查）
+ * 此函數可以添加到主題的 functions.php 中來強制啟用點數使用
+ */
+function wc_points_rewards_force_enable_points_usage() {
+    // 多重安全檢查
+    if (!current_user_can('manage_woocommerce')) {
+        return false;
+    }
+    
+    // 檢查是否在管理後台或具有適當的 nonce
+    if (!is_admin() && !wp_verify_nonce($_REQUEST['force_points_nonce'] ?? '', 'wc_points_force_enable')) {
+        return false;
+    }
+    
+    // 記錄此操作
+    if (class_exists('WC_Points_Rewards_Security')) {
+        $security = WC_Points_Rewards_Security::instance();
+        $security->log_security_event('admin_force_points', '管理員強制啟用點數使用', get_current_user_id());
+    }
+    
+    // 添加一個 hook 來允許管理員跳過所有限制
+    add_filter('wc_points_rewards_can_use_points', '__return_true', 999);
+    add_filter('wc_points_rewards_override_restrictions', '__return_true', 999);
+    
+    return true;
+}
+
+/**
+ * 檢查是否啟用了管理員覆蓋功能
+ */
+function wc_points_rewards_is_admin_override_enabled() {
+    $settings = get_option('wc_points_rewards_settings', array());
+    return isset($settings['allow_admin_override']) && $settings['allow_admin_override'] === 'yes';
+}
+
+/**
+ * 為當前用戶強制啟用點數使用（緊急修復功能，加強安全性）
+ * 可以在主題的 functions.php 中調用此函數來臨時解決點數使用問題
+ */
+function wc_points_rewards_emergency_enable_points() {
+    // 嚴格的權限檢查
+    if (!current_user_can('manage_woocommerce')) {
+        return;
+    }
+    
+    // 只能在管理後台使用
+    if (!is_admin()) {
+        return;
+    }
+    
+    // 記錄緊急操作
+    if (class_exists('WC_Points_Rewards_Security')) {
+        $security = WC_Points_Rewards_Security::instance();
+        $security->log_security_event('emergency_points_enable', '管理員使用緊急點數啟用功能', get_current_user_id());
+    }
+    
+    // 臨時設置允許管理員覆蓋
+    add_filter('pre_option_wc_points_rewards_settings', function($value) {
+        if (!is_array($value)) {
+            $value = get_option('wc_points_rewards_settings', array());
+        }
+        $value['allow_admin_override'] = 'yes';
+        $value['max_discount_percent'] = '100';
+        $value['min_cart_total'] = '0';
+        return $value;
+    });
+}
+
+/**
+ * 調試點數使用問題的助手函數
+ */
+function wc_points_rewards_debug_points_usage($user_id = null, $points_to_use = 0) {
+    if (!current_user_can('manage_woocommerce')) {
+        return array('error' => '權限不足');
+    }
+    
+    if (!$user_id) {
+        $user_id = get_current_user_id();
+    }
+    
+    if (!class_exists('WC_Points_Rewards_Database') || !class_exists('WC_Points_Rewards_Points_Calculator')) {
+        return array('error' => '點數系統未初始化');
+    }
+    
+    $database = WC_Points_Rewards_Database::instance();
+    $calculator = WC_Points_Rewards_Points_Calculator::instance();
+    $settings = get_option('wc_points_rewards_settings', array());
+    
+    $available_points = $database->get_user_points($user_id);
+    $cart_total = WC()->cart ? WC()->cart->get_subtotal() : 0;
+    
+    $debug_info = array(
+        'user_id' => $user_id,
+        'available_points' => $available_points,
+        'points_to_use' => $points_to_use,
+        'cart_total' => $cart_total,
+        'settings' => array(
+            'min_cart_total' => isset($settings['min_cart_total']) ? $settings['min_cart_total'] : '0',
+            'max_discount_percent' => isset($settings['max_discount_percent']) ? $settings['max_discount_percent'] : '100',
+            'points_value' => isset($settings['points_value']) ? $settings['points_value'] : '1',
+            'allow_admin_override' => isset($settings['allow_admin_override']) ? $settings['allow_admin_override'] : 'no'
+        ),
+        'checks' => array()
+    );
+    
+    // 執行各項檢查
+    $debug_info['checks']['sufficient_points'] = $points_to_use <= $available_points;
+    $debug_info['checks']['min_cart_total'] = $cart_total >= floatval($settings['min_cart_total'] ?? 0);
+    
+    if ($points_to_use > 0) {
+        $discount_amount = $calculator->calculate_discount_amount($points_to_use);
+        $max_discount_amount = ($cart_total * floatval($settings['max_discount_percent'] ?? 100)) / 100;
+        $debug_info['checks']['max_discount_check'] = $discount_amount <= $max_discount_amount;
+        $debug_info['discount_amount'] = $discount_amount;
+        $debug_info['max_discount_amount'] = $max_discount_amount;
+    }
+    
+    $debug_info['can_use_points'] = $calculator->can_use_points($cart_total, $points_to_use);
+    $debug_info['is_admin'] = current_user_can('manage_woocommerce');
+    
+    return $debug_info;
+}
+
+/**
+ * 🚀 修正：產生帳戶端點 URL（確保與所有永久連結結構兼容）
+ */
+function wc_points_rewards_get_account_endpoint_url($endpoint) {
+    if (class_exists('WC_Points_Rewards_Account')) {
+        return WC_Points_Rewards_Account::get_account_endpoint_url($endpoint);
+    }
+    
+    // 後備方案
+    $account_page_id = wc_get_page_id('myaccount');
+    $account_page_url = get_permalink($account_page_id);
+    
+    if (!$account_page_url) {
+        return home_url('/my-account/?' . $endpoint);
+    }
+    
+    $permalink_structure = get_option('permalink_structure');
+    
+    if (empty($permalink_structure)) {
+        // 預設永久連結結構
+        return add_query_arg($endpoint, '', $account_page_url);
+    } else {
+        // 美化永久連結結構 - 使用查詢參數
+        return trailingslashit($account_page_url) . '?' . $endpoint;
+    }
 }

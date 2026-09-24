@@ -1,750 +1,750 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR millenniumlim
+# English translations for WooCommerce Points & Rewards package.
+# Copyright (C) 2025 millenniumlim
 # This file is distributed under the same license as the WooCommerce Points & Rewards package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Translated by GitHub Copilot, 2025.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce Points & Rewards 1.4.7\n"
 "Report-Msgid-Bugs-To: https://github.com/millenniumlin/woocommerce-points-"
 "rewards\n"
 "POT-Creation-Date: 2025-08-30 07:03+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2025-08-30 07:30+0000\n"
+"Last-Translator: GitHub Copilot\n"
+"Language-Team: English\n"
+"Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: frontend/views/account-member-tier.php:53
 #, php-format
 msgid "%d年度消費"
-msgstr ""
+msgstr "%d Annual Spending"
 
 #: frontend/class-account.php:1034
 #, php-format
 msgid "%d年消費統計"
-msgstr ""
+msgstr "%d Year Spending Statistics"
 
 #: includes/class-points-calculator.php:356
 #, php-format
 msgid "%s"
-msgstr ""
+msgstr "%s"
 
 #: includes/class-notifications.php:179
 #, php-format
 msgid "%s 等級即將到期"
-msgstr ""
+msgstr "%s Tier Expiring Soon"
 
 #: admin/class-settings.php:379
 #, php-format
 msgid "%s 設定值過大，已調整為最大值 %d"
-msgstr ""
+msgstr "%s setting value too large, adjusted to maximum %d"
 
 #: admin/class-settings.php:394
 #, php-format
 msgid "%s 設定值過大，已調整為最大值 %s"
-msgstr ""
+msgstr "%s setting value too large, adjusted to maximum %s"
 
 #: admin/class-settings.php:375
 #, php-format
 msgid "%s 設定值過小，已調整為最小值 %d"
-msgstr ""
+msgstr "%s setting value too small, adjusted to minimum %d"
 
 #: admin/class-settings.php:390
 #, php-format
 msgid "%s 設定值過小，已調整為最小值 %s"
-msgstr ""
+msgstr "%s setting value too small, adjusted to minimum %s"
 
 #: includes/functions.php:112
 #, php-format
 msgid "%s%s等於%s"
-msgstr ""
+msgstr "%s%s equals %s"
 
 #: admin/class-settings.php:152
 msgid "1點等於多少元（用於折抵）"
-msgstr ""
+msgstr "Value of 1 point in currency (for discounts)"
 
 #: admin/views/settings.php:82
 msgid "1點等於多少錢（例如：1表示1點=1元）"
-msgstr ""
+msgstr "How much 1 point is worth (e.g., 1 means 1 point = 1 unit of currency)"
 
 #: admin/views/reports.php:202 frontend/views/account-points-overview.php:45
 msgid "30天內到期"
-msgstr ""
+msgstr "30天內到期"
 
 #: admin/views/reports.php:198
 msgid "7天內到期"
-msgstr ""
+msgstr "7天內到期"
 
 #: includes/widgets/class-points-widget.php:17
 msgid "WC 點數餘額"
-msgstr ""
+msgstr "WC PointsBalance"
 
 #: install.php:53
 msgid "WooCommerce Points & Rewards 需要 PHP 8.0 或更高版本。"
-msgstr ""
+msgstr "WooCommerce Points & Rewards 需要 PHP 8.0 或更高Version。"
 
 #: install.php:58
 msgid "WooCommerce Points & Rewards 需要 WordPress 6.0 或更高版本。"
-msgstr ""
+msgstr "WooCommerce Points & Rewards 需要 WordPress 6.0 或更高Version。"
 
 #: install.php:63
 msgid "WooCommerce Points & Rewards 需要先安裝 WooCommerce 外掛。"
-msgstr ""
+msgstr "WooCommerce Points & Rewards 需要先安裝 WooCommerce Plugin。"
 
 #: admin/views/dashboard.php:180
 msgid "WooCommerce 版本"
-msgstr ""
+msgstr "WooCommerce Version"
 
 #: admin/views/dashboard.php:175
 msgid "WordPress 版本"
-msgstr ""
+msgstr "WordPress Version"
 
 #: admin/views/points-list.php:111 frontend/class-account.php:925
 #: frontend/views/account-points-history.php:89
 msgid "« 上一頁"
-msgstr ""
+msgstr "« 上一頁"
 
 #: frontend/views/cart-points-section.php:72
 #, php-format
 msgid "✓ 已使用 %s 點數，折抵 %s"
-msgstr ""
+msgstr "✓ Redeemed %s Points，折抵 %s"
 
 #: admin/class-admin.php:516 admin/class-admin.php:518
 #: frontend/class-account.php:1005
 msgid "一般會員"
-msgstr ""
+msgstr "一般Member"
 
 #: admin/views/points-list.php:112 frontend/class-account.php:926
 #: frontend/views/account-points-history.php:90
 msgid "下一頁 »"
-msgstr ""
+msgstr "下一頁 »"
 
 #: includes/class-security.php:241 frontend/class-checkout.php:317
 msgid "不符合點數使用條件"
-msgstr ""
+msgstr "不符合Points使用條件"
 
 #: frontend/views/account-member-tier.php:44
 #, php-format
 msgid "享有 %s 額外點數回饋"
-msgstr ""
+msgstr "享有 %s 額外Points回饋"
 
 #: frontend/class-frontend.php:433
 #, php-format
 msgid "享有 %s%% 額外點數回饋"
-msgstr ""
+msgstr "享有 %s%% 額外Points回饋"
 
 #: admin/views/tier-edit.php:138 admin/views/tier-edit.php:149
 msgid "人"
-msgstr ""
+msgstr "人"
 
 #: admin/views/dashboard.php:238
 msgid "今日使用點數"
-msgstr ""
+msgstr "今Day使用Points"
 
 #: admin/views/dashboard.php:233
 msgid "今日發放點數"
-msgstr ""
+msgstr "今Day發放Points"
 
 #: admin/views/dashboard.php:202
 msgid "今日統計"
-msgstr ""
+msgstr "今DayStatistics"
 
 #: admin/views/points-list.php:72 frontend/class-account.php:882
 #: frontend/views/account-points-history.php:43
 msgid "使用"
-msgstr ""
+msgstr "使用"
 
 #: admin/views/tiers-list.php:107
 msgid "使用說明"
-msgstr ""
+msgstr "使用說明"
 
 #: admin/views/reports.php:227 admin/views/reports.php:440
 #: admin/views/points-list.php:27 admin/class-admin.php:574
 #: frontend/views/cart-points-section.php:27
 #: frontend/views/cart-points-section.php:94
 msgid "使用點數"
-msgstr ""
+msgstr "使用Points"
 
 #: admin/class-admin.php:612
 msgid "使用點數:"
-msgstr ""
+msgstr "使用Points:"
 
 #: admin/views/reports.php:168
 msgid "使用點數的用戶數："
-msgstr ""
+msgstr "使用Points的User數："
 
 #: admin/views/settings.php:112
 msgid "例如：每1元回饋1點"
-msgstr ""
+msgstr "例如：每1元回饋1Points"
 
 #: admin/views/settings.php:120
 msgid "個月"
-msgstr ""
+msgstr "個Month"
 
 #: admin/class-admin.php:91 admin/class-admin.php:92 admin/class-admin.php:203
 msgid "儀表板"
-msgstr ""
+msgstr "Dashboard"
 
 #: admin/class-admin.php:203
 msgid "儀表板頁面開發中..."
-msgstr ""
+msgstr "Dashboard頁面開發中..."
 
 #: admin/views/settings.php:234 admin/class-settings.php:290
 msgid "儲存設定"
-msgstr ""
+msgstr "SaveSettings"
 
 #: admin/views/settings.php:165
 msgid "允許客戶在購物車使用點數折抵"
-msgstr ""
+msgstr "允許客戶在購物車使用Points折抵"
 
 #: admin/class-settings.php:202
 msgid "允許用戶在購物車和結帳頁面使用點數折抵"
-msgstr ""
+msgstr "允許User在購物車和結帳頁面使用Points折抵"
 
 #: admin/views/settings.php:108
 msgid "元回饋"
-msgstr ""
+msgstr "元回饋"
 
 #: frontend/class-account.php:549
 msgid "出生 - 年/月/日"
-msgstr ""
+msgstr "出生 - Year/Month/Day"
 
 #: admin/class-admin.php:239
 msgid "列表頁面開發中..."
-msgstr ""
+msgstr "List頁面開發中..."
 
 #: admin/views/tiers-list.php:95 admin/views/tiers-list.php:357
 #: admin/views/tiers-list.php:362
 msgid "刪除"
-msgstr ""
+msgstr "Delete"
 
 #: admin/views/tiers-list.php:340
 msgid "刪除中..."
-msgstr ""
+msgstr "Delete中..."
 
 #: admin/views/points-list.php:49 frontend/class-account.php:867
 #: frontend/views/account-points-history.php:23
 msgid "到期日"
-msgstr ""
+msgstr "Expiry Date"
 
 #: admin/views/dashboard.php:124
 msgid "前"
-msgstr ""
+msgstr "前"
 
 #: admin/views/settings.php:91
 #, php-format
 msgid ""
 "前往 <a href=\"%s\" target=\"_blank\">WooCommerce 一般設定</a> 調整小數位數顯"
 "示。"
-msgstr ""
+msgstr "前往 <a href=\"%s\" target=\"_blank\">WooCommerce 一般Settings</a> 調整小數位數Display。"
 
 #: admin/views/reports.php:289
 msgid "匯出 CSV"
-msgstr ""
+msgstr "Export CSV"
 
 #: includes/widgets/class-points-widget.php:69 frontend/class-account.php:1020
 #: frontend/class-frontend.php:486
 #, php-format
 msgid "升級至 %s"
-msgstr ""
+msgstr "升級至 %s"
 
 #: frontend/class-account.php:1018 frontend/views/account-member-tier.php:77
 msgid "升級進度"
-msgstr ""
+msgstr "升級進度"
 
 #: frontend/views/account-points-overview.php:43
 msgid "即將到期"
-msgstr ""
+msgstr "Expiring"
 
 #: frontend/class-account.php:706
 msgid "即將到期點數"
-msgstr ""
+msgstr "ExpiringPoints"
 
 #: includes/class-security.php:290 includes/class-security.php:335
 msgid "參數錯誤"
-msgstr ""
+msgstr "ParametersError"
 
 #: admin/views/tier-edit.php:169
 msgid "取消"
-msgstr ""
+msgstr "Cancel"
 
 #: frontend/views/cart-points-section.php:78
 msgid "取消使用"
-msgstr ""
+msgstr "Cancel使用"
 
 #: includes/class-points-calculator.php:354
 msgid "可獲得點數"
-msgstr ""
+msgstr "Points to Earn"
 
 #: includes/widgets/class-points-widget.php:52
 msgid "可用點數"
-msgstr ""
+msgstr "AvailablePoints"
 
 #: admin/class-settings.php:119
 msgid "啟用整個點數獎勵系統"
-msgstr ""
+msgstr "Active整個PointsRewardsSystem"
 
 #: admin/class-settings.php:237
 msgid "啟用會員等級"
-msgstr ""
+msgstr "ActiveMember Tier"
 
 #: admin/class-settings.php:242
 msgid "啟用會員等級系統"
-msgstr ""
+msgstr "ActiveMember TierSystem"
 
 #: admin/views/historical-orders.php:105
 msgid "啟用測試模式（只顯示將要處理的訂單數量，不實際發放點數）"
-msgstr ""
+msgstr "Active測試模式（只Display將要處理的訂單數量，不實際發放Points）"
 
 #: admin/views/settings.php:135
 msgid "啟用生日點數"
-msgstr ""
+msgstr "Active生DayPoints"
 
 #: admin/views/settings.php:161 admin/class-settings.php:197
 msgid "啟用購物車點數折抵"
-msgstr ""
+msgstr "Active購物車Points折抵"
 
 #: admin/class-settings.php:268
 msgid "啟用通知"
-msgstr ""
+msgstr "Active通知"
 
 #: admin/views/settings.php:64
 msgid "啟用點數獎勵功能"
-msgstr ""
+msgstr "ActivePointsRewardsFeature"
 
 #: admin/class-settings.php:273
 msgid "啟用點數相關的通知功能"
-msgstr ""
+msgstr "ActivePoints相關的通知Feature"
 
 #: admin/views/settings.php:60 admin/class-settings.php:114
 msgid "啟用點數系統"
-msgstr ""
+msgstr "ActivePointsSystem"
 
 #: admin/class-settings.php:224
 msgid "單筆消費訂單最多可以使用多少%比例的購物車小計金額來使用點數"
-msgstr ""
+msgstr "單筆消費訂單最多可以使用多少%比例的購物車小計金額來使用Points"
 
 #: admin/views/settings.php:192
 msgid "回溯歷史訂單點數"
-msgstr ""
+msgstr "回溯歷史訂單Points"
 
 #: includes/widgets/class-points-widget.php:60
 #: frontend/views/account-points-overview.php:33
 #: frontend/views/account-member-tier.php:82
 msgid "回饋"
-msgstr ""
+msgstr "回饋"
 
 #: admin/views/settings.php:139
 msgid "在用戶生日月份贈送點數"
-msgstr ""
+msgstr "在User生DayMonth份贈送Points"
 
 #: admin/class-settings.php:284
 msgid "在點數到期前幾天發送提醒"
-msgstr ""
+msgstr "在Points到期前幾天發送提醒"
 
 #: admin/views/settings.php:215
 msgid "執行處理"
-msgstr ""
+msgstr "執行處理"
 
 #: admin/views/settings.php:56
 msgid "基本設定"
-msgstr ""
+msgstr "基本Settings"
 
 #: admin/views/tier-edit.php:34
 msgid "基本資訊"
-msgstr ""
+msgstr "基本Info"
 
 #: includes/class-points-calculator.php:358
 #, php-format
 msgid "基礎 %s + 等級加成 %s%%"
-msgstr ""
+msgstr "Base %s + Tier Bonus %s%%"
 
 #: frontend/views/account-member-tier.php:142
 msgid "基礎回饋"
-msgstr ""
+msgstr "基礎回饋"
 
 #: admin/views/tier-edit.php:196 admin/views/tier-edit.php:356
 msgid "基礎點數回饋"
-msgstr ""
+msgstr "基礎Points回饋"
 
 #: admin/class-admin.php:127 admin/class-admin.php:128
 #: admin/class-admin.php:352
 msgid "報表"
-msgstr ""
+msgstr "Reports"
 
 #: admin/class-admin.php:352
 msgid "報表頁面開發中..."
-msgstr ""
+msgstr "Reports頁面開發中..."
 
 #: admin/views/dashboard.php:170
 msgid "外掛版本"
-msgstr ""
+msgstr "PluginVersion"
 
 #: frontend/views/checkout-points-section.php:41
 msgid "如需修改點數使用，請返回購物車頁面"
-msgstr ""
+msgstr "如需修改Points使用，請返回購物車頁面"
 
 #: includes/class-ajax-handler.php:57 includes/class-security.php:57
 #: admin/class-admin.php:393 admin/class-settings.php:327
 msgid "安全驗證失敗"
-msgstr ""
+msgstr "Security verification failed"
 
 #: frontend/class-checkout.php:252
 msgid "安全驗證失敗，請重新整理頁面再試"
-msgstr ""
+msgstr "Security verification failed，請Refresh頁面再試"
 
 #: admin/views/settings.php:88
 msgid "小數位數顯示"
-msgstr ""
+msgstr "小數位數Display"
 
 #: admin/views/tiers-list.php:120
 msgid "尚未設定會員等級"
-msgstr ""
+msgstr "尚未SettingsMember Tier"
 
 #: admin/views/historical-orders.php:178
 msgid "尚無處理記錄"
-msgstr ""
+msgstr "尚None處理記錄"
 
 #: includes/class-security.php:250
 #, php-format
 msgid "已使用 %s 點數"
-msgstr ""
+msgstr "Redeemed %s Points"
 
 #: frontend/views/checkout-points-section.php:34
 #: frontend/class-checkout.php:360
 #, php-format
 msgid "已使用 %s 點數，折抵 %s"
-msgstr ""
+msgstr "Redeemed %s Points，折抵 %s"
 
 #: admin/views/dashboard.php:44 frontend/views/cart-points-section.php:40
 msgid "已使用點數"
-msgstr ""
+msgstr "RedeemedPoints"
 
 #: frontend/views/cart-points-section.php:60
 msgid "已使用點數折抵金額"
-msgstr ""
+msgstr "RedeemedPoints折抵金額"
 
 #: admin/views/dashboard.php:187 admin/views/dashboard.php:194
 msgid "已停用"
-msgstr ""
+msgstr "已Inactive"
 
 #: admin/views/dashboard.php:187 admin/views/dashboard.php:194
 msgid "已啟用"
-msgstr ""
+msgstr "已Active"
 
 #: admin/views/dashboard.php:36
 msgid "已發放點數"
-msgstr ""
+msgstr "已發放Points"
 
 #: includes/class-security.php:271
 msgid "已移除點數使用"
-msgstr ""
+msgstr "已RemovePoints使用"
 
 #: frontend/class-checkout.php:402
 msgid "已移除點數折抵"
-msgstr ""
+msgstr "已RemovePoints折抵"
 
 #: admin/views/historical-orders.php:56
 msgid "已處理訂單數"
-msgstr ""
+msgstr "已處理訂單數"
 
 #: admin/views/reports.php:206
 msgid "已過期未標記"
-msgstr ""
+msgstr "已過期未標記"
 
 #: admin/views/tier-edit.php:154
 msgid "平均年度消費"
-msgstr ""
+msgstr "平均Year度消費"
 
 #: admin/views/reports.php:170
 msgid "平均每次使用："
-msgstr ""
+msgstr "平均每次使用："
 
 #: admin/class-settings.php:252
 msgid "年度"
-msgstr ""
+msgstr "Year度"
 
 #: frontend/class-account.php:1037
 msgid "年度消費金額"
-msgstr ""
+msgstr "Year度消費金額"
 
 #: admin/views/tier-edit.php:348
 msgid "年消費滿"
-msgstr ""
+msgstr "Year消費滿"
 
 #: admin/views/tier-edit.php:184 frontend/views/account-member-tier.php:131
 #, php-format
 msgid "年消費滿 %s"
-msgstr ""
+msgstr "Year消費滿 %s"
 
 #: admin/views/tiers-list.php:121
 msgid "建立您的第一個會員等級，開始提供用戶更好的購物體驗。"
-msgstr ""
+msgstr "建立您的第一個Member Tier，開始提供User更好的購物體驗。"
 
 #: admin/views/tiers-list.php:123 admin/views/tier-edit.php:167
 msgid "建立等級"
-msgstr ""
+msgstr "建立Tier"
 
 #: admin/views/dashboard.php:61 frontend/views/account-points-overview.php:80
 msgid "快速操作"
-msgstr ""
+msgstr "快速操作"
 
 #. 準備郵件內容
 #: includes/class-member-tier.php:265
 #, php-format
 msgid "恭喜！您已升級為 %s"
-msgstr ""
+msgstr "恭喜！您已升級為 %s"
 
 #: frontend/views/account-member-tier.php:109
 msgid "恭喜！您已達到最高會員等級"
-msgstr ""
+msgstr "恭喜！您已達到最高Member Tier"
 
 #: frontend/class-frontend.php:508
 msgid "您已達到最高會員等級！"
-msgstr ""
+msgstr "您已達到最高Member Tier！"
 
 #: frontend/class-account.php:707
 #, php-format
 msgid "您有 %s 將在30天內到期，請盡快使用！"
-msgstr ""
+msgstr "您有 %s 將在30天內到期，請盡快使用！"
 
 #: admin/class-reports.php:323 admin/class-settings.php:332
 msgid "您沒有權限執行此操作"
-msgstr ""
+msgstr "您沒有權限執行此操作"
 
 #: admin/class-admin.php:335
 msgid "您沒有權限訪問此頁面"
-msgstr ""
+msgstr "您沒有權限訪問此頁面"
 
 #: includes/class-notifications.php:224
 msgid "您獲得了新的點數！"
-msgstr ""
+msgstr "您獲得了新的Points！"
 
 #: frontend/class-account.php:545
 msgid "您的會員註冊日期和時間"
-msgstr ""
+msgstr "您的Member註冊Day期和Hour間"
 
 #: frontend/class-account.php:566
 msgid "您的聯絡電話，可隨時修改"
-msgstr ""
+msgstr "您的聯絡電話，可隨Hour修改"
 
 #: frontend/class-checkout.php:434
 msgid "您的點數使用已自動調整"
-msgstr ""
+msgstr "您的Points使用已自動調整"
 
 #: frontend/class-checkout.php:145
 msgid "您目前沒有可用的點數"
-msgstr ""
+msgstr "您目前沒有Available的Points"
 
 #: frontend/views/account-member-tier.php:110
 msgid "感謝您的長期支持，請繼續享受我們的優質服務！"
-msgstr ""
+msgstr "感謝您的長期支持，請繼續享受我們的優質服務！"
 
 #: includes/class-security.php:358
 #, php-format
 msgid "成功扣除用戶 %s 點數"
-msgstr ""
+msgstr "Success扣除User %s Points"
 
 #: includes/class-security.php:313
 #, php-format
 msgid "成功為用戶添加 %s 點數"
-msgstr ""
+msgstr "Success為User添加 %s Points"
 
 #: includes/widgets/class-points-widget.php:29
 #: includes/widgets/class-points-widget.php:91 frontend/class-account.php:195
 #: frontend/class-account.php:329 frontend/class-account.php:660
 #: frontend/class-frontend.php:323
 msgid "我的點數"
-msgstr ""
+msgstr "My Points"
 
 #: admin/views/points-list.php:25
 msgid "所有類型"
-msgstr ""
+msgstr "所有Type"
 
 #: includes/class-security.php:361
 msgid "扣除點數失敗"
-msgstr ""
+msgstr "扣除PointsFailed"
 
 #: admin/views/historical-orders.php:71
 msgid "批量處理歷史訂單"
-msgstr ""
+msgstr "批量處理歷史訂單"
 
 #: admin/views/points-list.php:122
 msgid "找不到符合條件的點數記錄"
-msgstr ""
+msgstr "找不到符合條件的Points History"
 
 #: admin/views/tiers-list.php:53
 msgid "拖拽排序"
-msgstr ""
+msgstr "拖拽Sort"
 
 #: admin/views/tiers-list.php:109
 msgid "拖拽等級名稱左側的圖標可以調整等級順序"
-msgstr ""
+msgstr "拖拽TierName左側的圖標可以調整Tier順序"
 
 #: admin/views/reports.php:224
 msgid "排名"
-msgstr ""
+msgstr "排名"
 
 #: admin/views/tiers-list.php:30
 msgid "排序"
-msgstr ""
+msgstr "Sort"
 
 #: admin/views/historical-orders.php:156
 msgid "描述"
-msgstr ""
+msgstr "Description"
 
 #: admin/views/points-list.php:32
 msgid "搜尋用戶或描述"
-msgstr ""
+msgstr "SearchUser或Description"
 
 #: admin/views/tiers-list.php:35
 msgid "操作"
-msgstr ""
+msgstr "操作"
 
 #: frontend/class-frontend.php:281
 msgid "操作成功"
-msgstr ""
+msgstr "操作Success"
 
 #: includes/class-security.php:219
 msgid "操作過於頻繁，請稍後再試"
-msgstr ""
+msgstr "操作過於頻繁，請稍後再試"
 
 #: admin/views/reports.php:68 admin/views/reports.php:258
 msgid "數據匯出"
-msgstr ""
+msgstr "數據Export"
 
 #: admin/views/tier-edit.php:13
 msgid "新增會員等級"
-msgstr ""
+msgstr "AddMember Tier"
 
 #: admin/views/tiers-list.php:16 admin/class-admin.php:228
 msgid "新增等級"
-msgstr ""
+msgstr "AddTier"
 
 #: admin/class-admin.php:228
 msgid "新增頁面開發中..."
-msgstr ""
+msgstr "Add頁面開發中..."
 
 #: admin/views/settings.php:130 admin/class-settings.php:174
 msgid "新用戶註冊時贈送的點數"
-msgstr ""
+msgstr "新User註冊Hour贈送的Points"
 
 #: admin/views/points-list.php:48 admin/views/historical-orders.php:153
 #: frontend/class-account.php:719 frontend/class-account.php:863
 #: frontend/views/account-points-history.php:20 frontend/class-frontend.php:373
 msgid "日期"
-msgstr ""
+msgstr "Date"
 
 #: includes/class-ajax-handler.php:73
 msgid "日期格式不正確"
-msgstr ""
+msgstr "Day期Format不正確"
 
 #: includes/class-ajax-handler.php:81
 msgid "日期範圍不合理"
-msgstr ""
+msgstr "Day期範圍不合理"
 
 #: includes/class-ajax-handler.php:90
 msgid "日期範圍不能超過2年"
-msgstr ""
+msgstr "Day期範圍不能超過2Year"
 
 #: admin/views/reports.php:78
 msgid "時期："
-msgstr ""
+msgstr "Hour期："
 
 #: admin/views/dashboard.php:140
 msgid "暫無點數活動記錄"
-msgstr ""
+msgstr "暫NonePoints活動記錄"
 
 #: frontend/class-account.php:934 frontend/views/account-points-history.php:100
 #: frontend/class-frontend.php:366
 msgid "暫無點數記錄"
-msgstr ""
+msgstr "暫NonePoints History"
 
 #: admin/views/reports.php:94
 msgid "更新"
-msgstr ""
+msgstr "更新"
 
 #: admin/views/tier-edit.php:167
 msgid "更新等級"
-msgstr ""
+msgstr "更新Tier"
 
 #: admin/views/tiers-list.php:32 admin/views/tier-edit.php:54
 msgid "最低消費金額"
-msgstr ""
+msgstr "Minimum Spending金額"
 
 #: admin/views/tier-edit.php:381
 msgid "最低消費金額必須為有效數字"
-msgstr ""
+msgstr "Minimum Spending金額必須為有效數字"
 
 #: admin/views/tier-edit.php:208
 msgid "最低消費金額為 0 的等級會成為所有新用戶的預設等級"
-msgstr ""
+msgstr "Minimum Spending金額為 0 的Tier會成為所有新User的DefaultTier"
 
 #: admin/views/tiers-list.php:110
 msgid "最低消費金額為0的等級會成為預設等級"
-msgstr ""
+msgstr "Minimum Spending金額為0的Tier會成為DefaultTier"
 
 #: admin/views/settings.php:180 admin/class-settings.php:208
 msgid "最低購物車金額"
-msgstr ""
+msgstr "最低購物車金額"
 
 #: frontend/class-checkout.php:322
 #, php-format
 msgid "最多只能折抵 %s%% 的金額（%s）"
-msgstr ""
+msgstr "最多只能折抵 %s%% 的金額（%s）"
 
 #: frontend/views/cart-points-section.php:54
 #, php-format
 msgid "最多可折抵 %s%%"
-msgstr ""
+msgstr "最多可折抵 %s%%"
 
 #: admin/views/settings.php:171
 msgid "最大折扣百分比"
-msgstr ""
+msgstr "最大折扣百Minute比"
 
 #: admin/class-settings.php:219
 msgid "最大折抵比例"
-msgstr ""
+msgstr "最大折抵比例"
 
 #: admin/views/reports.php:279
 msgid "最活躍用戶"
-msgstr ""
+msgstr "最活躍User"
 
 #: admin/views/reports.php:218
 msgid "最活躍用戶 TOP 10"
-msgstr ""
+msgstr "最活躍User TOP 10"
 
 #: admin/views/reports.php:80
 msgid "最近7天"
-msgstr ""
+msgstr "最近7天"
 
 #: admin/views/historical-orders.php:134
 msgid "最近處理記錄"
-msgstr ""
+msgstr "最近處理記錄"
 
 #: frontend/views/account-points-overview.php:54
 msgid "最近記錄"
-msgstr ""
+msgstr "最近記錄"
 
 #: admin/views/dashboard.php:86
 msgid "最近點數活動"
-msgstr ""
+msgstr "最近Points活動"
 
 #: frontend/class-account.php:715
 msgid "最近點數記錄"
-msgstr ""
+msgstr "最近Points History"
 
 #: admin/views/reports.php:139
 msgid "會員人數"
-msgstr ""
+msgstr "Member人數"
 
 #: admin/views/reports.php:65
 msgid "會員分析"
-msgstr ""
+msgstr "MemberMinute析"
 
 #: admin/class-admin.php:100 admin/class-admin.php:101
 #: admin/class-admin.php:239 admin/class-admin.php:495
@@ -754,947 +754,947 @@ msgstr ""
 #: frontend/views/account-points-overview.php:30
 #: frontend/views/account-points-overview.php:89
 msgid "會員等級"
-msgstr ""
+msgstr "Member Tier"
 
 #: admin/views/reports.php:132 admin/views/reports.php:274
 msgid "會員等級分布"
-msgstr ""
+msgstr "Member TierMinute布"
 
 #: admin/views/dashboard.php:52
 msgid "會員等級數"
-msgstr ""
+msgstr "Member Tier數"
 
 #: frontend/views/account-member-tier.php:154
 msgid "會員等級根據年度累積消費金額自動升級"
-msgstr ""
+msgstr "Member Tier根據Year度累積消費金額自動升級"
 
 #: admin/class-settings.php:255
 msgid "會員等級的計算週期"
-msgstr ""
+msgstr "Member Tier的計算週期"
 
 #: admin/views/tier-edit.php:48
 msgid "會員等級的顯示名稱，例如：銅牌會員、銀牌會員等"
-msgstr ""
+msgstr "Member Tier的DisplayName，例如：銅牌Member、銀牌Member等"
 
 #: admin/views/tiers-list.php:14
 msgid "會員等級管理"
-msgstr ""
+msgstr "Member TierManagement"
 
 #: frontend/class-frontend.php:470
 msgid "會員等級系統暫時無法使用"
-msgstr ""
+msgstr "Member TierSystem暫HourNone法使用"
 
 #: admin/class-settings.php:230
 msgid "會員等級設定"
-msgstr ""
+msgstr "Member Tier Settings"
 
 #: frontend/class-account.php:1050 frontend/views/account-member-tier.php:116
 msgid "會員等級說明"
-msgstr ""
+msgstr "Member Tier說明"
 
 #: frontend/class-account.php:540
 msgid "會員註冊時間"
-msgstr ""
+msgstr "Member註冊Hour間"
 
 #: frontend/views/account-member-tier.php:155
 msgid "會員資格有效期為一年，到期後將重新計算等級"
-msgstr ""
+msgstr "Member資格有效期為一Year，到期後將重新計算Tier"
 
 #: frontend/class-account.php:537
 msgid "會員資訊"
-msgstr ""
+msgstr "MemberInfo"
 
 #: frontend/class-frontend.php:451
 #, php-format
 msgid "有效期至：%s"
-msgstr ""
+msgstr "有效期至：%s"
 
 #: admin/views/reports.php:123
 msgid "有效點數總額"
-msgstr ""
+msgstr "有效Points總額"
 
 #: admin/views/tiers-list.php:111
 msgid "有用戶使用的等級無法刪除，請先遷移用戶至其他等級"
-msgstr ""
+msgstr "有User使用的TierNone法Delete，請先遷移User至OtherTier"
 
 #: admin/views/points-list.php:56 admin/views/dashboard.php:114
 msgid "未知用戶"
-msgstr ""
+msgstr "未知User"
 
 #: admin/views/historical-orders.php:60
 msgid "未處理訂單數"
-msgstr ""
+msgstr "未處理訂單數"
 
 #: admin/views/reports.php:82
 msgid "本年"
-msgstr ""
+msgstr "本Year"
 
 #: admin/views/reports.php:81
 msgid "本月"
-msgstr ""
+msgstr "本Month"
 
 #: frontend/views/cart-points-section.php:51
 msgid "本次最多可用"
-msgstr ""
+msgstr "本次最多Available"
 
 #: admin/views/tiers-list.php:80
 msgid "查看"
-msgstr ""
+msgstr "查看"
 
 #: admin/views/dashboard.php:134 frontend/views/account-points-overview.php:72
 msgid "查看全部記錄"
-msgstr ""
+msgstr "查看All記錄"
 
 #: admin/views/dashboard.php:77
 msgid "查看報表"
-msgstr ""
+msgstr "查看Reports"
 
 #: frontend/class-account.php:738
 msgid "查看完整記錄"
-msgstr ""
+msgstr "查看完整記錄"
 
 #: admin/views/tier-edit.php:141
 msgid "查看用戶"
-msgstr ""
+msgstr "查看User"
 
 #: frontend/class-account.php:673
 msgid "查看等級"
-msgstr ""
+msgstr "查看Tier"
 
 #: frontend/class-account.php:744 frontend/views/account-points-overview.php:86
 msgid "查看記錄"
-msgstr ""
+msgstr "查看記錄"
 
 #: includes/widgets/class-points-widget.php:82 frontend/class-account.php:662
 msgid "查看詳情"
-msgstr ""
+msgstr "查看詳情"
 
 #: frontend/class-account.php:1010
 msgid "標準回饋"
-msgstr ""
+msgstr "標準回饋"
 
 #: includes/widgets/class-points-widget.php:96
 msgid "標題:"
-msgstr ""
+msgstr "Title:"
 
 #: includes/class-ajax-handler.php:52 includes/class-security.php:280
 #: includes/class-security.php:325 admin/class-admin.php:388
 msgid "權限不足"
-msgstr ""
+msgstr "Insufficient permissions"
 
 #: includes/class-notifications.php:256
 msgid "歡迎加入！您獲得了註冊贈送點數"
-msgstr ""
+msgstr "歡迎加入！您獲得了Registration bonus points"
 
 #: admin/views/historical-orders.php:40
 msgid ""
 "此功能可以為指定日期範圍內的已完成訂單補發點數。系統會自動跳過已經處理過的訂"
 "單，避免重複發放。"
-msgstr ""
+msgstr "此Feature可以為指定Day期範圍內的Completed訂單補發Points。System會自動跳過已經處理過的訂單，避免重複發放。"
 
 #: admin/views/reports.php:173
 msgid "此期間內沒有點數使用記錄"
-msgstr ""
+msgstr "此期間內沒有Points使用記錄"
 
 #: admin/views/tier-edit.php:82
 msgid ""
 "此等級會員購物時額外獲得的點數回饋百分比。例如設定 10，表示額外獲得 10% 點"
 "數。"
-msgstr ""
+msgstr "此TierMember購物Hour額外獲得的PointsBonus Percentage。例如Settings 10，表示額外獲得 10% Points。"
 
 #: admin/views/tier-edit.php:148
 msgid "歷史總用戶數"
-msgstr ""
+msgstr "歷史總User數"
 
 #: admin/class-admin.php:118 admin/class-admin.php:119
 msgid "歷史訂單處理"
-msgstr ""
+msgstr "歷史訂單處理"
 
 #: admin/views/historical-orders.php:37
 msgid "歷史訂單點數補發"
-msgstr ""
+msgstr "歷史訂單Points補發"
 
 #: admin/views/settings.php:106
 msgid "每"
-msgstr ""
+msgstr "每"
 
 #: admin/class-settings.php:130
 msgid "每消費多少金額可獲得1點"
-msgstr ""
+msgstr "每消費多少金額可獲得1Points"
 
 #: admin/views/reports.php:140
 msgid "比例"
-msgstr ""
+msgstr "比例"
 
 #: admin/views/reports.php:228
 msgid "活躍度"
-msgstr ""
+msgstr "活躍度"
 
 #: admin/views/dashboard.php:243
 msgid "活躍用戶數"
-msgstr ""
+msgstr "活躍User數"
 
 #: frontend/class-account.php:998 frontend/class-account.php:1055
 #, php-format
 msgid "消費滿 %s"
-msgstr ""
+msgstr "消費滿 %s"
 
 #: admin/views/settings.php:175
 msgid ""
 "消費者最多可使用訂單金額多少百分比的點數來折抵（例如：設定50，表示最多可用點"
 "數折抵訂單金額的50%）"
-msgstr ""
+msgstr "消費者最多可使用訂單金額多少百Minute比的Points來折抵（例如：Settings50，表示最多AvailablePoints折抵訂單金額的50%）"
 
 #: frontend/views/account-member-tier.php:157
 msgid "消費金額以實際付款金額為準（不包含點數折抵部分）"
-msgstr ""
+msgstr "消費金額以實際付款金額為準（不包含Points折抵部Minute）"
 
 #: includes/class-security.php:316
 msgid "添加點數失敗"
-msgstr ""
+msgstr "添加PointsFailed"
 
 #: includes/class-ajax-handler.php:187
 #, php-format
 msgid ""
 "測試完成！找到 %d 筆符合條件的訂單，跳過 %d 筆已處理訂單。<br>預計將發放總點"
 "數：%s"
-msgstr ""
+msgstr "測試完成！找到 %d 筆符合條件的訂單，跳過 %d 筆已處理訂單。<br>預計將發放總Points：%s"
 
 #: admin/views/historical-orders.php:101
 msgid "測試模式"
-msgstr ""
+msgstr "測試模式"
 
 #: admin/views/tiers-list.php:73
 msgid "無加成"
-msgstr ""
+msgstr "None加成"
 
 #: admin/class-reports.php:329
 msgid "無效的報表類型"
-msgstr ""
+msgstr "None效的ReportsType"
 
 #: includes/class-member-tier.php:127
 msgid "無法刪除：仍有會員使用此等級"
-msgstr ""
+msgstr "None法Delete：仍有Member使用此Tier"
 
 #: frontend/class-frontend.php:425
 msgid "無法取得會員等級資訊"
-msgstr ""
+msgstr "None法取得Member TierInfo"
 
 #: admin/views/tier-edit.php:186 admin/views/tier-edit.php:350
 #: frontend/views/account-member-tier.php:133
 msgid "無消費門檻"
-msgstr ""
+msgstr "None消費門檻"
 
 #: frontend/class-account.php:1008
 msgid "無特殊要求"
-msgstr ""
+msgstr "None特殊要求"
 
 #: admin/views/tiers-list.php:66
 msgid "無門檻"
-msgstr ""
+msgstr "None門檻"
 
 #: admin/views/points-list.php:69 frontend/class-account.php:879
 #: frontend/views/account-points-history.php:40
 msgid "獲得"
-msgstr ""
+msgstr "獲得"
 
 #: frontend/class-account.php:1041 frontend/views/account-member-tier.php:58
 msgid "獲得總點數"
-msgstr ""
+msgstr "獲得總Points"
 
 #: admin/views/reports.php:226 admin/views/reports.php:428
 #: admin/views/points-list.php:26 admin/class-admin.php:573
 msgid "獲得點數"
-msgstr ""
+msgstr "獲得Points"
 
 #: admin/class-admin.php:608
 msgid "獲得點數:"
-msgstr ""
+msgstr "獲得Points:"
 
 #: frontend/class-account.php:622
 msgid "生日設定成功！生日點數將於生日月的第1天發放。"
-msgstr ""
+msgstr "生DaySettingsSuccess！生DayPoints將於生DayMonth的第1天發放。"
 
 #: frontend/class-account.php:555
 msgid "生日資訊已設定，無法修改"
-msgstr ""
+msgstr "生DayInfo已Settings，None法修改"
 
 #: includes/class-points-calculator.php:250
 #: includes/class-points-calculator.php:264 admin/views/settings.php:145
 #: admin/class-settings.php:180
 msgid "生日贈送點數"
-msgstr ""
+msgstr "Birthday bonus points"
 
 #: includes/class-ajax-handler.php:198 admin/views/reports.php:225
 #: admin/views/points-list.php:44 admin/views/historical-orders.php:154
 msgid "用戶"
-msgstr ""
+msgstr "User"
 
 #: admin/views/tier-edit.php:64
 msgid "用戶年度累積消費達到此金額時自動升級到此等級。設為 0 表示預設等級。"
-msgstr ""
+msgstr "UserYear度累積消費達到此金額Hour自動升級到此Tier。設為 0 表示DefaultTier。"
 
 #: admin/views/tiers-list.php:34
 msgid "用戶數量"
-msgstr ""
+msgstr "User數量"
 
 #: admin/views/settings.php:149
 msgid "用戶生日月份贈送的點數"
-msgstr ""
+msgstr "User生DayMonth份贈送的Points"
 
 #: admin/views/tier-edit.php:210
 msgid "用戶等級每年重新計算一次"
-msgstr ""
+msgstr "UserTier每Year重新計算一次"
 
 #: admin/class-settings.php:185
 msgid "用戶設定生日時贈送的點數"
-msgstr ""
+msgstr "UserSettings生DayHour贈送的Points"
 
 #: includes/class-security.php:343
 msgid "用戶點數不足"
-msgstr ""
+msgstr "UserInsufficient points"
 
 #: admin/views/tier-edit.php:165
 msgid "發佈"
-msgstr ""
+msgstr "發佈"
 
 #: admin/views/tiers-list.php:361 frontend/class-frontend.php:280
 msgid "發生錯誤，請稍後再試"
-msgstr ""
+msgstr "發生Error，請稍後再試"
 
 #: admin/class-admin.php:161
 msgid "發生錯誤，請稍後再試。"
-msgstr ""
+msgstr "發生Error，請稍後再試。"
 
 #: frontend/views/cart-points-section.php:45
 msgid "目前剩餘點數"
-msgstr ""
+msgstr "目前剩餘Points"
 
 #: admin/views/tier-edit.php:136
 msgid "目前用戶數"
-msgstr ""
+msgstr "目前User數"
 
 #: frontend/class-account.php:996 frontend/class-account.php:1006
 #: frontend/views/account-member-tier.php:125
 msgid "目前等級"
-msgstr ""
+msgstr "Current Tier"
 
 #: frontend/views/account-points-overview.php:19
 msgid "目前點數"
-msgstr ""
+msgstr "目前Points"
 
 #: admin/class-admin.php:159
 msgid "確定要刪除嗎？此操作無法復原。"
-msgstr ""
+msgstr "確定要Delete嗎？此操作None法復原。"
 
 #: admin/views/tiers-list.php:333
 msgid "確定要刪除此等級嗎？此操作無法復原。"
-msgstr ""
+msgstr "確定要Delete此Tier嗎？此操作None法復原。"
 
 #: admin/views/historical-orders.php:241
 msgid "確定要執行測試模式嗎？"
-msgstr ""
+msgstr "確定要執行測試模式嗎？"
 
 #: admin/views/settings.php:302
 msgid "確定要處理此日期範圍內的歷史訂單嗎？此操作無法撤銷。"
-msgstr ""
+msgstr "確定要處理此Day期範圍內的歷史訂單嗎？此操作None法撤銷。"
 
 #: admin/views/historical-orders.php:242
 msgid "確定要開始處理歷史訂單嗎？此操作將會實際發放點數。"
-msgstr ""
+msgstr "確定要開始處理歷史訂單嗎？此操作將會實際發放Points。"
 
 #: frontend/views/account-points-history.php:103
 #: frontend/views/account-points-overview.php:83
 #: frontend/views/account-member-tier.php:102
 msgid "立即購物"
-msgstr ""
+msgstr "立即購物"
 
 #: includes/class-ajax-handler.php:195
 msgid "符合條件的訂單："
-msgstr ""
+msgstr "符合條件的訂單："
 
 #: frontend/class-account.php:690
 #, php-format
 msgid "等於 %s"
-msgstr ""
+msgstr "等於 %s"
 
 #: frontend/views/account-member-tier.php:156
 msgid "等級加成適用於購物獲得的點數回饋"
-msgstr ""
+msgstr "Tier加成適用於購物獲得的Points回饋"
 
 #: admin/views/tiers-list.php:112
 msgid "等級升級基於用戶的年度累積消費金額"
-msgstr ""
+msgstr "Tier升級基於User的Year度累積消費金額"
 
 #: admin/views/reports.php:138 admin/views/tiers-list.php:31
 #: admin/views/tier-edit.php:39 admin/views/tier-edit.php:178
 #: admin/views/tier-edit.php:341
 msgid "等級名稱"
-msgstr ""
+msgstr "TierName"
 
 #: admin/views/tier-edit.php:371
 msgid "等級名稱不能為空"
-msgstr ""
+msgstr "TierName不能為空"
 
 #: admin/views/tier-edit.php:207
 msgid "等級名稱會顯示在前端用戶介面中"
-msgstr ""
+msgstr "TierName會Display在前端User介面中"
 
 #: frontend/views/account-member-tier.php:64
 msgid "等級有效期"
-msgstr ""
+msgstr "Tier有效期"
 
 #: admin/views/tier-edit.php:97
 msgid "等級的排序順序，數字越小排序越前面"
-msgstr ""
+msgstr "Tier的Sort順序，數字越小Sort越前面"
 
 #: admin/views/tier-edit.php:105
 msgid "等級統計"
-msgstr ""
+msgstr "TierStatistics"
 
 #: frontend/views/account-member-tier.php:152
 msgid "等級規則說明"
-msgstr ""
+msgstr "Tier規則說明"
 
 #: admin/class-settings.php:248
 msgid "等級計算週期"
-msgstr ""
+msgstr "Tier計算週期"
 
 #: admin/views/tier-edit.php:88
 msgid "等級順序"
-msgstr ""
+msgstr "Tier順序"
 
 #: admin/views/tier-edit.php:175
 msgid "等級預覽"
-msgstr ""
+msgstr "Tier預覽"
 
 #: includes/class-security.php:350
 msgid "管理員手動扣除"
-msgstr ""
+msgstr "Management員手動扣除"
 
 #: includes/class-security.php:303
 msgid "管理員手動添加"
-msgstr ""
+msgstr "Management員手動添加"
 
 #: admin/views/points-list.php:29
 msgid "管理員調整"
-msgstr ""
+msgstr "Management員調整"
 
 #: admin/views/tiers-list.php:22
 msgid ""
 "管理會員等級設定，包括升級條件和回饋百分比。等級會根據用戶的年度消費金額自動"
 "升級。"
-msgstr ""
+msgstr "ManagementMember TierSettings，包括升級條件和Bonus Percentage。Tier會根據User的Year度消費金額自動升級。"
 
 #: admin/views/dashboard.php:69
 msgid "管理等級"
-msgstr ""
+msgstr "ManagementTier"
 
 #: admin/views/points-list.php:34
 msgid "篩選"
-msgstr ""
+msgstr "Filter"
 
 #: admin/views/settings.php:196
 msgid ""
 "系統會找出指定日期範圍內所有已完成的訂單，為這些訂單的會員補發對應的點數（基"
 "礎點數 + 等級加成），更新會員的年度消費記錄，重新計算並升級會員等級。已經處理"
 "過的訂單會自動跳過，不會重複給點數。"
-msgstr ""
+msgstr "System會找出指定Day期範圍內所有Completed的訂單，為這些訂單的Member補發對應的Points（基礎Points + Tier加成），更新Member的Year度消費記錄，重新計算並升級Member Tier。已經處理過的訂單會自動跳過，不會重複給Points。"
 
 #: admin/views/dashboard.php:149
 msgid "系統狀態"
-msgstr ""
+msgstr "SystemStatus"
 
 #: frontend/class-checkout.php:371
 msgid "系統發生錯誤，請稍後再試或聯繫管理員"
-msgstr ""
+msgstr "System發生Error，請稍後再試或聯繫Management員"
 
 #: admin/views/dashboard.php:65
 msgid "系統設定"
-msgstr ""
+msgstr "SystemSettings"
 
 #: admin/class-settings.php:253
 msgid "累計"
-msgstr ""
+msgstr "累計"
 
 #: admin/views/settings.php:208 admin/views/historical-orders.php:91
 msgid "結束日期"
-msgstr ""
+msgstr "End Date"
 
 #: admin/views/reports.php:90
 msgid "結束日期："
-msgstr ""
+msgstr "結束Day期："
 
 #: admin/views/tiers-list.php:88
 msgid "編輯"
-msgstr ""
+msgstr "Edit"
 
 #: admin/views/tier-edit.php:13
 msgid "編輯會員等級"
-msgstr ""
+msgstr "EditMember Tier"
 
 #: admin/class-admin.php:221
 msgid "編輯等級"
-msgstr ""
+msgstr "EditTier"
 
 #: admin/class-admin.php:221
 msgid "編輯頁面開發中..."
-msgstr ""
+msgstr "Edit頁面開發中..."
 
 #: admin/views/reports.php:169
 msgid "總使用次數："
-msgstr ""
+msgstr "總使用次數："
 
 #: admin/views/reports.php:115
 msgid "總使用點數"
-msgstr ""
+msgstr "總使用Points"
 
 #: admin/views/historical-orders.php:52
 msgid "總完成訂單數"
-msgstr ""
+msgstr "總完成訂單數"
 
 #: admin/views/dashboard.php:28
 msgid "總用戶數"
-msgstr ""
+msgstr "總User數"
 
 #: admin/views/reports.php:111
 msgid "總發放點數"
-msgstr ""
+msgstr "總發放Points"
 
 #: admin/views/reports.php:59
 msgid "總覽"
-msgstr ""
+msgstr "總覽"
 
 #: frontend/class-account.php:562
 msgid "聯絡電話"
-msgstr ""
+msgstr "聯絡電話"
 
 #: frontend/class-account.php:635
 msgid "聯絡電話已更新"
-msgstr ""
+msgstr "聯絡電話已更新"
 
 #: admin/views/reports.php:83
 msgid "自定義"
-msgstr ""
+msgstr "自定義"
 
 #: admin/views/reports.php:284
 msgid "至"
-msgstr ""
+msgstr "至"
 
 #: admin/views/settings.php:310 admin/class-admin.php:160
 msgid "處理中..."
-msgstr ""
+msgstr "處理中..."
 
 #: admin/views/historical-orders.php:275
 msgid "處理失敗"
-msgstr ""
+msgstr "處理Failed"
 
 #: admin/views/settings.php:334
 msgid "處理失敗，請稍後再試"
-msgstr ""
+msgstr "處理Failed，請稍後再試"
 
 #: admin/views/settings.php:326
 msgid "處理完成"
-msgstr ""
+msgstr "處理完成"
 
 #: includes/class-ajax-handler.php:215
 #, php-format
 msgid "處理完成！共處理 %d 筆訂單，跳過 %d 筆已處理訂單，總共發放 %s 點數。"
-msgstr ""
+msgstr "處理完成！共處理 %d 筆訂單，跳過 %d 筆已處理訂單，總共發放 %s Points。"
 
 #: admin/views/historical-orders.php:124
 msgid "處理結果"
-msgstr ""
+msgstr "處理結果"
 
 #: includes/class-member-tier.php:268
 #, php-format
 msgid ""
 "親愛的 %s，<br><br>恭喜您已升級為 %s！<br>您現在可以享受 %s%% 的額外點數回"
 "饋。<br><br>感謝您的支持！"
-msgstr ""
+msgstr "親愛的 %s，<br><br>恭喜您已升級為 %s！<br>您現在可以享受 %s%% 的額外Points回饋。<br><br>感謝您的支持！"
 
 #: includes/class-notifications.php:154
 #, php-format
 msgid ""
 "親愛的 %s，<br><br>您有 %s 點即將於 %s 到期。<br>請盡快使用，避免點數失效。"
 "<br><br>立即購物：%s"
-msgstr ""
+msgstr "親愛的 %s，<br><br>您有 %s Points即將於 %s 到期。<br>請盡快使用，避免Points失效。<br><br>立即購物：%s"
 
 #: includes/class-notifications.php:236
 #, php-format
 msgid "親愛的 %s，<br><br>您獲得了 %s 點！<br><br>查看我的帳戶：%s"
-msgstr ""
+msgstr "親愛的 %s，<br><br>您獲得了 %s Points！<br><br>查看我的Account：%s"
 
 #: includes/class-notifications.php:182
 #, php-format
 msgid ""
 "親愛的 %s，<br><br>您的 %s 等級將於 %s 到期。<br>請繼續購物以維持會員等級資"
 "格。<br><br>立即購物：%s"
-msgstr ""
+msgstr "親愛的 %s，<br><br>您的 %s Tier將於 %s 到期。<br>請繼續購物以維持Member Tier資格。<br><br>立即購物：%s"
 
 #: includes/class-notifications.php:228
 #, php-format
 msgid ""
 "親愛的 %s，<br><br>感謝您的購買！您的訂單 #%s 已獲得 %s 點。<br><br>查看我的"
 "帳戶：%s"
-msgstr ""
+msgstr "親愛的 %s，<br><br>感謝您的購買！您的訂單 #%s Earned %s Points。<br><br>查看我的Account：%s"
 
 #: includes/class-notifications.php:259
 #, php-format
 msgid ""
 "親愛的 %s，<br><br>歡迎加入我們！<br>作為新會員，您獲得了 %s 點作為歡迎禮。"
 "<br><br>立即開始購物：%s"
-msgstr ""
+msgstr "親愛的 %s，<br><br>歡迎加入我們！<br>作為新Member，您獲得了 %s Points作為歡迎禮。<br><br>立即開始購物：%s"
 
 #: includes/class-ajax-handler.php:197
 msgid "訂單"
-msgstr ""
+msgstr "訂單"
 
 #. 記錄點數使用
 #: frontend/class-checkout.php:224
 #, php-format
 msgid "訂單 #%s 使用點數折抵"
-msgstr ""
+msgstr "訂單 #%s 使用Points折抵"
 
 #: includes/class-points-calculator.php:127
 #, php-format
 msgid "訂單 #%s 獲得點數（基礎: %s, 等級加成: %s%%）"
-msgstr ""
+msgstr "Order #%s earned points (Base: %s, Tier Bonus: %s%%)"
 
 #: includes/class-ajax-handler.php:160
 #, php-format
 msgid "訂單 #%s 補發點數"
-msgstr ""
+msgstr "訂單 #%s 補發Points"
 
 #: admin/views/historical-orders.php:46
 msgid "訂單統計"
-msgstr ""
+msgstr "訂單Statistics"
 
 #: admin/class-admin.php:136 admin/class-admin.php:137
 #: admin/class-admin.php:367
 msgid "設定"
-msgstr ""
+msgstr "Settings"
 
 #: admin/views/settings.php:42
 msgid "設定已儲存"
-msgstr ""
+msgstr "Settings已Save"
 
 #: frontend/class-account.php:557
 msgid "設定生日可獲得生日禮點數（僅可設定一次）"
-msgstr ""
+msgstr "Settings生Day可獲得生Day禮Points（僅可Settings一次）"
 
 #: admin/class-admin.php:367
 msgid "設定頁面開發中..."
-msgstr ""
+msgstr "Settings頁面開發中..."
 
 #: includes/class-points-calculator.php:218 admin/views/settings.php:126
 #: admin/class-settings.php:169
 msgid "註冊贈送點數"
-msgstr ""
+msgstr "Registration bonus points"
 
 #: admin/views/points-list.php:47 admin/views/tier-edit.php:204
 #: frontend/class-account.php:721 frontend/class-account.php:866
 #: frontend/views/account-points-history.php:21 frontend/class-frontend.php:375
 msgid "說明"
-msgstr ""
+msgstr "說明"
 
 #: admin/views/points-list.php:78 frontend/class-account.php:888
 #: frontend/views/account-points-history.php:49
 msgid "調整"
-msgstr ""
+msgstr "調整"
 
 #: includes/class-security.php:215 includes/class-security.php:262
 #: frontend/class-account.php:355 frontend/class-account.php:402
 #: frontend/class-account.php:442 frontend/class-checkout.php:256
 msgid "請先登入"
-msgstr ""
+msgstr "請先登入"
 
 #: frontend/class-frontend.php:408
 msgid "請先登入查看會員等級"
-msgstr ""
+msgstr "請先登入查看Member Tier"
 
 #: frontend/class-frontend.php:466
 msgid "請先登入查看等級進度"
-msgstr ""
+msgstr "請先登入查看Tier進度"
 
 #: frontend/class-frontend.php:314
 msgid "請先登入查看點數"
-msgstr ""
+msgstr "請先登入查看Points"
 
 #: frontend/class-frontend.php:345
 msgid "請先登入查看點數記錄"
-msgstr ""
+msgstr "請先登入查看Points History"
 
 #: includes/class-ajax-handler.php:65
 msgid "請提供有效的日期範圍"
-msgstr ""
+msgstr "Please provide a valid date range"
 
 #: admin/views/historical-orders.php:280
 msgid "請求失敗："
-msgstr ""
+msgstr "請求Failed："
 
 #: frontend/class-frontend.php:283 frontend/class-checkout.php:263
 msgid "請輸入有效的點數"
-msgstr ""
+msgstr "請Input有效的Points"
 
 #: admin/views/settings.php:293 admin/views/historical-orders.php:229
 msgid "請選擇開始和結束日期"
-msgstr ""
+msgstr "請選擇開始和結束Day期"
 
 #: install.php:70
 msgid "資料庫權限不足，無法創建表格。"
-msgstr ""
+msgstr "Data庫Insufficient permissions，None法創建表格。"
 
 #: admin/class-settings.php:213
 msgid "購物車小計金額超過多少後才能開始使用點數（0表示無限制）"
-msgstr ""
+msgstr "購物車小計金額超過多少後才能開始使用Points（0表示None限制）"
 
 #: frontend/class-checkout.php:274 frontend/class-checkout.php:383
 msgid "購物車未初始化，請重新整理頁面"
-msgstr ""
+msgstr "購物車未初始化，請Refresh頁面"
 
 #: frontend/class-checkout.php:133
 #, php-format
 msgid "購物車滿 %s 即可使用點數折抵"
-msgstr ""
+msgstr "購物車滿 %s 即可使用Points折抵"
 
 #: admin/views/settings.php:184
 msgid "購物車金額需達到此數額才能使用點數折抵（設定為0表示無限制）"
-msgstr ""
+msgstr "購物車金額需達到此數額才能使用Points折抵（Settings為0表示None限制）"
 
 #: frontend/class-checkout.php:320
 #, php-format
 msgid "購物車金額須達 %s 才能使用點數"
-msgstr ""
+msgstr "購物車金額須達 %s 才能使用Points"
 
 #: admin/views/settings.php:157
 msgid "購物車點數使用設定"
-msgstr ""
+msgstr "購物車Points使用Settings"
 
 #: admin/class-settings.php:191
 msgid "購物車點數使用限制"
-msgstr ""
+msgstr "購物車Points使用限制"
 
 #: admin/views/reports.php:62
 msgid "趨勢分析"
-msgstr ""
+msgstr "趨勢Minute析"
 
 #: frontend/class-frontend.php:279
 msgid "載入中..."
-msgstr ""
+msgstr "載入中..."
 
 #: frontend/views/cart-points-section.php:92
 msgid "輸入要使用的點數"
-msgstr ""
+msgstr "Input要使用的Points"
 
 #: admin/views/tier-edit.php:19
 msgid "返回列表"
-msgstr ""
+msgstr "返回List"
 
 #: admin/views/dashboard.php:192
 msgid "通知功能"
-msgstr ""
+msgstr "通知Feature"
 
 #: admin/class-settings.php:261
 msgid "通知設定"
-msgstr ""
+msgstr "通知Settings"
 
 #: admin/views/points-list.php:75 frontend/class-account.php:885
 #: frontend/views/account-points-history.php:46
 msgid "過期"
-msgstr ""
+msgstr "過期"
 
 #: admin/views/reports.php:119 admin/views/points-list.php:28
 msgid "過期點數"
-msgstr ""
+msgstr "過期Points"
 
 #: admin/views/reports.php:261
 msgid "選擇要匯出的報表類型："
-msgstr ""
+msgstr "選擇要Export的ReportsType："
 
 #: admin/views/historical-orders.php:95
 msgid "選擇要處理的訂單結束日期"
-msgstr ""
+msgstr "選擇要處理的訂單結束Day期"
 
 #: admin/views/historical-orders.php:85
 msgid "選擇要處理的訂單開始日期"
-msgstr ""
+msgstr "選擇要處理的訂單開始Day期"
 
 #: includes/widgets/class-points-widget.php:75 frontend/class-account.php:1027
 #, php-format
 msgid "還需 %s"
-msgstr ""
+msgstr "還需 %s"
 
 #: frontend/views/account-member-tier.php:96
 #, php-format
 msgid "還需消費 %s"
-msgstr ""
+msgstr "還需消費 %s"
 
 #: frontend/class-frontend.php:491
 #, php-format
 msgid "還需消費 %s（已消費 %s / 目標 %s）"
-msgstr ""
+msgstr "還需消費 %s（已消費 %s / 目標 %s）"
 
 #: includes/class-ajax-handler.php:199
 msgid "金額"
-msgstr ""
+msgstr "金額"
 
 #: admin/views/settings.php:201 admin/views/historical-orders.php:81
 msgid "開始日期"
-msgstr ""
+msgstr "Start Date"
 
 #: admin/views/settings.php:298 admin/views/historical-orders.php:234
 msgid "開始日期不能晚於結束日期"
-msgstr ""
+msgstr "開始Day期不能晚於結束Day期"
 
 #: includes/class-ajax-handler.php:85
 msgid "開始日期必須早於結束日期"
-msgstr ""
+msgstr "開始Day期必須早於結束Day期"
 
 #: admin/views/reports.php:87
 msgid "開始日期："
-msgstr ""
+msgstr "開始Day期："
 
 #: admin/views/historical-orders.php:113
 msgid "開始處理"
-msgstr ""
+msgstr "開始處理"
 
 #: admin/views/settings.php:218 admin/views/settings.php:337
 msgid "開始處理歷史訂單"
-msgstr ""
+msgstr "開始處理歷史訂單"
 
 #: frontend/class-account.php:743
 msgid "開始購物"
-msgstr ""
+msgstr "開始購物"
 
 #: frontend/views/account-points-history.php:101
 msgid "開始購物即可獲得點數！"
-msgstr ""
+msgstr "開始購物即Points to Earn！"
 
 #: frontend/class-account.php:935
 msgid "開始購物賺取點數"
-msgstr ""
+msgstr "開始購物賺取Points"
 
 #: includes/class-ajax-handler.php:200
 msgid "預計點數"
-msgstr ""
+msgstr "預計Points"
 
 #: admin/views/tiers-list.php:59
 msgid "預設"
-msgstr ""
+msgstr "Default"
 
 #: admin/views/tier-edit.php:354
 msgid "額外"
-msgstr ""
+msgstr "額外"
 
 #: frontend/class-account.php:698
 #, php-format
 msgid "額外 +%s 點數回饋"
-msgstr ""
+msgstr "額外 +%s Points回饋"
 
 #: admin/views/tier-edit.php:194
 #, php-format
 msgid "額外 +%s%% 點數回饋"
-msgstr ""
+msgstr "額外 +%s%% Points回饋"
 
 #: admin/views/tiers-list.php:33
 msgid "額外回饋"
-msgstr ""
+msgstr "額外回饋"
 
 #: admin/views/tier-edit.php:70
 msgid "額外回饋百分比"
-msgstr ""
+msgstr "額外Bonus Percentage"
 
 #: admin/views/tier-edit.php:391
 msgid "額外回饋百分比必須在 0-100 之間"
-msgstr ""
+msgstr "額外Bonus Percentage必須在 0-100 之間"
 
 #: admin/views/tiers-list.php:113
 msgid "額外回饋百分比會應用於用戶購物獲得的點數"
-msgstr ""
+msgstr "額外Bonus Percentage會應用於User購物獲得的Points"
 
 #: admin/views/tier-edit.php:209
 msgid "額外回饋百分比會疊加在基礎點數回饋上"
-msgstr ""
+msgstr "額外Bonus Percentage會疊加在基礎Points回饋上"
 
 #: admin/views/points-list.php:46 frontend/class-account.php:864
 msgid "類型"
-msgstr ""
+msgstr "Type"
 
 #: includes/widgets/class-points-widget.php:105
 msgid "顯示升級進度"
-msgstr ""
+msgstr "Display升級進度"
 
 #: includes/widgets/class-points-widget.php:101
 msgid "顯示會員等級"
-msgstr ""
+msgstr "DisplayMember Tier"
 
 #: includes/widgets/class-points-widget.php:19
 msgid "顯示用戶的點數餘額和會員等級"
-msgstr ""
+msgstr "DisplayUser的PointsBalance和Member Tier"
 
 #. 修正：直接從個別選項讀取
 #: includes/functions.php:93 frontend/class-account.php:661
 #: frontend/class-account.php:707
 msgid "點"
-msgstr ""
+msgstr "Points"
 
 #: admin/views/historical-orders.php:155 frontend/class-frontend.php:374
 msgid "點數"
-msgstr ""
+msgstr "Points"
 
 #: includes/class-security.php:233 frontend/class-frontend.php:282
 #: frontend/class-checkout.php:292
 msgid "點數不足"
-msgstr ""
+msgstr "Insufficient points"
 
 #: admin/views/reports.php:163
 msgid "點數使用分析"
-msgstr ""
+msgstr "Points使用Minute析"
 
 #: admin/views/settings.php:78 admin/class-settings.php:147
 msgid "點數價值"
-msgstr ""
+msgstr "Points價Value"
 
 #: admin/class-settings.php:279
 msgid "點數到期提醒"
-msgstr ""
+msgstr "Points到期提醒"
 
 #: admin/views/reports.php:193
 msgid "點數到期警報"
-msgstr ""
+msgstr "Points到期警報"
 
 #: includes/class-notifications.php:151
 msgid "點數即將到期提醒"
-msgstr ""
+msgstr "PointsExpiring提醒"
 
 #: admin/views/settings.php:70 admin/class-settings.php:136
 msgid "點數名稱"
-msgstr ""
+msgstr "PointsName"
 
 #: admin/views/tier-edit.php:354 frontend/class-account.php:671
 #: frontend/class-account.php:1001 frontend/class-account.php:1057
 #: frontend/views/account-member-tier.php:140
 msgid "點數回饋"
-msgstr ""
+msgstr "Points回饋"
 
 #: admin/views/settings.php:103
 msgid "點數回饋比例"
-msgstr ""
+msgstr "Points回饋比例"
 
 #: admin/views/settings.php:90
 msgid ""
 "點數小數位數現在自動跟隨 WooCommerce > 設定 > 一般 > 貨幣選項 > 小數位數 的設"
 "定。"
-msgstr ""
+msgstr "Points小數位數現在自動跟隨 WooCommerce > Settings > 一般 > 貨幣Options > 小數位數 的Settings。"
 
 #: admin/class-settings.php:163
 msgid "點數幾個月後過期（0表示永不過期）"
-msgstr ""
+msgstr "Points幾個Month後過期（0表示永不過期）"
 
 #: includes/class-security.php:225
 msgid "點數必須大於0"
-msgstr ""
+msgstr "Points必須大於0"
 
 #: frontend/views/checkout-points-section.php:28
 #: frontend/class-checkout.php:191 frontend/class-checkout.php:200
@@ -1702,112 +1702,112 @@ msgstr ""
 #: frontend/class-checkout.php:460 frontend/class-checkout.php:466
 #: frontend/class-checkout.php:468 frontend/class-checkout.php:476
 msgid "點數折抵"
-msgstr ""
+msgstr "Points折抵"
 
 #: frontend/class-checkout.php:268
 msgid "點數數值過大"
-msgstr ""
+msgstr "Points數Value過大"
 
 #: admin/views/settings.php:117 admin/class-settings.php:158
 msgid "點數有效期"
-msgstr ""
+msgstr "Points有效期"
 
 #: admin/views/reports.php:269
 msgid "點數歷史記錄"
-msgstr ""
+msgstr "Points歷史記錄"
 
 #: admin/class-settings.php:125
 msgid "點數比例"
-msgstr ""
+msgstr "Points比例"
 
 #: admin/class-admin.php:80 admin/class-admin.php:81
 #: admin/class-settings.php:60
 msgid "點數獎勵"
-msgstr ""
+msgstr "PointsRewards"
 
 #: admin/views/dashboard.php:20
 msgid "點數獎勵儀表板"
-msgstr ""
+msgstr "PointsRewardsDashboard"
 
 #: admin/views/reports.php:52
 msgid "點數獎勵報表"
-msgstr ""
+msgstr "PointsRewardsReports"
 
 #: admin/class-settings.php:103
 msgid "點數獎勵系統設定"
-msgstr ""
+msgstr "PointsRewardsSystemSettings"
 
 #: admin/views/settings.php:47 admin/class-settings.php:59
 msgid "點數獎勵設定"
-msgstr ""
+msgstr "PointsRewardsSettings"
 
 #: admin/views/reports.php:183
 msgid "點數獲得與使用趨勢（最近30天）"
-msgstr ""
+msgstr "Points獲得與使用趨勢（最近30天）"
 
 #: admin/views/settings.php:99
 msgid "點數獲得設定"
-msgstr ""
+msgstr "Points獲得Settings"
 
 #: admin/views/settings.php:121
 msgid "點數的有效期限，超過此期限點數將自動過期"
-msgstr ""
+msgstr "Points的有效期限，超過此期限Points將自動過期"
 
 #: admin/class-settings.php:141
 msgid "點數的顯示名稱"
-msgstr ""
+msgstr "Points的DisplayName"
 
 #: admin/views/settings.php:73
 msgid "點數的顯示名稱，例如：點、積分、金幣等"
-msgstr ""
+msgstr "Points的DisplayName，例如：Points、積Minute、金幣等"
 
 #: frontend/class-frontend.php:318 frontend/class-frontend.php:349
 #: frontend/class-frontend.php:412
 msgid "點數系統暫時無法使用"
-msgstr ""
+msgstr "PointsSystem暫HourNone法使用"
 
 #: admin/views/dashboard.php:185
 msgid "點數系統狀態"
-msgstr ""
+msgstr "PointsSystemStatus"
 
 #: frontend/class-account.php:348 frontend/class-account.php:395
 #: frontend/class-account.php:435
 msgid "點數系統目前未啟用"
-msgstr ""
+msgstr "PointsSystem目前未Active"
 
 #: includes/class-ajax-handler.php:107
 msgid "點數系統類別未正確載入"
-msgstr ""
+msgstr "PointsSystem類別未正確載入"
 
 #: admin/views/reports.php:105
 msgid "點數統計概覽"
-msgstr ""
+msgstr "PointsStatisticsOverview"
 
 #: admin/views/dashboard.php:73 admin/class-admin.php:109
 #: admin/class-admin.php:110 admin/class-admin.php:325
 #: frontend/class-account.php:196 frontend/class-account.php:331
 #: frontend/class-account.php:857
 msgid "點數記錄"
-msgstr ""
+msgstr "Points History"
 
 #: admin/views/points-list.php:14
 msgid "點數記錄管理"
-msgstr ""
+msgstr "Points HistoryManagement"
 
 #: admin/class-admin.php:325
 msgid "點數記錄頁面開發中..."
-msgstr ""
+msgstr "Points History頁面開發中..."
 
 #: admin/views/points-list.php:45 frontend/class-account.php:720
 #: frontend/class-account.php:865 frontend/views/account-points-history.php:22
 msgid "點數變化"
-msgstr ""
+msgstr "Points變化"
 
 #: admin/class-admin.php:605
 msgid "點數資訊"
-msgstr ""
+msgstr "PointsInfo"
 
 #: admin/class-admin.php:494 frontend/class-account.php:688
 #: frontend/views/cart-points-section.php:34
 msgid "點數餘額"
-msgstr ""
+msgstr "PointsBalance"

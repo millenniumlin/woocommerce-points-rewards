@@ -31,7 +31,7 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
             <div class="points-overview-section">
                 <div class="points-info-grid">
                     <div class="points-info-item">
-                        <span class="points-label"><?php _e('可用點數', 'wc-points-rewards'); ?>：</span>
+                        <span class="points-label"><?php _e('點數餘額', 'wc-points-rewards'); ?>：</span>
                         <span class="points-value available-points"><?php echo wc_points_rewards_number_format($available_points); ?></span>
                     </div>
                     
@@ -88,32 +88,18 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
                                class="input-text points-input" 
                                min="1" 
                                max="<?php echo esc_attr($max_usable_points); ?>" 
-                               step="0.01" 
+                               step="1" 
                                placeholder="<?php _e('輸入要使用的點數', 'wc-points-rewards'); ?>" />
                         <button type="button" class="button button-primary wc-points-apply-discount" data-nonce="<?php echo wp_create_nonce('wc_points_rewards_nonce'); ?>">
                             <?php _e('使用點數', 'wc-points-rewards'); ?>
                         </button>
                     </div>
                     
-                    <div class="points-quick-actions">
-                        <?php 
-                        $quick_options = array(
-                            array('points' => min($max_usable_points, 100), 'label' => __('使用 100 點', 'wc-points-rewards')),
-                            array('points' => round($max_usable_points * 0.5), 'label' => __('使用 50%', 'wc-points-rewards')),
-                            array('points' => $max_usable_points, 'label' => __('全部使用', 'wc-points-rewards'))
-                        );
-                        
-                        foreach ($quick_options as $option):
-                            if ($option['points'] > 0):
-                        ?>
-                        <button type="button" class="button-link points-quick-use" data-points="<?php echo esc_attr($option['points']); ?>">
-                            <?php echo esc_html($option['label']); ?>
-                        </button>
-                        <?php 
-                            endif;
-                        endforeach; 
-                        ?>
+                    <!-- 折抵金額預覽 -->
+                    <div class="discount-preview-container">
+                        <!-- 動態生成的折抵預覽將插入此處 -->
                     </div>
+
                 </div>
             <?php endif; ?>
             
@@ -121,97 +107,3 @@ $max_usable_points = isset($max_points) ? $max_points : $available_points;
         </div>
     </td>
 </tr>
-
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-    // 點數使用快捷按鈕
-    $('.points-quick-use').on('click', function() {
-        var points = $(this).data('points');
-        $('#points-to-use').val(points);
-    });
-    
-    // 應用點數折扣
-    $('.wc-points-apply-discount').on('click', function() {
-        var $button = $(this);
-        var $input = $('#points-to-use');
-        var points = parseFloat($input.val());
-        var nonce = $button.data('nonce');
-        
-        if (!points || points <= 0) {
-            showPointsMessage('<?php _e('請輸入有效的點數', 'wc-points-rewards'); ?>', 'error');
-            return;
-        }
-        
-        $button.prop('disabled', true).text('<?php _e('處理中...', 'wc-points-rewards'); ?>');
-        
-        $.ajax({
-            url: wcPointsRewards.ajaxUrl,
-            type: 'POST',
-            data: {
-                action: 'wc_points_rewards_apply_discount',
-                points: points,
-                nonce: nonce
-            },
-            success: function(response) {
-                if (response.success) {
-                    showPointsMessage(response.data.message, 'success');
-                    $('body').trigger('update_checkout');
-                    location.reload(); // 重新載入頁面以更新顯示
-                } else {
-                    showPointsMessage(response.data, 'error');
-                }
-            },
-            error: function() {
-                showPointsMessage('<?php _e('發生錯誤，請稍後再試', 'wc-points-rewards'); ?>', 'error');
-            },
-            complete: function() {
-                $button.prop('disabled', false).text('<?php _e('使用點數', 'wc-points-rewards'); ?>');
-            }
-        });
-    });
-    
-    // 移除點數折扣
-    $('.wc-points-remove-discount').on('click', function() {
-        var $button = $(this);
-        var nonce = $button.data('nonce');
-        
-        $button.prop('disabled', true).text('<?php _e('處理中...', 'wc-points-rewards'); ?>');
-        
-        $.ajax({
-            url: wcPointsRewards.ajaxUrl,
-            type: 'POST',
-            data: {
-                action: 'wc_points_rewards_remove_discount',
-                nonce: nonce
-            },
-            success: function(response) {
-                if (response.success) {
-                    showPointsMessage(response.data.message, 'success');
-                    $('body').trigger('update_checkout');
-                    location.reload(); // 重新載入頁面以更新顯示
-                } else {
-                    showPointsMessage(response.data, 'error');
-                }
-            },
-            error: function() {
-                showPointsMessage('<?php _e('發生錯誤，請稍後再試', 'wc-points-rewards'); ?>', 'error');
-            },
-            complete: function() {
-                $button.prop('disabled', false).text('<?php _e('移除', 'wc-points-rewards'); ?>');
-            }
-        });
-    });
-    
-    function showPointsMessage(message, type) {
-        var $messages = $('.points-messages');
-        $messages.removeClass('wc-points-success wc-points-error')
-                .addClass('wc-points-' + type)
-                .html(message)
-                .show();
-        
-        setTimeout(function() {
-            $messages.fadeOut();
-        }, 5000);
-    }
-});
-</script>

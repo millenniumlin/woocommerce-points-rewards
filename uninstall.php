@@ -25,7 +25,10 @@ function wc_points_rewards_cleanup_database() {
     );
     
     foreach ($tables as $table) {
-        $wpdb->query("DROP TABLE IF EXISTS $table");
+        // 安全地驗證表名格式，只允許 WordPress 前綴格式
+        if (preg_match('/^' . preg_quote($wpdb->prefix, '/') . 'wc_points_rewards_[a-z_]+$/', $table)) {
+            $wpdb->query("DROP TABLE IF EXISTS `{$table}`");
+        }
     }
     
     // 刪除選項
@@ -40,11 +43,19 @@ function wc_points_rewards_cleanup_database() {
         delete_option($option);
     }
     
-    // 刪除用戶 meta
-    $wpdb->query("DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE 'wc_points_rewards_%'");
+    // 刪除用戶 meta（使用安全的查詢）
+    $wpdb->query($wpdb->prepare(
+        "DELETE FROM `{$wpdb->usermeta}` WHERE meta_key LIKE %s", 
+        'wc_points_rewards_%'
+    ));
     
-    // 刪除訂單 meta
-    $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE meta_key IN ('_points_awarded', '_points_discount_amount', '_points_used')");
+    // 刪除訂單 meta（使用安全的查詢）
+    $meta_keys = array('_points_awarded', '_points_discount_amount', '_points_used');
+    $placeholders = implode(',', array_fill(0, count($meta_keys), '%s'));
+    $wpdb->query($wpdb->prepare(
+        "DELETE FROM `{$wpdb->postmeta}` WHERE meta_key IN ($placeholders)",
+        ...$meta_keys
+    ));
 }
 
 /**

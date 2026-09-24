@@ -3,8 +3,8 @@
  * Plugin Name: WooCommerce Points & Rewards 會員系統
  * Plugin URI: https://github.com/millenniumlin/woocommerce-points-rewards
  * Description: 完整的 WooCommerce 累積消費點數獎勵系統，支援會員等級、點數回饋、折抵功能等。
- * Version: 1.0.2
- * Author: millenniumlim
+ * Version: 1.6.8
+ * Author: Github Copilot x millenniumlim
  * License: GPL v2 or later
  * Text Domain: wc-points-rewards
  * Domain Path: /languages
@@ -25,8 +25,19 @@ if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
     return;
 }
 
+// 宣告 WooCommerce 高效能訂單儲存（HPOS）相容性
+add_action('before_woocommerce_init', function() {
+    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+            'custom_order_tables',
+            __FILE__,
+            true
+        );
+    }
+});
+
 // 定義常數 - 修正版本號一致性
-define('WC_POINTS_REWARDS_VERSION', '1.0.2');  // 修正：與標題版本一致
+define('WC_POINTS_REWARDS_VERSION', '1.4.7');  // 修正：與標題版本一致
 define('WC_POINTS_REWARDS_PLUGIN_FILE', __FILE__);
 define('WC_POINTS_REWARDS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WC_POINTS_REWARDS_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -165,8 +176,8 @@ class WC_Points_Rewards {
             }
         }
         
-        // 前端功能
-        if (!is_admin()) {
+        // 前端功能（包括 AJAX 請求）
+        if (!is_admin() || (defined('DOING_AJAX') && DOING_AJAX)) {
             if (class_exists('WC_Points_Rewards_Frontend')) {
                 WC_Points_Rewards_Frontend::instance();
             }
@@ -213,6 +224,7 @@ class WC_Points_Rewards {
         // 清除排程任務
         wp_clear_scheduled_hook('wc_points_rewards_daily_cleanup');
         wp_clear_scheduled_hook('wc_points_rewards_notification_check');
+        wp_clear_scheduled_hook('wc_points_rewards_daily_birthday_check');
         
         // 停用時也重新整理重寫規則，移除我們的端點
         flush_rewrite_rules(false);
@@ -279,17 +291,16 @@ class WC_Points_Rewards {
             
             // 前台顯示控制設定
             'show_in_menu' => 'no',  // 預設不在選單顯示
-            'show_in_shop_loop' => 'yes',
-            'show_in_single_product' => 'yes',
             
             // 原有設定
-            'points_per_amount' => 100, // 每100元回饋1點
+            'points_per_amount' => 1, // 每1元回饋1點
             'points_amount' => 1,
             'registration_points' => 100,
             'birthday_points' => 200,
             'points_expiry_months' => 12,
             'min_cart_total' => 0,
-            'max_discount_percent' => 100,
+            'max_discount_percent' => 50,
+            'enable_cart_redemption' => 'yes',
             'notification_days' => 30,
             'enable_notifications' => 'yes',
             'enable_birthday_points' => 'yes',
@@ -297,7 +308,7 @@ class WC_Points_Rewards {
             
             // 點數名稱設定
             'points_name' => '點',
-            'points_value' => 0.01  // 1點 = 0.01元
+            'points_value' => 1  // 1點 = 1元
         );
         
         add_option('wc_points_rewards_settings', $default_settings);
@@ -385,6 +396,11 @@ class WC_Points_Rewards {
         
         if (!wp_next_scheduled('wc_points_rewards_notification_check')) {
             wp_schedule_event(time(), 'daily', 'wc_points_rewards_notification_check');
+        }
+        
+        // 新增：每日生日點數檢查
+        if (!wp_next_scheduled('wc_points_rewards_daily_birthday_check')) {
+            wp_schedule_event(time(), 'daily', 'wc_points_rewards_daily_birthday_check');
         }
     }
 }

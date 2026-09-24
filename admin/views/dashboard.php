@@ -154,6 +154,16 @@ $total_tiers = intval($total_tiers);
                     $plugin_version = WC_POINTS_REWARDS_VERSION;
                     $wp_version = get_bloginfo('version');
                     $wc_version = defined('WC_VERSION') ? WC_VERSION : 'N/A';
+                    
+                    // 🚀 修正：支援兩種設定儲存方式
+                    // 優先檢查主設定數組，如果沒有則檢查個別選項
+                    $enable_points_system = isset($settings['enable_points_system']) 
+                        ? $settings['enable_points_system'] 
+                        : get_option('wc_points_rewards_enable_points_system', 'yes');
+                    
+                    $enable_notifications = isset($settings['enable_notifications']) 
+                        ? $settings['enable_notifications'] 
+                        : get_option('wc_points_rewards_enable_notifications', 'yes');
                     ?>
                     
                     <div class="status-item">
@@ -173,15 +183,15 @@ $total_tiers = intval($total_tiers);
                     
                     <div class="status-item">
                         <span class="status-label"><?php _e('點數系統狀態', 'wc-points-rewards'); ?>:</span>
-                        <span class="status-value status-<?php echo isset($settings['enable_points_system']) && $settings['enable_points_system'] === 'yes' ? 'enabled' : 'disabled'; ?>">
-                            <?php echo isset($settings['enable_points_system']) && $settings['enable_points_system'] === 'yes' ? __('已啟用', 'wc-points-rewards') : __('已停用', 'wc-points-rewards'); ?>
+                        <span class="status-value status-<?php echo $enable_points_system === 'yes' ? 'enabled' : 'disabled'; ?>">
+                            <?php echo $enable_points_system === 'yes' ? __('已啟用', 'wc-points-rewards') : __('已停用', 'wc-points-rewards'); ?>
                         </span>
                     </div>
                     
                     <div class="status-item">
                         <span class="status-label"><?php _e('通知功能', 'wc-points-rewards'); ?>:</span>
-                        <span class="status-value status-<?php echo isset($settings['enable_notifications']) && $settings['enable_notifications'] === 'yes' ? 'enabled' : 'disabled'; ?>">
-                            <?php echo isset($settings['enable_notifications']) && $settings['enable_notifications'] === 'yes' ? __('已啟用', 'wc-points-rewards') : __('已停用', 'wc-points-rewards'); ?>
+                        <span class="status-value status-<?php echo $enable_notifications === 'yes' ? 'enabled' : 'disabled'; ?>">
+                            <?php echo $enable_notifications === 'yes' ? __('已啟用', 'wc-points-rewards') : __('已停用', 'wc-points-rewards'); ?>
                         </span>
                     </div>
                 </div>

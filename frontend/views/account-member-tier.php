@@ -51,12 +51,12 @@ if (!defined('ABSPATH')) {
         <div class="tier-stats">
             <div class="stat-item">
                 <div class="stat-label"><?php printf(__('%d年度消費', 'wc-points-rewards'), $yearly_stats->year ?? date('Y')); ?></div>
-                <div class="stat-value"><?php echo wc_price($yearly_stats->total_spent); ?></div>
+                <div class="stat-value"><?php echo wc_price(floatval($yearly_stats->total_spent ?? 0)); ?></div>
             </div>
             
             <div class="stat-item">
                 <div class="stat-label"><?php _e('獲得總點數', 'wc-points-rewards'); ?></div>
-                <div class="stat-value"><?php echo wc_points_rewards_number_format($yearly_stats->total_points_earned); ?> <?php echo wc_points_rewards_get_points_name(); ?></div>
+                <div class="stat-value"><?php echo wc_points_rewards_number_format(floatval($yearly_stats->total_points_earned ?? 0)); ?> <?php echo wc_points_rewards_get_points_name(); ?></div>
             </div>
             
             <?php if ($yearly_stats->tier_expiry_date): ?>
@@ -93,7 +93,7 @@ if (!defined('ABSPATH')) {
             </div>
             
             <div class="remaining-amount">
-                <?php printf(__('還需消費 %s', 'wc-points-rewards'), '<strong>' . wc_price($tier_progress['amount_to_next']) . '</strong>'); ?>
+                <?php printf(__('還需消費 %s', 'wc-points-rewards'), '<strong>' . wc_price(floatval($tier_progress['amount_to_next'] ?? 0)) . '</strong>'); ?>
             </div>
         </div>
         
