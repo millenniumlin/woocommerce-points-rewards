@@ -15,6 +15,11 @@ if (!defined('ABSPATH')) {
 class WC_Points_Rewards_Admin_Points_Manager {
 
     /**
+     * 手動補發描述標記。
+     */
+    const MANUAL_GRANT_MARKER = '[manual_grant]';
+
+    /**
      * 單例實例
      *
      * @var self|null
@@ -56,9 +61,11 @@ class WC_Points_Rewards_Admin_Points_Manager {
                 FROM {$points_table}
                 WHERE type = %s
                 AND points > 0
+                AND description LIKE %s
                 AND admin_user_id = %d
                 AND created_at BETWEEN %s AND %s",
                 'admin',
+                '%' . self::MANUAL_GRANT_MARKER . '%',
                 $operator_id,
                 $day_window['start'],
                 $day_window['end']
@@ -70,8 +77,10 @@ class WC_Points_Rewards_Admin_Points_Manager {
             FROM {$points_table}
             WHERE type = %s
             AND points > 0
+            AND description LIKE %s
             AND created_at BETWEEN %s AND %s",
             'admin',
+            '%' . self::MANUAL_GRANT_MARKER . '%',
             $day_window['start'],
             $day_window['end']
         ));
@@ -173,6 +182,7 @@ class WC_Points_Rewards_Admin_Points_Manager {
 
             // 除了新增 admin_user_id 欄位外，描述仍保留穩定格式，方便舊資料與人工查核。
             $description = $this->build_operator_description(
+                self::MANUAL_GRANT_MARKER,
                 __('管理員補發', 'wc-points-rewards'),
                 $reason,
                 $operator_user
@@ -258,6 +268,7 @@ class WC_Points_Rewards_Admin_Points_Manager {
         }
 
         $description = $this->build_operator_description(
+            '[admin_deduction]',
             __('管理員扣除', 'wc-points-rewards'),
             $reason ? $reason : __('管理員手動扣除', 'wc-points-rewards'),
             $operator_user
@@ -303,14 +314,16 @@ class WC_Points_Rewards_Admin_Points_Manager {
     /**
      * 建立稽核描述。
      *
+     * @param string  $marker       穩定標記。
      * @param string  $action_label 動作標籤。
      * @param string  $reason       原因。
      * @param WP_User $operator     操作者。
      * @return string
      */
-    private function build_operator_description($action_label, $reason, $operator) {
+    private function build_operator_description($marker, $action_label, $reason, $operator) {
         return sprintf(
-            '%1$s：%2$s [admin_user_id=%3$d;login=%4$s;name=%5$s]',
+            '%1$s %2$s：%3$s [admin_user_id=%4$d;login=%5$s;name=%6$s]',
+            $marker,
             $action_label,
             $reason,
             $operator->ID,

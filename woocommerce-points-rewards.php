@@ -315,10 +315,9 @@ class WC_Points_Rewards {
             add_option('wc_points_rewards_settings', $default_settings);
         }
 
-        add_option('wc_points_rewards_enable_manual_admin_points', 'yes');
-        add_option('wc_points_rewards_manual_admin_points_per_grant_max', 1000);
-        add_option('wc_points_rewards_manual_admin_points_per_admin_daily_max', 1000);
-        add_option('wc_points_rewards_manual_admin_points_site_daily_max', 3000);
+        foreach ($this->get_runtime_default_options() as $option_name => $option_value) {
+            add_option($option_name, $option_value);
+        }
         add_option('wc_points_rewards_version', WC_POINTS_REWARDS_VERSION);
     }
     
@@ -399,10 +398,23 @@ class WC_Points_Rewards {
      * 確保新增的個別 option 在舊站升級時也會建立。
      */
     private function ensure_runtime_default_options() {
-        add_option('wc_points_rewards_enable_manual_admin_points', 'yes');
-        add_option('wc_points_rewards_manual_admin_points_per_grant_max', 1000);
-        add_option('wc_points_rewards_manual_admin_points_per_admin_daily_max', 1000);
-        add_option('wc_points_rewards_manual_admin_points_site_daily_max', 3000);
+        foreach ($this->get_runtime_default_options() as $option_name => $option_value) {
+            add_option($option_name, $option_value);
+        }
+    }
+
+    /**
+     * 取得需確保存在的個別 option 預設值。
+     *
+     * @return array<string,mixed>
+     */
+    private function get_runtime_default_options() {
+        return array(
+            'wc_points_rewards_enable_manual_admin_points' => 'yes',
+            'wc_points_rewards_manual_admin_points_per_grant_max' => 1000,
+            'wc_points_rewards_manual_admin_points_per_admin_daily_max' => 1000,
+            'wc_points_rewards_manual_admin_points_site_daily_max' => 3000,
+        );
     }
     
     /**
