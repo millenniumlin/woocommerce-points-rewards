@@ -174,7 +174,7 @@ class WC_Points_Rewards_Admin {
     $total_users = intval($total_users ?? 0);
     
     $points_table = $wpdb->prefix . 'wc_points_rewards_points';
-    $total_points_issued = $wpdb->get_var("SELECT SUM(points) FROM `{$points_table}` WHERE points > 0 AND type != 'expired'");
+    $total_points_issued = $wpdb->get_var("SELECT SUM(points) FROM `{$points_table}` WHERE (type = 'earned' OR (type = 'admin' AND points > 0))");
     $total_points_issued = floatval($total_points_issued ?? 0);
     
     // 修正第 185 行 - 先處理 null 值再使用 abs()
@@ -460,6 +460,10 @@ class WC_Points_Rewards_Admin {
      * 處理管理員手動補發點數表單。
      */
     public function handle_manual_grant_points() {
+        if ('POST' !== strtoupper($_SERVER['REQUEST_METHOD'] ?? '')) {
+            wp_die(__('無效的請求方式。', 'wc-points-rewards'));
+        }
+
         if (!wc_points_rewards_is_site_administrator()) {
             wp_die(__('只有網站管理員可以手動補發點數。', 'wc-points-rewards'));
         }

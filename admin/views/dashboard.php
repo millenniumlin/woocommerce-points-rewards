@@ -208,7 +208,7 @@ $total_tiers = intval($total_tiers);
     
     $today_earned_raw = $wpdb->get_var($wpdb->prepare("
         SELECT SUM(points) FROM $points_table 
-        WHERE points > 0 AND type != 'expired' AND DATE(created_at) = %s
+        WHERE (type = 'earned' OR (type = 'admin' AND points > 0)) AND DATE(created_at) = %s
     ", $today));
     
     // 修正第 204 行 - 先處理 null 值再使用 abs()

@@ -179,8 +179,9 @@ class WC_Points_Rewards_Database {
             SELECT COALESCE(SUM(points), 0) 
             FROM `{$table_name}` 
             WHERE user_id = %d 
+            AND type != %s
             AND (expiry_date IS NULL OR expiry_date > %s)
-        ", $user_id, wc_points_rewards_get_site_mysql_datetime()));
+        ", $user_id, 'expired', wc_points_rewards_get_site_mysql_datetime()));
         
         // 確保返回有效的浮點數
         $result = floatval($total_points);
@@ -536,8 +537,10 @@ class WC_Points_Rewards_Database {
             "SELECT COALESCE(SUM(points), 0)
             FROM `{$table_name}`
             WHERE user_id = %d
+            AND type != %s
             AND (expiry_date IS NULL OR expiry_date > %s)",
             $user_id,
+            'expired',
             $current_time
         ));
     }
