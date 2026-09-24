@@ -267,6 +267,7 @@ class WC_Points_Rewards {
     public function init() {
         // 檢查版本更新
         $this->check_version();
+        $this->ensure_runtime_default_options();
         
         // 設定排程任務
         $this->schedule_events();
@@ -390,6 +391,18 @@ class WC_Points_Rewards {
         if (class_exists('WC_Points_Rewards_Database')) {
             WC_Points_Rewards_Database::create_tables();
         }
+
+        $this->ensure_runtime_default_options();
+    }
+
+    /**
+     * 確保新增的個別 option 在舊站升級時也會建立。
+     */
+    private function ensure_runtime_default_options() {
+        add_option('wc_points_rewards_enable_manual_admin_points', 'yes');
+        add_option('wc_points_rewards_manual_admin_points_per_grant_max', 1000);
+        add_option('wc_points_rewards_manual_admin_points_per_admin_daily_max', 1000);
+        add_option('wc_points_rewards_manual_admin_points_site_daily_max', 3000);
     }
     
     /**
