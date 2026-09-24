@@ -333,7 +333,7 @@ class WC_Points_Rewards_Settings {
                             </th>
                             <td>
                                 <input type="number" id="manual_admin_points_per_grant_max" name="wc_points_rewards_manual_admin_points_per_grant_max"
-                                       value="<?php echo esc_attr($manual_grant_settings['per_grant_max']); ?>" min="1" max="100000" step="1">
+                                       value="<?php echo esc_attr($manual_grant_settings['per_grant_max']); ?>" min="0" max="100000" step="0.01">
                                 <p class="description"><?php echo esc_html(wc_points_rewards_format_points_with_value($manual_grant_settings['per_grant_max'])); ?></p>
                             </td>
                         </tr>
@@ -344,7 +344,7 @@ class WC_Points_Rewards_Settings {
                             </th>
                             <td>
                                 <input type="number" id="manual_admin_points_per_admin_daily_max" name="wc_points_rewards_manual_admin_points_per_admin_daily_max"
-                                       value="<?php echo esc_attr($manual_grant_settings['per_admin_daily_max']); ?>" min="1" max="100000" step="1">
+                                       value="<?php echo esc_attr($manual_grant_settings['per_admin_daily_max']); ?>" min="0" max="100000" step="0.01">
                                 <p class="description"><?php echo esc_html(wc_points_rewards_format_points_with_value($manual_grant_settings['per_admin_daily_max'])); ?></p>
                             </td>
                         </tr>
@@ -355,7 +355,7 @@ class WC_Points_Rewards_Settings {
                             </th>
                             <td>
                                 <input type="number" id="manual_admin_points_site_daily_max" name="wc_points_rewards_manual_admin_points_site_daily_max"
-                                       value="<?php echo esc_attr($manual_grant_settings['site_daily_max']); ?>" min="1" max="500000" step="1">
+                                       value="<?php echo esc_attr($manual_grant_settings['site_daily_max']); ?>" min="0" max="500000" step="0.01">
                                 <p class="description"><?php echo esc_html(wc_points_rewards_format_points_with_value($manual_grant_settings['site_daily_max'])); ?></p>
                             </td>
                         </tr>
@@ -430,9 +430,9 @@ class WC_Points_Rewards_Settings {
             'expiry_notification_days' => array('type' => 'integer', 'min' => 1, 'max' => 365, 'default' => 30),
             'enable_birthday_notification' => array('type' => 'checkbox', 'default' => 'yes'),
             'enable_manual_admin_points' => array('type' => 'checkbox', 'default' => 'yes'),
-            'manual_admin_points_per_grant_max' => array('type' => 'integer', 'min' => 1, 'max' => 100000, 'default' => 1000),
-            'manual_admin_points_per_admin_daily_max' => array('type' => 'integer', 'min' => 1, 'max' => 100000, 'default' => 1000),
-            'manual_admin_points_site_daily_max' => array('type' => 'integer', 'min' => 1, 'max' => 500000, 'default' => 3000),
+            'manual_admin_points_per_grant_max' => array('type' => 'non_negative_number', 'min' => 0, 'max' => 100000, 'default' => 1000),
+            'manual_admin_points_per_admin_daily_max' => array('type' => 'non_negative_number', 'min' => 0, 'max' => 100000, 'default' => 1000),
+            'manual_admin_points_site_daily_max' => array('type' => 'non_negative_number', 'min' => 0, 'max' => 500000, 'default' => 3000),
         );
         
         $errors = array();

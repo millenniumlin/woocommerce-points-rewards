@@ -326,9 +326,9 @@ function wc_points_rewards_get_manual_grant_settings() {
     );
 
     $settings['enabled']             = ('no' === $settings['enabled']) ? 'no' : 'yes';
-    $settings['per_grant_max']       = max(1, min($settings['per_grant_max'], 100000));
-    $settings['per_admin_daily_max'] = max(1, min($settings['per_admin_daily_max'], 100000));
-    $settings['site_daily_max']      = max(1, min($settings['site_daily_max'], 500000));
+    $settings['per_grant_max']       = max(0, min($settings['per_grant_max'], 100000));
+    $settings['per_admin_daily_max'] = max(0, min($settings['per_admin_daily_max'], 100000));
+    $settings['site_daily_max']      = max(0, min($settings['site_daily_max'], 500000));
 
     return $settings;
 }
