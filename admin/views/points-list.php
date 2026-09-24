@@ -94,7 +94,7 @@ if (!defined('ABSPATH')) {
                     <?php submit_button(__('確認補發點數', 'wc-points-rewards'), 'primary', '', false); ?>
                 </form>
             <?php else : ?>
-                <p><?php _e('只有網站管理員或 Multisite Super Admin 可以手動補發點數。', 'wc-points-rewards'); ?></p>
+                <p><?php _e('只有授權的網站管理者可以手動補發點數。', 'wc-points-rewards'); ?></p>
             <?php endif; ?>
         </div>
     </div>

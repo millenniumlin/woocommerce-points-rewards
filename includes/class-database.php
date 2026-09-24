@@ -564,7 +564,12 @@ class WC_Points_Rewards_Database {
     private static function ensure_points_table_admin_user_id_schema($points_table) {
         global $wpdb;
 
-        $safe_points_table = esc_sql($points_table);
+        $safe_points_table = preg_replace('/[^A-Za-z0-9_]/', '', $points_table);
+
+        if (empty($safe_points_table)) {
+            return;
+        }
+
         $column_exists = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM `{$safe_points_table}` LIKE %s", 'admin_user_id'));
 
         if ('admin_user_id' !== $column_exists) {
@@ -594,7 +599,13 @@ class WC_Points_Rewards_Database {
             return self::$points_table_supports_admin_user_id;
         }
 
-        $table_name = esc_sql($wpdb->prefix . 'wc_points_rewards_points');
+        $table_name = preg_replace('/[^A-Za-z0-9_]/', '', $wpdb->prefix . 'wc_points_rewards_points');
+
+        if (empty($table_name)) {
+            self::$points_table_supports_admin_user_id = false;
+            return false;
+        }
+
         $column_exists = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM `{$table_name}` LIKE %s", 'admin_user_id'));
 
         self::$points_table_supports_admin_user_id = ('admin_user_id' === $column_exists);
