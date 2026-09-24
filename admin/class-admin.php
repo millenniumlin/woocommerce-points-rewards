@@ -174,7 +174,7 @@ class WC_Points_Rewards_Admin {
     $total_users = intval($total_users ?? 0);
     
     $points_table = $wpdb->prefix . 'wc_points_rewards_points';
-    $total_points_issued = $wpdb->get_var("SELECT SUM(points) FROM `{$points_table}` WHERE (type = 'earned' OR (type = 'admin' AND points > 0))");
+    $total_points_issued = $wpdb->get_var("SELECT SUM(points) FROM `{$points_table}` WHERE points > 0 AND type != 'expired'");
     $total_points_issued = floatval($total_points_issued ?? 0);
     
     // 修正第 185 行 - 先處理 null 值再使用 abs()

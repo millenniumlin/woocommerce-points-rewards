@@ -78,7 +78,9 @@ class WC_Points_Rewards_Notifications {
     private function check_points_expiry_notifications() {
         global $wpdb;
         
-        $notification_days = isset($this->settings['expiry_notification_days']) ? intval($this->settings['expiry_notification_days']) : 30;
+        $notification_days = isset($this->settings['expiry_notification_days'])
+            ? intval($this->settings['expiry_notification_days'])
+            : (isset($this->settings['notification_days']) ? intval($this->settings['notification_days']) : 30);
         $points_table = $wpdb->prefix . 'wc_points_rewards_points';
         $window_start = wc_points_rewards_get_site_mysql_datetime();
         $window_end = wc_points_rewards_get_site_datetime('+' . $notification_days . ' days')->format('Y-m-d H:i:s');
