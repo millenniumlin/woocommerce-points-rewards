@@ -18,6 +18,13 @@ class WC_Points_Rewards_Database {
      * 單例實例
      */
     private static $instance = null;
+
+    /**
+     * 點數表是否已支援 admin_user_id 欄位。
+     *
+     * @var bool|null
+     */
+    private static $points_table_supports_admin_user_id = null;
     
     /**
      * 獲取單例實例
@@ -127,6 +134,8 @@ class WC_Points_Rewards_Database {
         dbDelta($points_sql);
         dbDelta($stats_sql);
         dbDelta($settings_sql);
+
+        self::ensure_points_table_admin_user_id_schema($points_table);
         
         // 更新資料庫版本
         update_option('wc_points_rewards_db_version', '1.0.0');
@@ -217,7 +226,7 @@ class WC_Points_Rewards_Database {
                 $data['order_id'] = intval($order_id);
             }
 
-            if (!is_null($admin_user_id) && intval($admin_user_id) > 0) {
+            if (!is_null($admin_user_id) && intval($admin_user_id) > 0 && $this->points_table_supports_admin_user_id()) {
                 $data['admin_user_id'] = intval($admin_user_id);
             }
             
@@ -541,5 +550,51 @@ class WC_Points_Rewards_Database {
      */
     private function get_user_points_lock_name($user_id) {
         return substr('wcpr_points_user_' . get_current_blog_id() . '_' . intval($user_id), 0, 64);
+    }
+
+    /**
+     * 確保升級站點也補上 admin_user_id 欄位與索引。
+     *
+     * @param string $points_table 點數表名。
+     * @return void
+     */
+    private static function ensure_points_table_admin_user_id_schema($points_table) {
+        global $wpdb;
+
+        $column_exists = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM `{$points_table}` LIKE %s", 'admin_user_id'));
+
+        if ('admin_user_id' !== $column_exists) {
+            $wpdb->query(
+                "ALTER TABLE `{$points_table}` ADD COLUMN admin_user_id bigint(20) unsigned DEFAULT NULL COMMENT '操作管理員ID（人工補發/扣除/匯入）' AFTER order_id"
+            );
+        }
+
+        $index_exists = $wpdb->get_var($wpdb->prepare("SHOW INDEX FROM `{$points_table}` WHERE Key_name = %s", 'idx_admin_user_id'));
+
+        if (!$index_exists) {
+            $wpdb->query("ALTER TABLE `{$points_table}` ADD KEY idx_admin_user_id (admin_user_id)");
+        }
+
+        self::$points_table_supports_admin_user_id = true;
+    }
+
+    /**
+     * 檢查目前點數表是否支援 admin_user_id 欄位。
+     *
+     * @return bool
+     */
+    private function points_table_supports_admin_user_id() {
+        global $wpdb;
+
+        if (null !== self::$points_table_supports_admin_user_id) {
+            return self::$points_table_supports_admin_user_id;
+        }
+
+        $table_name = $wpdb->prefix . 'wc_points_rewards_points';
+        $column_exists = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM `{$table_name}` LIKE %s", 'admin_user_id'));
+
+        self::$points_table_supports_admin_user_id = ('admin_user_id' === $column_exists);
+
+        return self::$points_table_supports_admin_user_id;
     }
 }

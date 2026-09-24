@@ -43,10 +43,10 @@ class WC_Points_Rewards_Admin_Points_Manager {
     public function get_manual_grant_usage($operator_id = null) {
         global $wpdb;
 
-        $settings    = wc_points_rewards_get_manual_grant_settings();
+        $settings = wc_points_rewards_get_manual_grant_settings();
         $operator_id = $operator_id ? intval($operator_id) : get_current_user_id();
         $points_table = $wpdb->prefix . 'wc_points_rewards_points';
-        $day_window   = wc_points_rewards_get_site_day_window_mysql();
+        $day_window = wc_points_rewards_get_site_day_window_mysql();
 
         $admin_used = 0.0;
 
