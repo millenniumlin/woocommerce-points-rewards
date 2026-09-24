@@ -174,7 +174,7 @@ class WC_Points_Rewards_Admin {
     $total_users = intval($total_users ?? 0);
     
     $points_table = $wpdb->prefix . 'wc_points_rewards_points';
-    $total_points_issued = $wpdb->get_var("SELECT SUM(points) FROM `{$points_table}` WHERE type = 'earned' OR (type = 'admin' AND points > 0)");
+    $total_points_issued = $wpdb->get_var("SELECT SUM(points) FROM `{$points_table}` WHERE (type = 'earned' OR (type = 'admin' AND points > 0))");
     $total_points_issued = floatval($total_points_issued ?? 0);
     
     // 修正第 185 行 - 先處理 null 值再使用 abs()
@@ -322,7 +322,16 @@ class WC_Points_Rewards_Admin {
 
         $manual_grant_is_authorized = wc_points_rewards_is_site_administrator();
         $manual_grant_settings      = wc_points_rewards_get_manual_grant_settings();
-        $manual_grant_usage         = WC_Points_Rewards_Admin_Points_Manager::instance()->get_manual_grant_usage(get_current_user_id());
+        $manual_grant_usage         = array(
+            'admin_used'      => 0,
+            'admin_remaining' => 0,
+            'site_used'       => 0,
+            'site_remaining'  => 0,
+        );
+
+        if ($manual_grant_is_authorized) {
+            $manual_grant_usage = WC_Points_Rewards_Admin_Points_Manager::instance()->get_manual_grant_usage(get_current_user_id());
+        }
         $manual_grant_notice        = sanitize_key($_GET['manual_grant_notice'] ?? '');
         $manual_grant_message       = sanitize_text_field(wp_unslash($_GET['manual_grant_message'] ?? ''));
         $manual_grant_form_values   = array(

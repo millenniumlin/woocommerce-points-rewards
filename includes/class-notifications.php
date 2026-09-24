@@ -286,7 +286,7 @@ class WC_Points_Rewards_Notifications {
         $subject = __('生日快樂！您獲得了生日贈送點數', 'wc-points-rewards');
         
         // 取得點數有效期限
-        $expiry_months = get_option('wc_points_rewards_points_expiry_months', 12);
+        $expiry_months = wc_points_rewards_get_option('points_expiry_months', 12);
         $expiry_text = '';
         if ($expiry_months > 0) {
             $expiry_date = wc_points_rewards_get_site_datetime('+' . intval($expiry_months) . ' months')->format('Y-m-d');
