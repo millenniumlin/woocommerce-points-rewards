@@ -575,7 +575,7 @@ class WC_Points_Rewards_Database {
         $index_exists = $wpdb->get_var($wpdb->prepare("SHOW INDEX FROM `{$points_table}` WHERE Key_name = %s", 'idx_admin_user_id'));
 
         if (!$index_exists) {
-            $wpdb->query("ALTER TABLE `{$points_table}` ADD KEY idx_admin_user_id (admin_user_id)");
+            $wpdb->query("ALTER TABLE `{$points_table}` ADD INDEX idx_admin_user_id (admin_user_id)");
         }
 
         self::$points_table_supports_admin_user_id = true;
