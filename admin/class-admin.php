@@ -466,8 +466,10 @@ class WC_Points_Rewards_Admin {
 
         check_admin_referer('wc_points_rewards_manual_grant_points');
 
-        $user_id = intval(wp_unslash($_POST['grant_user_id'] ?? 0));
-        $points  = floatval(wp_unslash($_POST['grant_points'] ?? 0));
+        $raw_user_id = $_POST['grant_user_id'] ?? '';
+        $raw_points  = $_POST['grant_points'] ?? '';
+        $user_id     = intval(wp_unslash($raw_user_id));
+        $points      = floatval(wp_unslash($raw_points));
         $reason  = sanitize_textarea_field(wp_unslash($_POST['grant_reason'] ?? ''));
         $manager = WC_Points_Rewards_Admin_Points_Manager::instance();
         $result  = $manager->create_manual_grant($user_id, $points, $reason, get_current_user_id());

@@ -67,7 +67,7 @@ if (!defined('ABSPATH')) {
                                     <label for="grant_points"><?php _e('補發點數', 'wc-points-rewards'); ?></label>
                                 </th>
                                 <td>
-                                    <input type="number" id="grant_points" name="grant_points" min="1" step="1" required value="<?php echo esc_attr($manual_grant_form_values['points']); ?>">
+                                    <input type="number" id="grant_points" name="grant_points" min="0.01" step="0.01" required value="<?php echo esc_attr($manual_grant_form_values['points']); ?>">
                                     <p class="description">
                                         <?php
                                         printf(

@@ -163,8 +163,7 @@ class WC_Points_Rewards_Ajax_Handler {
                         'earned',
                         sprintf(__('訂單 #%s 補發點數', 'wc-points-rewards'), $order->get_order_number()),
                         $order->get_id(),
-                        $expiry_date,
-                        $operator_id
+                        $expiry_date
                     );
                     
                     if ($success) {
