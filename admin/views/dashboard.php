@@ -204,11 +204,11 @@ $total_tiers = intval($total_tiers);
     <?php
     global $wpdb;
     $points_table = $wpdb->prefix . 'wc_points_rewards_points';
-    $today = date('Y-m-d');
+    $today = wc_points_rewards_get_site_day_window_mysql()['date'];
     
     $today_earned_raw = $wpdb->get_var($wpdb->prepare("
         SELECT SUM(points) FROM $points_table 
-        WHERE type = 'earned' AND DATE(created_at) = %s
+        WHERE (type = 'earned' OR (type = 'admin' AND points > 0)) AND DATE(created_at) = %s
     ", $today));
     
     // 修正第 204 行 - 先處理 null 值再使用 abs()

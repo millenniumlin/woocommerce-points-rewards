@@ -58,7 +58,7 @@ if (!defined('ABSPATH')) {
                         </span>
                     </td>
                     <td class="expiry-cell">
-                        <?php if ($record->expiry_date && $record->type === 'earned'): ?>
+                        <?php if ($record->expiry_date && floatval($record->points) > 0 && in_array($record->type, array('earned', 'admin'), true)): ?>
                             <time datetime="<?php echo esc_attr($record->expiry_date); ?>">
                                 <?php echo date('Y-m-d', strtotime($record->expiry_date)); ?>
                             </time>

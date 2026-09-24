@@ -37,7 +37,7 @@ $unprocessed_orders = $total_completed_orders - $processed_orders;
     <h1><?php _e('歷史訂單點數補發', 'wc-points-rewards'); ?></h1>
     
     <div class="notice notice-info">
-        <p><?php _e('此功能可以為指定日期範圍內的已完成訂單補發點數。系統會自動跳過已經處理過的訂單，避免重複發放。', 'wc-points-rewards'); ?></p>
+        <p><?php _e('此工具用於外掛導入或資料遷移時，為指定日期範圍內尚未回饋點數的已完成訂單補發 earned 點數。系統會自動跳過已經處理過的訂單，避免重複發放。', 'wc-points-rewards'); ?></p>
     </div>
     
     <!-- 統計資訊 -->
@@ -105,6 +105,15 @@ $unprocessed_orders = $total_completed_orders - $processed_orders;
                                 <label for="dry_run"><?php _e('啟用測試模式（只顯示將要處理的訂單數量，不實際發放點數）', 'wc-points-rewards'); ?></label>
                             </td>
                         </tr>
+                        <tr>
+                            <th scope="row">
+                                <label for="confirmation"><?php _e('正式執行確認', 'wc-points-rewards'); ?></label>
+                            </th>
+                            <td>
+                                <input type="text" id="confirmation" name="confirmation" autocomplete="off">
+                                <p class="description"><?php _e('若取消勾選測試模式，請在此輸入 CONFIRM 才會真的補發點數。', 'wc-points-rewards'); ?></p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 
@@ -135,41 +144,41 @@ $unprocessed_orders = $total_completed_orders - $processed_orders;
         </div>
         <div class="inside">
             <?php
-            // 獲取最近的點數記錄
-            $points_table = $wpdb->prefix . 'wc_points_rewards_points';
-            $recent_backfills = $wpdb->get_results($wpdb->prepare("
-                SELECT p.*, u.display_name, u.user_email
-                FROM $points_table p
-                LEFT JOIN {$wpdb->users} u ON p.user_id = u.ID
-                WHERE p.description LIKE %s
-                ORDER BY p.created_at DESC
-                LIMIT 20
-            ", '%補發點數%'));
-            
+            $recent_backfills = get_option('wc_points_rewards_historical_backfill_log', array());
+
+            if (!is_array($recent_backfills)) {
+                $recent_backfills = array();
+            }
+
             if ($recent_backfills): ?>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
                             <th><?php _e('日期', 'wc-points-rewards'); ?></th>
-                            <th><?php _e('用戶', 'wc-points-rewards'); ?></th>
-                            <th><?php _e('點數', 'wc-points-rewards'); ?></th>
-                            <th><?php _e('描述', 'wc-points-rewards'); ?></th>
+                            <th><?php _e('操作者', 'wc-points-rewards'); ?></th>
+                            <th><?php _e('日期範圍', 'wc-points-rewards'); ?></th>
+                            <th><?php _e('處理摘要', 'wc-points-rewards'); ?></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($recent_backfills as $record): ?>
                             <tr>
-                                <td><?php echo esc_html(mysql2date('Y-m-d H:i:s', $record->created_at)); ?></td>
+                                <td><?php echo esc_html($record['run_at']); ?></td>
                                 <td>
-                                    <?php echo esc_html($record->display_name); ?>
-                                    <br><small><?php echo esc_html($record->user_email); ?></small>
+                                    <?php echo esc_html($record['operator_name']); ?>
+                                    <br><small><?php echo esc_html($record['operator_login']); ?> (ID: <?php echo esc_html($record['operator_id']); ?>)</small>
                                 </td>
+                                <td><?php echo esc_html($record['start_date'] . ' ~ ' . $record['end_date']); ?></td>
                                 <td>
-                                    <span class="points-earned">
-                                        +<?php echo wc_points_rewards_number_format($record->points); ?>
-                                    </span>
+                                    <?php
+                                    printf(
+                                        esc_html__('處理 %1$d 筆、跳過 %2$d 筆、補發 %3$s', 'wc-points-rewards'),
+                                        intval($record['processed_count']),
+                                        intval($record['skipped_count']),
+                                        wc_points_rewards_number_format(floatval($record['total_points']))
+                                    );
+                                    ?>
                                 </td>
-                                <td><?php echo esc_html($record->description); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -237,9 +246,15 @@ jQuery(document).ready(function($) {
         
         // 確認處理
         var isDryRun = $('#dry_run').is(':checked');
+        var confirmation = $('#confirmation').val();
         var confirmMessage = isDryRun 
             ? '<?php _e('確定要執行測試模式嗎？', 'wc-points-rewards'); ?>'
             : '<?php _e('確定要開始處理歷史訂單嗎？此操作將會實際發放點數。', 'wc-points-rewards'); ?>';
+
+        if (!isDryRun && confirmation.toUpperCase() !== 'CONFIRM') {
+            alert('<?php _e('正式執行前請輸入 CONFIRM。', 'wc-points-rewards'); ?>');
+            return;
+        }
             
         if (!confirm(confirmMessage)) {
             return;
@@ -258,7 +273,8 @@ jQuery(document).ready(function($) {
                 nonce: $('#nonce').val(),
                 start_date: startDate,
                 end_date: endDate,
-                dry_run: isDryRun ? 1 : 0
+                dry_run: isDryRun ? 1 : 0,
+                confirmation: confirmation
             },
             success: function(response) {
                 if (response.success) {

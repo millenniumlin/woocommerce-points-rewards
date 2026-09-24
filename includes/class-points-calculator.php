@@ -120,8 +120,7 @@ class WC_Points_Rewards_Points_Calculator {
             $database = WC_Points_Rewards_Database::instance();
             
             // 計算過期時間
-            $expiry_months = isset($this->settings['points_expiry_months']) ? intval($this->settings['points_expiry_months']) : 12;
-            $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
+            $expiry_date = wc_points_rewards_calculate_points_expiry_date();
             
             $description = sprintf(
                 __('訂單 #%s 獲得點數（基礎: %s, 等級加成: %s%%）', 'wc-points-rewards'),
@@ -206,11 +205,7 @@ class WC_Points_Rewards_Points_Calculator {
             $database = WC_Points_Rewards_Database::instance();
             
             // 計算過期時間
-            $expiry_months = isset($this->settings['points_expiry_months']) ? intval($this->settings['points_expiry_months']) : 12;
-            $expiry_date = null;
-            if ($expiry_months > 0) {
-                $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
-            }
+            $expiry_date = wc_points_rewards_calculate_points_expiry_date();
             
             $database->add_points(
                 $user_id,
@@ -252,11 +247,7 @@ class WC_Points_Rewards_Points_Calculator {
             
             if (!$existing_birthday_points) {
                 // 計算過期時間
-                $expiry_months = isset($this->settings['points_expiry_months']) ? intval($this->settings['points_expiry_months']) : 12;
-                $expiry_date = null;
-                if ($expiry_months > 0) {
-                    $expiry_date = date('Y-m-d H:i:s', strtotime("+{$expiry_months} months"));
-                }
+                $expiry_date = wc_points_rewards_calculate_points_expiry_date();
                 
                 $database->add_points(
                     $user_id,

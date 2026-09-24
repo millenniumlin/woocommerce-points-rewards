@@ -223,6 +223,134 @@ function wc_points_rewards_get_redemption_rate() {
 }
 
 /**
+ * 檢查目前用戶是否為網站管理員或 Multisite Super Admin
+ *
+ * @param int|null $user_id 用戶 ID。
+ * @return bool
+ */
+function wc_points_rewards_is_site_administrator($user_id = null) {
+    $user_id = $user_id ? intval($user_id) : get_current_user_id();
+
+    if ($user_id <= 0) {
+        return false;
+    }
+
+    if (is_multisite() && is_super_admin($user_id)) {
+        return true;
+    }
+
+    $user = get_user_by('id', $user_id);
+
+    return $user instanceof WP_User && in_array('administrator', (array) $user->roles, true);
+}
+
+/**
+ * 取得網站目前時區的 DateTimeImmutable。
+ *
+ * @param string|null $modify DateTime::modify() 字串。
+ * @return DateTimeImmutable
+ */
+function wc_points_rewards_get_site_datetime($modify = null) {
+    $datetime = current_datetime();
+
+    if (!empty($modify)) {
+        $modified = $datetime->modify($modify);
+        if ($modified instanceof DateTimeImmutable) {
+            return $modified;
+        }
+    }
+
+    return $datetime;
+}
+
+/**
+ * 取得網站目前時區的 MySQL datetime 字串。
+ *
+ * @param string|null $modify DateTime::modify() 字串。
+ * @return string
+ */
+function wc_points_rewards_get_site_mysql_datetime($modify = null) {
+    return wc_points_rewards_get_site_datetime($modify)->format('Y-m-d H:i:s');
+}
+
+/**
+ * 取得網站時區的當日開始與結束時間（MySQL 格式）。
+ *
+ * @return array<string,string>
+ */
+function wc_points_rewards_get_site_day_window_mysql() {
+    $current = wc_points_rewards_get_site_datetime();
+    $start   = $current->setTime(0, 0, 0);
+    $end     = $current->setTime(23, 59, 59);
+
+    return array(
+        'start' => $start->format('Y-m-d H:i:s'),
+        'end'   => $end->format('Y-m-d H:i:s'),
+        'date'  => $start->format('Y-m-d'),
+    );
+}
+
+/**
+ * 計算點數到期日（使用網站時區）。
+ *
+ * @return string|null
+ */
+function wc_points_rewards_calculate_points_expiry_date() {
+    $expiry_months = intval(wc_points_rewards_get_option('points_expiry_months', 12));
+
+    if ($expiry_months <= 0) {
+        return null;
+    }
+
+    return wc_points_rewards_get_site_datetime('+' . $expiry_months . ' months')->format('Y-m-d H:i:s');
+}
+
+/**
+ * 取得手動補發設定（以個別 option 為準）。
+ *
+ * @return array<string,mixed>
+ */
+function wc_points_rewards_get_manual_grant_settings() {
+    $defaults = array(
+        'enabled'             => 'yes',
+        'per_grant_max'       => 1000.0,
+        'per_admin_daily_max' => 1000.0,
+        'site_daily_max'      => 3000.0,
+    );
+
+    $settings = array(
+        'enabled'             => get_option('wc_points_rewards_enable_manual_admin_points', $defaults['enabled']),
+        'per_grant_max'       => floatval(get_option('wc_points_rewards_manual_admin_points_per_grant_max', $defaults['per_grant_max'])),
+        'per_admin_daily_max' => floatval(get_option('wc_points_rewards_manual_admin_points_per_admin_daily_max', $defaults['per_admin_daily_max'])),
+        'site_daily_max'      => floatval(get_option('wc_points_rewards_manual_admin_points_site_daily_max', $defaults['site_daily_max'])),
+    );
+
+    $settings['enabled']             = ('no' === $settings['enabled']) ? 'no' : 'yes';
+    $settings['per_grant_max']       = max(0, min($settings['per_grant_max'], 100000));
+    $settings['per_admin_daily_max'] = max(0, min($settings['per_admin_daily_max'], 100000));
+    $settings['site_daily_max']      = max(0, min($settings['site_daily_max'], 500000));
+
+    return $settings;
+}
+
+/**
+ * 格式化點數與金額等值。
+ *
+ * @param float $points 點數。
+ * @return string
+ */
+function wc_points_rewards_format_points_with_value($points) {
+    $formatted_value = wp_strip_all_tags(wc_price(wc_points_rewards_calculate_points_value($points)));
+
+    return sprintf(
+        __('%1$s %2$s（約 %3$s）', 'wc-points-rewards'),
+        wc_points_rewards_number_format($points),
+        wc_points_rewards_get_points_name(),
+        $formatted_value
+    );
+}
+
+/**
  * 計算點數價值
  */
 function wc_points_rewards_calculate_points_value($points) {

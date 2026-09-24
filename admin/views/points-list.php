@@ -14,6 +14,90 @@ if (!defined('ABSPATH')) {
     <h1 class="wp-heading-inline"><?php _e('點數記錄管理', 'wc-points-rewards'); ?></h1>
     
     <hr class="wp-header-end">
+
+    <?php if ('success' === $manual_grant_notice && $manual_grant_message) : ?>
+        <div class="notice notice-success is-dismissible"><p><?php echo esc_html($manual_grant_message); ?></p></div>
+    <?php elseif ('error' === $manual_grant_notice && $manual_grant_message) : ?>
+        <div class="notice notice-error"><p><?php echo esc_html($manual_grant_message); ?></p></div>
+    <?php endif; ?>
+
+    <div class="postbox manual-grant-box">
+        <div class="postbox-header">
+            <h2 class="hndle"><?php _e('手動補發點數', 'wc-points-rewards'); ?></h2>
+        </div>
+        <div class="inside">
+            <?php if ($manual_grant_is_authorized) : ?>
+                <div class="manual-grant-usage-grid">
+                    <div class="manual-grant-stat">
+                        <strong><?php _e('您的今日補發額度', 'wc-points-rewards'); ?></strong>
+                        <div><?php echo esc_html(wc_points_rewards_format_points_with_value($manual_grant_usage['admin_used'])); ?> / <?php echo esc_html(wc_points_rewards_format_points_with_value($manual_grant_settings['per_admin_daily_max'])); ?></div>
+                        <div class="description"><?php printf(esc_html__('剩餘：%s', 'wc-points-rewards'), wc_points_rewards_format_points_with_value($manual_grant_usage['admin_remaining'])); ?></div>
+                    </div>
+                    <div class="manual-grant-stat">
+                        <strong><?php _e('全站今日補發額度', 'wc-points-rewards'); ?></strong>
+                        <div><?php echo esc_html(wc_points_rewards_format_points_with_value($manual_grant_usage['site_used'])); ?> / <?php echo esc_html(wc_points_rewards_format_points_with_value($manual_grant_settings['site_daily_max'])); ?></div>
+                        <div class="description"><?php printf(esc_html__('剩餘：%s', 'wc-points-rewards'), wc_points_rewards_format_points_with_value($manual_grant_usage['site_remaining'])); ?></div>
+                    </div>
+                </div>
+
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="manual-grant-form">
+                    <?php wp_nonce_field('wc_points_rewards_manual_grant_points'); ?>
+                    <input type="hidden" name="action" value="wc_points_rewards_manual_grant_points">
+
+                    <table class="form-table">
+                        <tbody>
+                            <tr>
+                                <th scope="row">
+                                    <label for="grant_user_id"><?php _e('目標會員', 'wc-points-rewards'); ?></label>
+                                </th>
+                                <td>
+                                    <input type="number" id="grant_user_id" name="grant_user_id" min="1" step="1" required value="<?php echo esc_attr($manual_grant_form_values['user_id']); ?>">
+                                    <p class="description"><?php _e('請輸入 WordPress 使用者 ID。可先到「使用者」頁面依帳號或 Email 搜尋後取得 ID。', 'wc-points-rewards'); ?></p>
+                                    <?php if ($manual_grant_target_user) : ?>
+                                        <p>
+                                            <strong><?php echo esc_html($manual_grant_target_user->display_name); ?></strong>
+                                            <span>&lt;<?php echo esc_html($manual_grant_target_user->user_email); ?>&gt;</span><br>
+                                            <span class="description"><?php printf(esc_html__('目前點數餘額：%s', 'wc-points-rewards'), wc_points_rewards_format_points_with_value($manual_grant_target_points)); ?></span>
+                                        </p>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    <label for="grant_points"><?php _e('補發點數', 'wc-points-rewards'); ?></label>
+                                </th>
+                                <td>
+                                    <input type="number" id="grant_points" name="grant_points" min="0.01" step="0.01" required value="<?php echo esc_attr($manual_grant_form_values['points']); ?>">
+                                    <p class="description">
+                                        <?php
+                                        printf(
+                                            esc_html__('單筆上限：%s。功能目前%s。', 'wc-points-rewards'),
+                                            wc_points_rewards_format_points_with_value($manual_grant_settings['per_grant_max']),
+                                            'yes' === $manual_grant_settings['enabled'] ? __('已啟用', 'wc-points-rewards') : __('已停用', 'wc-points-rewards')
+                                        );
+                                        ?>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    <label for="grant_reason"><?php _e('補發原因', 'wc-points-rewards'); ?></label>
+                                </th>
+                                <td>
+                                    <textarea id="grant_reason" name="grant_reason" rows="4" class="large-text" maxlength="500" required><?php echo esc_textarea($manual_grant_form_values['reason']); ?></textarea>
+                                    <p class="description"><?php _e('原因為必填，會與操作者資訊一起寫入點數帳本作為稽核紀錄。', 'wc-points-rewards'); ?></p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <?php submit_button(__('確認補發點數', 'wc-points-rewards'), 'primary', '', false); ?>
+                </form>
+            <?php else : ?>
+                <p><?php _e('只有授權的網站管理者可以手動補發點數。', 'wc-points-rewards'); ?></p>
+            <?php endif; ?>
+        </div>
+    </div>
     
     <!-- 篩選選項 -->
     <div class="tablenav top">
@@ -146,5 +230,22 @@ if (!defined('ABSPATH')) {
     background: white;
     border: 1px solid #c3c4c7;
     margin-top: 20px;
+}
+
+.manual-grant-usage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.manual-grant-stat {
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    padding: 12px 16px;
+}
+
+.manual-grant-form input[type="number"] {
+    min-width: 220px;
 }
 </style>

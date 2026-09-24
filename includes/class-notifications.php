@@ -78,19 +78,23 @@ class WC_Points_Rewards_Notifications {
     private function check_points_expiry_notifications() {
         global $wpdb;
         
-        $notification_days = isset($this->settings['notification_days']) ? intval($this->settings['notification_days']) : 30;
+        $notification_days = isset($this->settings['expiry_notification_days'])
+            ? intval($this->settings['expiry_notification_days'])
+            : (isset($this->settings['notification_days']) ? intval($this->settings['notification_days']) : 30);
         $points_table = $wpdb->prefix . 'wc_points_rewards_points';
+        $window_start = wc_points_rewards_get_site_mysql_datetime();
+        $window_end = wc_points_rewards_get_site_datetime('+' . $notification_days . ' days')->format('Y-m-d H:i:s');
         
         // 獲取即將到期的點數
         $expiring_points = $wpdb->get_results($wpdb->prepare("
             SELECT user_id, SUM(points) as total_points, expiry_date
             FROM $points_table 
-            WHERE type = 'earned' 
+            WHERE (type = 'earned' OR (type = 'admin' AND points > 0))
             AND expiry_date IS NOT NULL 
-            AND expiry_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL %d DAY)
+            AND expiry_date BETWEEN %s AND %s
             GROUP BY user_id, DATE(expiry_date)
             HAVING total_points > 0
-        ", $notification_days));
+        ", $window_start, $window_end));
         
         foreach ($expiring_points as $record) {
             // 檢查是否已經發送過通知
@@ -284,10 +288,10 @@ class WC_Points_Rewards_Notifications {
         $subject = __('生日快樂！您獲得了生日贈送點數', 'wc-points-rewards');
         
         // 取得點數有效期限
-        $expiry_months = get_option('wc_points_rewards_points_expiry_months', 12);
+        $expiry_months = wc_points_rewards_get_option('points_expiry_months', 12);
         $expiry_text = '';
         if ($expiry_months > 0) {
-            $expiry_date = date('Y-m-d', strtotime("+{$expiry_months} months"));
+            $expiry_date = wc_points_rewards_get_site_datetime('+' . intval($expiry_months) . ' months')->format('Y-m-d');
             $expiry_text = sprintf(__('<br>點數將於 %s 到期，請記得使用。', 'wc-points-rewards'), $expiry_date);
         }
         
