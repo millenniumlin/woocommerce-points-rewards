@@ -564,18 +564,19 @@ class WC_Points_Rewards_Database {
     private static function ensure_points_table_admin_user_id_schema($points_table) {
         global $wpdb;
 
-        $column_exists = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM `{$points_table}` LIKE %s", 'admin_user_id'));
+        $safe_points_table = esc_sql($points_table);
+        $column_exists = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM `{$safe_points_table}` LIKE %s", 'admin_user_id'));
 
         if ('admin_user_id' !== $column_exists) {
             $wpdb->query(
-                "ALTER TABLE `{$points_table}` ADD COLUMN admin_user_id bigint(20) unsigned DEFAULT NULL COMMENT '操作管理員ID（人工補發/扣除/匯入）' AFTER order_id"
+                "ALTER TABLE `{$safe_points_table}` ADD COLUMN admin_user_id bigint(20) unsigned DEFAULT NULL COMMENT '操作管理員ID（人工補發/扣除/匯入）' AFTER order_id"
             );
         }
 
-        $index_exists = $wpdb->get_var($wpdb->prepare("SHOW INDEX FROM `{$points_table}` WHERE Key_name = %s", 'idx_admin_user_id'));
+        $index_exists = $wpdb->get_var($wpdb->prepare("SHOW INDEX FROM `{$safe_points_table}` WHERE Key_name = %s", 'idx_admin_user_id'));
 
         if (!$index_exists) {
-            $wpdb->query("ALTER TABLE `{$points_table}` ADD INDEX idx_admin_user_id (admin_user_id)");
+            $wpdb->query("ALTER TABLE `{$safe_points_table}` ADD INDEX idx_admin_user_id (admin_user_id)");
         }
 
         self::$points_table_supports_admin_user_id = true;
@@ -593,7 +594,7 @@ class WC_Points_Rewards_Database {
             return self::$points_table_supports_admin_user_id;
         }
 
-        $table_name = $wpdb->prefix . 'wc_points_rewards_points';
+        $table_name = esc_sql($wpdb->prefix . 'wc_points_rewards_points');
         $column_exists = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM `{$table_name}` LIKE %s", 'admin_user_id'));
 
         self::$points_table_supports_admin_user_id = ('admin_user_id' === $column_exists);
