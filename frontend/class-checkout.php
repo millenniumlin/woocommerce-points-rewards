@@ -272,7 +272,7 @@ class WC_Points_Rewards_Checkout {
             wp_send_json_error(__('請輸入有效的點數', 'wc-points-rewards'));
         }
 
-        if ($points_to_use > 999999999.99) {
+        if ($points_to_use > 99999999.99) {
             wp_send_json_error(__('點數數值過大', 'wc-points-rewards'));
         }
 

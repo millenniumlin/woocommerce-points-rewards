@@ -208,7 +208,7 @@ class WC_Points_Rewards_Database {
             return false;
         }
 
-        if (abs($points) > 999999999.99) {
+        if (abs($points) > 99999999.99) {
             return false;
         }
 

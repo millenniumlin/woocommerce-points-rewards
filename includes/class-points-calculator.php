@@ -59,6 +59,9 @@ class WC_Points_Rewards_Points_Calculator {
      */
     private function init_hooks() {
         add_action('woocommerce_order_status_completed', array($this, 'calculate_order_points'));
+        add_action('woocommerce_order_status_refunded', array($this, 'handle_order_refund_or_cancellation'));
+        add_action('woocommerce_order_status_cancelled', array($this, 'handle_order_refund_or_cancellation'));
+        add_action('woocommerce_order_status_failed', array($this, 'handle_order_refund_or_cancellation'));
         add_action('user_register', array($this, 'award_registration_points'));
         add_action('wc_points_rewards_birthday_bonus', array($this, 'award_birthday_points'));
         add_action('wc_points_rewards_daily_birthday_check', array($this, 'check_birthday_points'));
@@ -130,6 +133,66 @@ class WC_Points_Rewards_Points_Calculator {
     }
 
     /**
+     * 處理訂單退款或取消：退回已扣除點數，收回已發放點數，並扣除統計金額
+     */
+    public function handle_order_refund_or_cancellation($order_id) {
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return;
+        }
+
+        $user_id = $order->get_user_id();
+        if (!$user_id) {
+            return;
+        }
+
+        $database = WC_Points_Rewards_Database::instance();
+        $changed = false;
+
+        // 1. 退還客人使用的點數 (取消/退款)
+        $used_points = floatval($order->get_meta('_points_used'));
+        $refunded_used = $order->get_meta('_points_used_refunded');
+        if ($used_points > 0 && !$refunded_used) {
+            $database->add_points(
+                $user_id,
+                $used_points,
+                'admin',
+                sprintf(__('訂單 #%s 退款/取消，退回使用的點數', 'wc-points-rewards'), $order->get_order_number()),
+                $order_id
+            );
+            $order->update_meta_data('_points_used_refunded', 'yes');
+            $changed = true;
+        }
+
+        // 2. 扣回因為此訂單獲得的點數 (取消/退款)
+        $awarded_points = floatval($order->get_meta('_points_awarded'));
+        $reversed_awarded = $order->get_meta('_points_awarded_reversed');
+        if ($awarded_points > 0 && !$reversed_awarded) {
+            $database->deduct_points_with_lock(
+                $user_id,
+                $awarded_points,
+                'admin',
+                sprintf(__('訂單 #%s 退款/取消，收回發放的點數', 'wc-points-rewards'), $order->get_order_number()),
+                $order_id
+            );
+            $order->update_meta_data('_points_awarded_reversed', 'yes');
+            $changed = true;
+            
+            // 同時扣除會員年度消費統計 (因為訂單被取消了)
+            $order_total = $order->get_total();
+            $used_points_amount = floatval($order->get_meta('_points_discount_amount'));
+            $actual_paid_amount = $order_total - $used_points_amount;
+            
+            // 傳入負值來扣除
+            $database->update_user_yearly_stats($user_id, -$actual_paid_amount);
+        }
+
+        if ($changed) {
+            $order->save();
+        }
+    }
+
+    /**
      * 計算指定金額可獲得的點數 - 改進精度處理
      */
     public function calculate_points_for_amount($amount) {
@@ -150,7 +213,7 @@ class WC_Points_Rewards_Points_Calculator {
         $points_per_amount_scaled = intval(round($points_per_amount * $scale));
 
         $points = $amount_scaled / $points_per_amount_scaled;
-        $points = min($points, 999999999.99);
+        $points = min($points, 99999999.99);
 
         return round($points, $decimal_places);
     }
@@ -372,7 +435,7 @@ class WC_Points_Rewards_Points_Calculator {
         $point_value_scaled = intval(round($point_value * $scale));
 
         $discount_amount = ($points_scaled * $point_value_scaled) / ($scale * $scale);
-        $discount_amount = min($discount_amount, 999999999.99);
+        $discount_amount = min($discount_amount, 99999999.99);
 
         return round($discount_amount, $decimal_places);
     }
@@ -388,7 +451,7 @@ class WC_Points_Rewards_Points_Calculator {
             return false;
         }
 
-        if ($points_to_use > 999999999.99) {
+        if ($points_to_use > 99999999.99) {
             return false;
         }
 
