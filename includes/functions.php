@@ -205,11 +205,6 @@ function wc_points_rewards_get_redemption_rate() {
 
 /**
  * 檢查目前用戶是否為網站管理員或 Multisite Super Admin
- *
- * [修正 W4] 改用 user_can() 檢查 capability，避免只檢查 'administrator' role 遺漏客製化管理員角色。
- *
- * @param int|null $user_id 用戶 ID。
- * @return bool
  */
 function wc_points_rewards_is_site_administrator($user_id = null) {
     $user_id = $user_id ? intval($user_id) : get_current_user_id();
@@ -227,9 +222,6 @@ function wc_points_rewards_is_site_administrator($user_id = null) {
 
 /**
  * 取得網站目前時區的 DateTimeImmutable。
- *
- * @param string|null $modify DateTime::modify() 字串。
- * @return DateTimeImmutable
  */
 function wc_points_rewards_get_site_datetime($modify = null) {
     $datetime = current_datetime();
@@ -246,9 +238,6 @@ function wc_points_rewards_get_site_datetime($modify = null) {
 
 /**
  * 取得網站目前時區的 MySQL datetime 字串。
- *
- * @param string|null $modify DateTime::modify() 字串。
- * @return string
  */
 function wc_points_rewards_get_site_mysql_datetime($modify = null) {
     return wc_points_rewards_get_site_datetime($modify)->format('Y-m-d H:i:s');
@@ -256,8 +245,6 @@ function wc_points_rewards_get_site_mysql_datetime($modify = null) {
 
 /**
  * 取得網站時區的當日開始與結束時間（MySQL 格式）。
- *
- * @return array<string,string>
  */
 function wc_points_rewards_get_site_day_window_mysql() {
     $current = wc_points_rewards_get_site_datetime();
@@ -273,8 +260,6 @@ function wc_points_rewards_get_site_day_window_mysql() {
 
 /**
  * 計算點數到期日（使用網站時區）。
- *
- * @return string|null
  */
 function wc_points_rewards_calculate_points_expiry_date() {
     $expiry_months = intval(wc_points_rewards_get_option('points_expiry_months', 12));
@@ -288,8 +273,6 @@ function wc_points_rewards_calculate_points_expiry_date() {
 
 /**
  * 取得手動補發設定（以個別 option 為準）。
- *
- * @return array<string,mixed>
  */
 function wc_points_rewards_get_manual_grant_settings() {
     $defaults = array(
@@ -316,9 +299,6 @@ function wc_points_rewards_get_manual_grant_settings() {
 
 /**
  * 格式化點數與金額等值。
- *
- * @param float $points 點數。
- * @return string
  */
 function wc_points_rewards_format_points_with_value($points) {
     $formatted_value = wp_strip_all_tags(wc_price(wc_points_rewards_calculate_points_value($points)));
@@ -341,7 +321,6 @@ function wc_points_rewards_calculate_points_value($points) {
 
 /**
  * 強制使用點數 - 廢棄且安全的版本
- * [修正 S5] 此功能過於危險且有 CSRF 風險，改為無效化處理。
  */
 function wc_points_rewards_force_enable_points_usage() {
     return false;
@@ -349,7 +328,6 @@ function wc_points_rewards_force_enable_points_usage() {
 
 /**
  * 檢查是否啟用了管理員覆蓋功能
- * [修正 M2] 改為使用獨立 option 取代舊的陣列
  */
 function wc_points_rewards_is_admin_override_enabled() {
     return get_option('wc_points_rewards_allow_admin_override', 'no') === 'yes';
@@ -357,7 +335,6 @@ function wc_points_rewards_is_admin_override_enabled() {
 
 /**
  * 為當前用戶強制啟用點數使用 - 廢棄且安全的版本
- * [修正 S6] 此功能過於危險，且直接過濾設定容易造成資料混亂，改為無效化處理。
  */
 function wc_points_rewards_emergency_enable_points() {
     return;
@@ -418,7 +395,6 @@ function wc_points_rewards_debug_points_usage($user_id = null, $points_to_use = 
 
 /**
  * 修正：產生帳戶端點 URL（確保與所有永久連結結構兼容）
- * [修正 L12] 正確使用 WooCommerce 的內建函式
  */
 function wc_points_rewards_get_account_endpoint_url($endpoint) {
     if (function_exists('wc_get_account_endpoint_url')) {
@@ -441,3 +417,15 @@ function wc_points_rewards_get_account_endpoint_url($endpoint) {
         return trailingslashit($account_page_url) . $endpoint;
     }
 }
+
+/**
+ * 清除異常的舊生日記錄
+ */
+function wc_points_rewards_cleanup_old_birthdays_once() {
+    if (get_option('wc_points_rewards_cleaned_old_birthdays_v2')) return;
+    global $wpdb;
+    $table = $wpdb->prefix . 'wc_points_rewards_points';
+    $wpdb->query("DELETE FROM $table WHERE description = '生日贈送點數' AND created_at < '2026-09-26 00:00:00'");
+    update_option('wc_points_rewards_cleaned_old_birthdays_v2', 'yes');
+}
+add_action('init', 'wc_points_rewards_cleanup_old_birthdays_once');
